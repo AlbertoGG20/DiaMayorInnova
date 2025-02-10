@@ -56,4 +56,16 @@ group :development, :test do
   gem 'capistrano-yarn'
   gem 'capistrano-bundler', '~> 1.1.2'
   gem 'capistrano-rails', '~> 1.0'
+
+  # rspec-rails brings the RSpec testing framework to Ruby on Rails as a drop-in alternative to its default testing framework, Minitest.
+  gem 'rspec-rails', '~> 7.0.0'
+
+  # factory_bot is a fixtures replacement with a straightforward definition syntax
+  gem 'factory_bot_rails'
+
+  # fuubar is an instafailing RSpec formatter that uses a progress bar instead of a string of letters and dots as feedback.
+  gem 'fuubar'
+
+  # SimpleCov is a code coverage analysis tool for Ruby.
+  gem 'simplecov', require: false
 end
