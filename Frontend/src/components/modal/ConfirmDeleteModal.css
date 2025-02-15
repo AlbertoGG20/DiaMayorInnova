@@ -1,4 +1,4 @@
-/* ModalConfirmDelete.css */
+/* ConfirmDeleteModal.css */
 .modalConfirmDelete-overlay {
   position: fixed;
   top: 0;
@@ -16,16 +16,26 @@
   background: var(--Color-Neutral-White);
   padding: var(--gap-m);
   border-radius: var(--r-xs);
+  max-width: 500px;
   width: 400px;
   text-align: center;
+
+  & p {
+    padding: var(--gap-xxs);
+  }
+
+  & strong {
+    font-size: large;
+  }
 }
 
 .modalConfirmDelete-buttons button {
   margin: var(--gap-xxs);
+  box-shadow: var(--box-shadow-btn);
 }
 
 .btn-cancel {
-  background-color: var(--Color-red-600);
+  background-color: var(--Color-red-700);
   color: var(--Color-Neutral-White);
   border: none;
   padding: var(--gap-xxs) var(--gap-s);
@@ -33,7 +43,7 @@
 }
 
 .btn-confirm {
-  background-color: var(--Color-green-700);
+  background-color: var(--Color-green-900);
   color: var(--Color-Neutral-White);
   border: none;
   padding: 8px 16px;

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import userService from "../../../services/userService";
-import ModalConfirmDelete from '../../modal/ModalConfirmDelete';
+import ConfirmDeleteModal from '../../modal/ConfirmDeleteModal';
 import './ListUsers.css';
 
 const ListUsers = ({ users, setUsers, setSelectedUser }) => {
@@ -48,10 +48,11 @@ const ListUsers = ({ users, setUsers, setSelectedUser }) => {
         </ul>
       </section>
 
-      <ModalConfirmDelete
+      <ConfirmDeleteModal
         isOpen={isModalOpen}
-        user={userToDelete}
-        onDelete={deleteUser}
+        title="¿Estás seguro de que deseas eliminar este usuario?"
+        message={`El usuario "${userToDelete?.name}" será eliminado permanentemente.`}
+        onDelete={() => deleteUser(userToDelete.id)}
         onClose={() => setIsModalOpen(false)}
       />
     </>

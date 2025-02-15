@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_02_06_191031) do
+ActiveRecord::Schema[7.2].define(version: 2025_02_11_090828) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -63,14 +63,15 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_06_191031) do
   create_table "annotations", force: :cascade do |t|
     t.bigint "entry_id", null: false
     t.integer "number"
-    t.integer "credit"
-    t.integer "debit"
+    t.decimal "credit"
+    t.decimal "debit"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "account_id", null: false
     t.integer "account_number"
     t.index ["account_id"], name: "index_annotations_on_account_id"
     t.index ["entry_id"], name: "index_annotations_on_entry_id"
+    t.index ["number"], name: "index_annotations_on_number"
   end
 
   create_table "class_groups", force: :cascade do |t|
@@ -188,6 +189,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_06_191031) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "created_by"
+    t.text "additional_information"
+    t.boolean "is_exam", default: false
   end
 
   create_table "teacher_class_groups", force: :cascade do |t|

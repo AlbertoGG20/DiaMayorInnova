@@ -4,11 +4,9 @@ class ApplicationController < ActionController::API
   # Este método valida el token en cada solicitud
   def authenticate_user!
     token = request.headers['AUTH-TOKEN']
-    user = User.find_by(authentication_token: token)
+    @current_user = User.find_by(authentication_token: token)
     
-    if user
-      @current_user = user
-    else
+    unless @current_user
       render json: { error: 'Unauthorized' }, status: :unauthorized
     end
   end
@@ -18,10 +16,22 @@ class ApplicationController < ActionController::API
     @current_user
   end
 
-    include Response
+  # Método para verificar si el usuario tiene un rol específico
+  def authenticate_role!(role)
+    unless current_user && current_user.role == role.to_s
+      render json: { error: 'Unauthorized' }, status: :unauthorized
+    end
+  end
 
-    # Este código se asegura de manejar las excepciones de CanCanCan
-    rescue_from CanCan::AccessDenied do |exception|
+  # Método específico para verificar si el usuario es admin
+  def authenticate_admin!
+    authenticate_role!(:admin)
+  end
+
+  include Response
+
+   # Este código se asegura de manejar las excepciones de CanCanCan
+  rescue_from CanCan::AccessDenied do |exception|
     redirect_to root_path, alert: exception.message
   end
 end

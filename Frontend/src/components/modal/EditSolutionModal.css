@@ -24,6 +24,7 @@
   margin-bottom: 20px;
 }
 
+
 textarea {
   width: 100%;
   padding: 10px;
@@ -73,6 +74,7 @@ textarea {
   margin-bottom: 15px;
   border: 1px solid #ccc;
   border-radius: var(--r-xxs);
+  resize: none;
 }
 
 .statement-page-modal__actions {
@@ -170,6 +172,8 @@ textarea {
   opacity: 0.8;
 }
 
+
+
 .statement-page__button-delete i.fi-rr-trash {
   /* Boton borrar Apunte*/
   color: var(--Color-red-700);
@@ -184,19 +188,27 @@ textarea {
 .statement-page__button--remove-entry {
   display: flex;
   align-items: center;
+  background-color: var(--Color-Neutral-White);
+  border: none;
+  border-radius: var(--r-xs);
   gap: var(--gap-xxxs);
   padding: var(--gap-xxs) var(--gap-xs);
-  color: var(--Color-red-600);
+  color: var(--Color-red-700);
   font: inherit;
 }
 
 .statement-page__button--remove-entry i.fi-rr-trash {
   display: flex;
-  font-size: 1rem;
+  font-size: larger;
 }
 
 .statement-page__button--remove-entry:hover {
   color: var(--Color-red-400);
+}
+
+.statement-page__span--remove-entry {
+  color: var(--Color-red-700);
+  font-weight: bold;
 }
 
 .statement-page__entry-collapse {

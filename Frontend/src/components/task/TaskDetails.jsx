@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import taskService from "../../services/taskService";
+import ConfirmDeleteModal from "../modal/ConfirmDeleteModal";
 import "./TaskPage.css";
 
 const TaskDetails = ({ selectedTask, onDeleteStatement, onDeleteTask, onCloseModal }) => {
   const navigate = useNavigate();
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState(null);
 
   if (!selectedTask) return <p>Cargando detalles...</p>;
 
@@ -13,14 +16,19 @@ const TaskDetails = ({ selectedTask, onDeleteStatement, onDeleteTask, onCloseMod
   };
 
   const handleDeleteTask = async () => {
-    if (window.confirm("¿Estás seguro de que deseas eliminar esta tarea?")) {
-      try {
-        await taskService.deleteTask(selectedTask.id);
-        onDeleteTask(selectedTask.id);
-        onCloseModal();
-      } catch (err) {
-        console.error("Error al eliminar la tarea:", err);
-      }
+    setTaskToDelete(selectedTask);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDeleteTask = async () => {
+    try {
+      await taskService.deleteTask(taskToDelete.id);
+      onDeleteTask(taskToDelete.id);
+      onCloseModal();
+    } catch (err) {
+      console.error("Error al eliminar la tarea:", err);
+    } finally {
+      setIsDeleteModalOpen(false);
     }
   };
 
@@ -32,7 +40,7 @@ const TaskDetails = ({ selectedTask, onDeleteStatement, onDeleteTask, onCloseMod
       <section className="task-details__task-content">
         <p className="task-details__task-content--date">
           <strong>Fecha de apertura:{" "}</strong>
-          {new Date(selectedTask.opening_date).toLocaleDateString()}
+          {new Date(selectedTask.opening_date).toLocaleString()}
         </p>
         <p className="task-details__task-content--date">
           <strong>Fecha de cierre:{" "}</strong>
@@ -53,6 +61,7 @@ const TaskDetails = ({ selectedTask, onDeleteStatement, onDeleteTask, onCloseMod
                 <button
                   onClick={() => onDeleteStatement(selectedTask.id, statement.id)}
                   className="task-details__statement-item--delete-btn"
+                  aria-label="botón de eliminar enunciado de la tarea"
                 >
                   <i className="fi-rr-trash"></i>
                 </button>
@@ -71,6 +80,14 @@ const TaskDetails = ({ selectedTask, onDeleteStatement, onDeleteTask, onCloseMod
           Eliminar tarea
         </button>
       </footer>
+
+      <ConfirmDeleteModal
+        isOpen={isDeleteModalOpen}
+        title="¿Estás seguro de que deseas eliminar esta tarea?"
+        message={`La tarea "${taskToDelete?.title}" será eliminada permanentemente.`}
+        onDelete={confirmDeleteTask}
+        onClose={() => setIsDeleteModalOpen(false)}
+      />
     </article>
   );
 };

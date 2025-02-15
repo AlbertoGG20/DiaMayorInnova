@@ -1,8 +1,13 @@
-import { useRef } from "react";
+import { useRef, forwardRef, useImperativeHandle } from "react";
 import "./Modal.css";
 
-const Modal = ({ children, btnText = "Abrir Modal", modalTitle = "Modal" }) => {
+const Modal = forwardRef(({ children, btnText = "Abrir Modal", modalTitle = "Modal", showButton = true }, ref) => {
   const modalRef = useRef(null);
+
+  useImperativeHandle(ref, () => ({
+    showModal: () => modalRef.current?.showModal(),
+    close: () => modalRef.current?.close(),
+  }));
 
   const openModal = (e) => {
     e.preventDefault();
@@ -16,9 +21,11 @@ const Modal = ({ children, btnText = "Abrir Modal", modalTitle = "Modal" }) => {
 
   return (
     <>
-      <button className="btn light" onClick={openModal}>
-        {btnText}
-      </button>
+      {showButton && (
+        <button className="btn light" onClick={openModal}>
+          {btnText}
+        </button>
+      )}
 
       <dialog ref={modalRef} className="defaultModal">
         <header className="modal__header">
@@ -31,6 +38,6 @@ const Modal = ({ children, btnText = "Abrir Modal", modalTitle = "Modal" }) => {
       </dialog>
     </>
   )
-}
+});
 
-export default Modal
+export default Modal;

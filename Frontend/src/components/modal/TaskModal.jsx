@@ -1,14 +1,14 @@
 import React from "react";
 import "./TaskModal.css";
 
-const Modal = ({ show, onClose, children }) => {
+const TaskModal = ({ show, onClose, children }) => {
   if (!show) return null;
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         {children}
-        <button className="task-modal__button--close" onClick={onClose}>
+        <button className="task-modal__button--close" onClick={onClose} aria-label="Cerrar">
           Cerrar
         </button>
       </div>
@@ -16,4 +16,4 @@ const Modal = ({ show, onClose, children }) => {
   );
 };
 
-export default Modal;
+export default TaskModal;

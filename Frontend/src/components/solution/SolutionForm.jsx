@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import EntryForm from "../entry/EntryForm.jsx";
 
 const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
-  
+
   const handleSolutionChange = (event) => {
     setSolutions((solution) => {
       const updatedSolutions = [...solutions];
@@ -28,21 +28,21 @@ const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
     updatedSolutions[solutionIndex].entries.push({
       entry_number: updatedSolutions[solutionIndex].entries.length + 1,
       entry_date: "",
-      annotations: [{ number: 1, account_number: 0, credit: 0, debit: 0 }],
+      annotations: [{ number: 1, account_number: 0, credit: "", debit: "" }],
     });
     setSolutions(updatedSolutions);
     console.log("Soluciones actualizadas después de agregar asiento:", updatedSolutions);
   };
 
-/* En caso de querer un botón "Eliminar Asiento", por asiento  
- const removeEntry = (entryIndex) => {
-    const updatedSolutions = [...solutions];
-    updatedSolutions[solutionIndex].entries = updatedSolutions[solutionIndex].entries.filter(
-      (_, i) => i !== entryIndex
-    );
-    setSolutions(updatedSolutions);
-    console.log("Soluciones actualizadas después de eliminar asiento:", updatedSolutions);
-  }; */
+  /* En caso de querer un botón "Eliminar Asiento", por asiento  
+   const removeEntry = (entryIndex) => {
+      const updatedSolutions = [...solutions];
+      updatedSolutions[solutionIndex].entries = updatedSolutions[solutionIndex].entries.filter(
+        (_, i) => i !== entryIndex
+      );
+      setSolutions(updatedSolutions);
+      console.log("Soluciones actualizadas después de eliminar asiento:", updatedSolutions);
+    }; */
 
   const removeLastEntry = () => {
     const updatedSolutions = [...solutions];
@@ -75,11 +75,13 @@ const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
       <div className="statement-page__form-modal--solution">
         <h5>Solución {solutionIndex + 1}:</h5>
         <textarea
+          id="solution-description"
           name="description"
           className="statement-page__description"
           value={solution.description}
           onChange={handleSolutionChange}
           placeholder="Descripción de la solución"
+          aria-label="Descripción de la solución"
         />
         {/* <button type="button" onClick={removeSolution}>Eliminar Solución</button> */}
       </div>

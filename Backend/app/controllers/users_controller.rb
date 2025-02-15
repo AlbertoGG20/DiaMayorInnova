@@ -84,6 +84,8 @@ class UsersController < ApplicationController
 
   def set_user
     @user = User.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    json_response("User not found", false, {}, :not_found)
   end
 
   def user_params

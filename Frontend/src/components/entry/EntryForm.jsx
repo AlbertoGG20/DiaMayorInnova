@@ -26,18 +26,18 @@ const EntryForm = ({ solutionIndex, entry, entryIndex, solutions, setSolutions }
     updatedSolutions[solutionIndex].entries[entryIndex].annotations.push({
       number: updatedSolutions[solutionIndex].entries[entryIndex].annotations.length + 1,
       account_number: 0,
-      credit: 0,
-      debit: 0,
+      credit: "",
+      debit: "",
     });
     setSolutions(updatedSolutions);
   };
 
   return (
     <div className="statement-page__entry-expanded">
-      {/* Fecha del asiento */}
       <div className="statement-page__entry-expanded--date">
-        <label className="statement-page__date-label">Fecha:</label>
+        <label className="statement-page__date-label" htmlFor="entry_date">Fecha:</label>
         <input
+          id="entry_date"
           type="date"
           name="entry_date"
           value={entry.entry_date}
@@ -46,7 +46,6 @@ const EntryForm = ({ solutionIndex, entry, entryIndex, solutions, setSolutions }
         />
       </div>
 
-      {/* Encabezado de columnas */}
       <div className="statement-page__entry-columns">
         <span>Apt</span>
         <span>N° Cuenta</span>
@@ -56,7 +55,6 @@ const EntryForm = ({ solutionIndex, entry, entryIndex, solutions, setSolutions }
         <span>Acción</span>
       </div>
 
-      {/* Lista de Apuntes */}
       {entry.annotations.map((annotation, annotationIndex) => (
         <AnnotationForm
           key={annotationIndex}
@@ -69,7 +67,6 @@ const EntryForm = ({ solutionIndex, entry, entryIndex, solutions, setSolutions }
         />
       ))}
 
-      {/* Botón para añadir Apunte */}
       <button
         type="button"
         onClick={addAnnotation}

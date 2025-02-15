@@ -18,7 +18,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--gap-xl);
+  margin-bottom: var(--gap-s);
+  /* Estaba en xl */
 }
 
 /* ERROR 
@@ -93,7 +94,7 @@
   font-weight: bold;
 }
 
-.task-page__header--h4 {
+.task-page__header--h2 {
   font-size: var(--text-desktop-subtitles-2);
   font-weight: bold;
   padding: var(--gap-xs) 0 var(--gap-xs) 0;
@@ -138,7 +139,43 @@
   border: 1px solid var(--Color-grey-200);
   border-radius: var(--r-xs);
   font-size: var(--text-desktop-small);
-  font-family: var(--font-family)
+  font-family: var(--font-family);
+}
+
+.task-page__others {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--gap-m);
+  margin-top: var(--gap-xxs);
+}
+
+.task-page__container--exam {
+  display: flex;
+  /*align-items: flex-start;*/
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--gap-s);
+  width: auto;
+}
+
+.task-page__label--exam {
+  margin: 0;
+  width: auto;
+}
+
+.task-page__checkbox--exam {
+  margin: 0;
+  width: auto;
+  height: auto;
+  vertical-align: middle;
+}
+
+#additional_information {
+  resize: none;
+  font-size: var(--text-desktop-small);
+  margin-top: 0;
+  width: 100%;
+  height: 44px;
 }
 
 .task-page__input[type="date"],
@@ -146,6 +183,18 @@
   font-family: var(--font-family);
   font-size: var(--text-desktop-small);
   color: var(--Color-grey-500);
+}
+
+.task-page__buttons-container {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--gap-s);
+}
+
+.task-page__buttons-container--edition {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--gap-s);
 }
 
 .task-page__button--form {
@@ -156,7 +205,7 @@
   border: none;
   border-radius: var(--r-xs);
   cursor: pointer;
-  margin-top: var(--gap-xxs);
+  /* margin-top: var(--gap-xxs); */
   box-shadow: var(--box-shadow-btn);
 }
 
@@ -197,7 +246,7 @@
 }
 
 .task-page__button--edit {
-  padding: var(--gap-s) var(--gap-m);
+  padding: var(--gap-s) var(--gap-xxs);
   background-color: transparent;
   color: var(--Color-grey-400);
   border: none;
@@ -216,7 +265,6 @@
 
 .task-page__list-item {
   padding: var(--gap-s) 0;
-
   border-bottom: 1px solid var(--Color-grey-200);
   border-radius: var(--border-radius);
   display: flex;
@@ -234,7 +282,7 @@
 }
 
 .task-page__statement {
-  flex: 0 1 60%;
+  flex: 0 1 70%;
   font-size: var(--text-desktop-body-small);
   word-wrap: break-word;
 }
@@ -242,7 +290,7 @@
 .task-page__actions {
   display: flex;
   align-items: center;
-  gap: var(--gap-xs);
+  gap: var(--gap-xxxs);
   flex: 1;
 }
 
@@ -434,23 +482,37 @@
 }
 
 .modal {
-  background: var(--Color-Neutral-White);
+  /*background-color: var(--Color-Neutral-White);*/
   padding: var(--gap-m);
   border-radius: var(--r-xs);
-  max-width: 800px;
+  max-width: 1200px;
   width: 100%;
   position: relative;
 }
 
 .modal-solutionViewer__container {
-  background-color: var(--Color-grey-50);
-  border-radius: var(--r-xxs);
-  padding: var(--gap-xl)
+  background-color: var(--Color-Neutral-White);
+  border-radius: var(--r-s);
+  border: none;
+  padding: var(--gap-m) var(--gap-xxl);
 }
 
 .modal-solutionViewer__statement-content {
   padding: var(--gap-xs);
 
+}
+
+.modal-solutionViewer__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--gap-xxl);
+  border-bottom: 1px solid var(--Color-grey-100);
+  padding-bottom: var(--gap-s);
+}
+
+.modal-solutionViewer__statement-info {
+  padding-top: var(--gap-xs);
 }
 
 .modal-solutionViewer__statement-button {
@@ -477,7 +539,7 @@
 
 .modal-solutionViewer__solution-content {
   padding: var(--gap-m);
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
   background-color: var(--Color-Neutral-White);
   border-radius: var(--r-xs);
@@ -508,6 +570,11 @@
   font-weight: bold;
   padding: var(--gap-xxs) 0;
   color: var(--Color-Neutral-Dark);
+}
+
+.modal-solutionViewer__solution-item:nth-of-type(n+2) 
+  .modal-solutionViewer__solution--subtitle {
+  border-top: 1px solid var(--Color-grey-100);
 }
 
 .modal-solutionViewer__annotation--subtitle {
@@ -549,7 +616,7 @@
 
 .modal-solutionViewer__annotation-items-title {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
   gap: 10px;
   margin-bottom: var(--gap-xs);
   font-weight: bold;
@@ -565,17 +632,34 @@
 
 .modal-solutionViewer__annotation-item {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
   gap: 10px;
   text-align: center;
   padding: 5px 0;
 }
 
 .annotation-item--item {
-  padding: var(--gap-xxxs) 0;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  justify-content: center;
+  text-align: left;
+  padding: var(--gap-xxxs) 0 var(--gap-xxxs) var(--gap-xs);
   background-color: var(--Color-grey-50);
   border: 1px solid var(--Color-grey-100);
   border-radius: var(--r-xxs);
+}
+
+.annotation-item--item.empty {
+  background-color: transparent;
+  border: none;
+}
+
+.annotation-item--item.total-debit,
+.annotation-item--item.total-credit,
+.annotation-item--item.total-label {
+  padding: var(--gap-xxxs) var(--gap-xs) var(--gap-xxxs) 0;
+  align-items: flex-end;
 }
 
 .modal-solutionViewer__annotation-item:last-child {

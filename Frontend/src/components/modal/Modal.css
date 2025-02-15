@@ -24,3 +24,17 @@
   border-bottom: 1px solid var(--Color-grey-100);
   padding-bottom: var(--gap-s);
 }
+
+.account-list{
+  padding: var(--gap-m);
+}
+
+.account-item {
+  display: grid;
+  grid-template-columns: 80px auto;
+  gap: 10px;
+}
+
+.account-item_account {
+  text-align: left;
+}

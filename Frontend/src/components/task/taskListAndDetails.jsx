@@ -141,6 +141,7 @@ const TaskListAndDetails = () => {
                   onChange={handleSearchChange}
                   placeholder="Buscar por Título"
                   className="task-list__search-input"
+                  aria-label="Búsqueda por Título"
                 />
                 <i className="fi fi-rr-search task-list__search-icon"></i>
               </div>
