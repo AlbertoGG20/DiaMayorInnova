@@ -12,7 +12,6 @@ const StudentMark = () => {
   useEffect(() => {
     userExerciseDataService.getAllCalification()
       .then(({ data }) => {
-        // console.log(data) // Depuración
         setMarks(data)
         if (data.length !== 0)
           setIncludeMark(true)
@@ -29,7 +28,7 @@ const StudentMark = () => {
             <Modal
               key={"modal" + task.id}
               btnText={
-                <div className="mark_container">
+                <div className="mark_container" data-testid={`mark-${task.id}`}>
                   <p className='mark_mark'>{task.total_mark ? (task.total_mark).toFixed(2) : " - "}</p>
                   <p className='mark-text_title'>{task.task.title}</p>
                 </div>
