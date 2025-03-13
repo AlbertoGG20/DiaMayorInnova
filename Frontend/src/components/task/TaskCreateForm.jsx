@@ -186,7 +186,6 @@ const TaskCreateForm = ({ onTaskCreated }) => {
       <header className="task-page__header--header">
         <button className="btn light" onClick={() => navigate("/home")}>
           <i className="fi fi-rr-arrow-small-left"></i>
-          Volver
         </button>
         <div className="task-title">
           <h1>{editMode ? "Edición de Tarea" : "Creación de Tarea"}</h1>

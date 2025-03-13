@@ -25,12 +25,6 @@ const TaskForm = ({
       <form className="task-page__form--form">
         <header className="task-page__form--header">
           <h2 className="task-page__header">Crear Tarea</h2>
-          <AssignTaskUser
-            id={id}
-            assignedInclude={assignedInclude}
-            setCurrentUsers={setCurrentUsers}
-            currentUsers={currentUsers}
-          />
         </header>
         <div>
           <label className="task-page__label--title" htmlFor="title">Tarea:</label>
@@ -103,13 +97,19 @@ const TaskForm = ({
             {id && (
               <button
                 type="button"
-                className="task-page__button--form task-page__button--cancel"
+                className="task-page__button--form task-page__button--cancel btn light"
                 onClick={() => navigate("/home")}
               >
                 Cancelar
               </button>
             )}
           </div>
+          <AssignTaskUser
+            id={id}
+            assignedInclude={assignedInclude}
+            setCurrentUsers={setCurrentUsers}
+            currentUsers={currentUsers}
+          />
           <button
             type="button"
             // className="task-page__button--form"

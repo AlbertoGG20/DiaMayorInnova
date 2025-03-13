@@ -2,17 +2,15 @@ class TeacherClassGroupsController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    if current_user.student?
+    if current_user.teacher?
+      @teacherClassGroups = TeacherClassGroup.where(user_id: current_user.id)
+    elsif current_user.admin? || current_user.center_admin?
       @teacherClassGroups = TeacherClassGroup.all
-      render json: @teacherClassGroups
     else
-      if current_user.admin?
-        # render json: { message: "Operación exitosa"}
-        @teacherClassGroups = TeacherClassGroup.all
-      render json: @teacherClassGroups
-      end
+      render json: { error: "No autorizado" }, status: :forbidden
+      return
     end
-      # render json: @teacherClassGroups
+    render json: @teacherClassGroups
   end
 
   def create

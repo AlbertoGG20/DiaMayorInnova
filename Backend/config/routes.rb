@@ -1,12 +1,18 @@
 Rails.application.routes.draw do
 
-  resources :class_groups
   resources :accounting_plans do
     member do
       get 'export_csv'
     end
     collection do
       post 'import_csv'
+    end
+  end
+  
+  resources :class_groups do
+    member do
+      get 'users' # AÑADIDO
+      put 'update_users'
     end
   end
   
@@ -68,7 +74,12 @@ end
     resources :registrations
   end
 
-  resources :users, only: [:index, :show, :create, :update, :destroy]
+  resources :users, only: [:index, :show, :create, :update, :destroy] do
+    collection do
+      get 'current'
+      get '/users/by_class/:id', to: 'users#by_class'
+    end
+  end
   
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.

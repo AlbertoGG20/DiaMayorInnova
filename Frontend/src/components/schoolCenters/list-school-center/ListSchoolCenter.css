@@ -39,3 +39,24 @@
   display: flex;
   justify-content: space-between;
 }
+
+@media (max-width: 1024px) {
+  .school-center-list__container {
+      border-left: none; 
+  }
+
+  .schools-centers_list {
+      flex-direction: column; 
+  }
+}
+
+@media (max-width: 768px) {
+  .school-center-list__container {
+      padding: var(--gap-xs); 
+  }
+
+  .school-list_item {
+      font-size: var(--text-mobile-tiny);
+      padding: var(--gap-xxs);
+  }
+}

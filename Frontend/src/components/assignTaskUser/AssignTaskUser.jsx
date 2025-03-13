@@ -80,7 +80,7 @@ const AssignTaskUser = ({ assignedInclude, setCurrentUsers, currentUsers }) => {
             <div className="list__items">
               {
                 teacherClass && teacherClass.map((module) => (
-                  <button className={(currentClass === module.id) ? "btn " : "btn light"} onClick={(e) => handleSelectClass(e, module.id)} key={`class_btn_${module.id}`}>{module.module}</button>
+                  <button className={(currentClass === module.id) ? "btn " : "btn light"} onClick={(e) => handleSelectClass(e, module.id)} key={`class_btn_${module.id}`}>{module.course_module}</button>
                 ))
               }
             </div>

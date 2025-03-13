@@ -21,15 +21,7 @@ const get = async (id) => {
   }
 };
 
-const create = async (data) => {
-  try {
-    const response = await http.post("/school_centers", data);
-    return response;
-  } catch (error) {
-    console.error("Error en la creación:", error);
-    return null;
-  }
-};
+const create = (data) =>  http.post("/school_centers",{ school_center: data });
 
 const update = async (id, data) => {
   try {
@@ -41,15 +33,7 @@ const update = async (id, data) => {
   }
 };
 
-const remove = async (id) => {
-  try {
-    const response = await http.delete(`/school_centers/${id}`);
-    return response;
-  } catch (error) {
-    console.error("Error en la eliminación:", error);
-    return null;
-  }
-};
+const remove = (schoolId) => http.delete(`/school_centers/${schoolId}`);
 
 const removeAll = async () => {
   try {

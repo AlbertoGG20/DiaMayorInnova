@@ -16,9 +16,9 @@
 
 .task-page__form--header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
-  margin-bottom: var(--gap-s);
+  margin-bottom: var(--gap-xxs);
   /* Estaba en xl */
 }
 
@@ -32,7 +32,6 @@
 .task-page__input.error {
   border: 1px solid var(--Color-red-600);
   font-family: var(--font-family)
-    /* Rojo para indicar error */
 }
 
 /* Estilo para el mensaje de error genérico */
@@ -48,8 +47,10 @@
 
 .task-page__form {
   grid-area: task-form;
-  padding: var(--gap-xl);
-  border-radius: var(--border-radius);
+  padding: var(--gap-s);
+  border-radius: var(--r-xxs);
+  background-color: var(--Color-White);
+  box-shadow: var(--box-shadow-btn);
 }
 
 .task-page__form--form {
@@ -58,9 +59,10 @@
 
 .task-page__preview {
   grid-area: task-preview;
-  padding: var(--gap-m);
-  border-radius: var(--border-radius);
-  border-left: 1px solid var(--Color-grey-200);
+  padding: var(--gap-s);
+  border-radius: var(--r-xxs);
+  background-color: var(--Color-White);
+  box-shadow: var(--box-shadow-btn);
   overflow-y: auto;
   max-height: 100%;
 }
@@ -71,14 +73,15 @@
 
 .task-page__selection {
   grid-area: statements-selection;
-  padding: var(--gap-xl) var(--gap-xxxs) var(--gap-xl) var(--gap-xl);
-  border-top: 1px solid var(--Color-grey-200);
-  border-radius: var(--border-radius);
+  padding: var(--gap-xl);
+  border-radius: var(--r-xxss);
   height: 100%;
   display: flex;
   flex-direction: column;
   gap: var(--gap-s);
   overflow: hidden;
+  background-color: var(--Color-White);
+  box-shadow: var(--box-shadow-btn);
 }
 
 .task-page__selection--content {
@@ -135,7 +138,7 @@
 
 .task-page__input {
   width: 100%;
-  padding: var(--gap-xs);
+  padding: var(--gap-xxs);
   border: 1px solid var(--Color-grey-200);
   border-radius: var(--r-xs);
   font-size: var(--text-desktop-small);
@@ -175,7 +178,8 @@
   font-size: var(--text-desktop-small);
   margin-top: 0;
   width: 100%;
-  height: 44px;
+  height: 38px;
+  margin-bottom: 10px;
 }
 
 .task-page__input[type="date"],
@@ -187,7 +191,7 @@
 
 .task-page__buttons-container {
   display: flex;
-  justify-content: space-between;
+  justify-content: start;
   gap: var(--gap-s);
 }
 
@@ -434,41 +438,27 @@
 
 .task-page__header--header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--gap-l) var(--gap-xl);
-  grid-area: task-header;
-}
-
-.task-page__header--header .back-button {
-  background: none;
-  border: 1px solid var(--Color-grey-100);
-  border-radius: var(--r-xs);
-  font-size: var(--text-desktop-small);
-  cursor: pointer;
-  color: var(--Color-Neutral-Dark);
-  display: flex;
+  justify-content: flex-start;
   align-items: center;
   gap: var(--gap-xs);
-  font-family: var(--font-family);
+  padding: 0;
+  grid-area: task-header;
 }
 
 .task-page__header--header .fi {
   display: flex;
   gap: var(--gap-xs);
   justify-content: center;
-
 }
 
 .task-page__header--header .task-title {
   color: var(--Color-Neutral-Dark);
   text-align: center;
-  flex: 1;
+
 }
 
 .task-title h1 {
-  font-size: var(--text-desktop-medium);
-  font-weight: lighter;
+  font-size: var(--text-desktop-lead);
   margin-right: 80px;
 }
 
@@ -653,6 +643,11 @@
   background-color: var(--Color-grey-50);
   border: 1px solid var(--Color-grey-100);
   border-radius: var(--r-xxs);
+}
+
+.annotation-item--item.debit,
+.annotation-item--item.credit {
+  align-items: flex-end;
 }
 
 .annotation-item--item.empty {

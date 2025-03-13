@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../../context/AuthContext.jsx";
 import userService from "../../../services/userService.js";
+import SchoolsServices from "../../../services/SchoolsServices.js";
 import { API_BASE_URL } from "../../../config.js";
 import './AddUsers.css';
 
@@ -14,12 +15,27 @@ const AddUsers = ({ setUsers, selectedUser, setSelectedUser }) => {
     second_lastName: "",
     featured_image: null,
     role: "student",
+    school_center_id: "",
   };
 
   const [input, setInput] = useState(initialUserState);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [schoolCenters, setSchoolCenters] = useState([]);
   const auth = useAuth();
+
+  useEffect(() => {
+    const fetchSchoolCenters = async () => {
+      try {
+        const response = await SchoolsServices.getAll();
+        console.log("AQui los datos de los centros:", response.data)
+        setSchoolCenters(response.data);
+      } catch (error) {
+        console.error("Error al obtener centros educativos:", error);
+      }
+    };
+    fetchSchoolCenters();
+  }, []);
 
   useEffect(() => {
     if (selectedUser) {
@@ -31,9 +47,10 @@ const AddUsers = ({ setUsers, selectedUser, setSelectedUser }) => {
         first_lastName: selectedUser.first_lastName || "",
         second_lastName: selectedUser.second_lastName || "",
         featured_image: selectedUser.featured_image?.url
-        ? `${API_BASE_URL}${selectedUser.featured_image.url}`
-        : null,
+          ? `${API_BASE_URL}${selectedUser.featured_image.url}`
+          : null,
         role: selectedUser.role,
+        school_center_id: selectedUser.school_center_id || "",
       });
     } else {
       setInput(initialUserState);
@@ -81,7 +98,9 @@ const AddUsers = ({ setUsers, selectedUser, setSelectedUser }) => {
       formData.append("user[featured_image]", input.featured_image);
     }
     formData.append("user[role]", input.role);
-
+    if (input.school_center_id) {
+      formData.append("user[school_center_id]", input.school_center_id);
+    }
     try {
       if (selectedUser) {
         const response = await userService.updateUser(selectedUser.id, formData);
@@ -128,7 +147,7 @@ const AddUsers = ({ setUsers, selectedUser, setSelectedUser }) => {
                 value={input.email}
                 onChange={handleInput}
                 placeholder="ejemplo@yahoo.es"
-                
+
               />
             </label>
             <label htmlFor='password' className='user_label'>Contraseña
@@ -167,7 +186,7 @@ const AddUsers = ({ setUsers, selectedUser, setSelectedUser }) => {
                 value={input.name}
                 onChange={handleInput}
                 placeholder="Pedro"
-                
+
               />
             </label>
             <label htmlFor='first_lastName' className='user_label'>Primer Apellido
@@ -179,7 +198,7 @@ const AddUsers = ({ setUsers, selectedUser, setSelectedUser }) => {
                 value={input.first_lastName}
                 onChange={handleInput}
                 placeholder="Pica"
-                
+
               />
             </label>
             <label htmlFor='second_lastName' className='user_label'>Segundo Apellido
@@ -191,7 +210,7 @@ const AddUsers = ({ setUsers, selectedUser, setSelectedUser }) => {
                 value={input.second_lastName}
                 onChange={handleInput}
                 placeholder="Piedras"
-                
+
               />
             </label>
           </fieldset>
@@ -225,13 +244,27 @@ const AddUsers = ({ setUsers, selectedUser, setSelectedUser }) => {
               className="user_item"
               value={input.role}
               onChange={handleInput}
-              
+
             >
               <option value="admin">Admin</option>
+              <option value="center_admin">Center_Admin</option>
               <option value="teacher">Teacher</option>
               <option value="student">Student</option>
             </select>
           </label>
+
+          {auth?.user?.role !== "center_admin" && (
+          <label htmlFor="school_center_id" className="user_label">Centro Escolar
+            <select id="school_center_id" name="school_center_id" className="user_item" value={input.school_center_id} onChange={handleInput}>
+              <option value="">Seleccione un centro</option>
+              {schoolCenters.map((center) => (
+                <option key={center.id} value={center.id}>
+                  {center.school_name}
+                </option>
+              ))}
+            </select>
+          </label>
+          )}
 
           <button type="submit" className="createSchool_submit btn"><i className='fi fi-rr-plus'></i>{selectedUser ? "Actualizar Usuario" : "Registrar Usuario"}</button>
           {selectedUser && <button type="button" className="btn light" onClick={() => setSelectedUser(null)}>Cancelar</button>}

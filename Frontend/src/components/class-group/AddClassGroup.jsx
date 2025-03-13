@@ -7,7 +7,7 @@ const AddClassGroup = () => {
   const initialClassGroupState = {
     id: null,
     course: 0,
-    module: "",
+    course_module: "",
     modality: "",
     number_students: 0,
     max_students: 0,
@@ -34,7 +34,7 @@ const AddClassGroup = () => {
     const max_students = Number(classGroup.max_students);
     const weekly_hours = Number(classGroup.weekly_hours);
 
-    if (course <= 0 || !classGroup.module || !classGroup.modality ||
+    if (course <= 0 || !classGroup.course_module || !classGroup.modality ||
       number_students <= 0 || max_students <= 0 ||
       !classGroup.location || weekly_hours <= 0) {
       setError("Todos los campos son obligatorios y deben tener valores válidos.");
@@ -53,7 +53,7 @@ const AddClassGroup = () => {
     if (validateForm()) {
       let data = {
         course: parseInt(classGroup.course),
-        module: classGroup.module.trim(),
+        course_module: classGroup.course_module.trim(),
         modality: classGroup.modality.trim(),
         number_students: parseInt(classGroup.number_students),
         max_students: parseInt(classGroup.max_students),
@@ -66,7 +66,7 @@ const AddClassGroup = () => {
           setClassGroup({
             id: parseInt(response.data.id),
             course: parseInt(response.data.course),
-            module: response.data.module.trim(),
+            course_module: response.data.course_module.trim(),
             modality: response.data.modality.trim(),
             number_students: parseInt(response.data.number_students),
             max_students: parseInt(response.data.max_students),

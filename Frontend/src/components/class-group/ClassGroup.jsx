@@ -10,7 +10,7 @@ const ClassGroup = () => {
   const initialClassGroupState = {
     id: null,
     course: 0,
-    module: "",
+    course_module: "",
     modality: "",
     number_students: 0,
     max_students: 0,
@@ -50,7 +50,7 @@ const ClassGroup = () => {
     const max_students = Number(currentClassGroup.max_students);
     const weekly_hours = Number(currentClassGroup.weekly_hours);
 
-    if (course <= 0 || !currentClassGroup.module || !currentClassGroup.modality ||
+    if (course <= 0 || !currentClassGroup.course_module || !currentClassGroup.modality ||
       number_students <= 0 || max_students <= 0 ||
       !currentClassGroup.location || weekly_hours <= 0) {
       setError("Todos los campos son obligatorios y deben tener valores válidos.");

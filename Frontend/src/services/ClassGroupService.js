@@ -80,6 +80,28 @@ const findByTeacherId = async (id) => {
     }
 }
 
+const updateClassGroupUsers = async (id, data) => {
+    try {
+      const response = await http.put(`/class_groups/${id}/update_users`, {
+        users: data.users
+      });
+      return response;
+    } catch (error) {
+      console.error("Error actualizando usuarios:", error);
+      return null;
+    }
+  };
+
+  const getClassGroupUsers = async (id) => {
+    try {
+      const response = await http.get(`/class_groups/${id}/users`);
+      return response;
+    } catch (error) {
+      console.error("Error obteniendo usuarios del grupo:", error);
+      return null;
+    }
+  };
+
 const ClassGroupService = {
     getAll,
     get,
@@ -89,6 +111,8 @@ const ClassGroupService = {
     removeAll,
     findByModule,
     findByTeacherId,
+    updateClassGroupUsers,
+    getClassGroupUsers,
 };
 
 export default ClassGroupService;

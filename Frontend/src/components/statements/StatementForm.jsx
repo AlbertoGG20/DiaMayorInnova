@@ -251,11 +251,11 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
           <div className="statement-page__buttons--actions">
             <button type="submit" className="statement-page__button--form">{statement ? "Actualizar" : "Crear"}</button>
             {statement && (
-              <button type="button" onClick={handleCancel} className="statement-page__button--form">
+              <button type="button" onClick={handleCancel} className="statement-page__button--form btn light">
                 Cancelar
               </button>
             )}
-            <button type="button" onClick={handleAddSolution} className="statement-page__button--form">
+            <button type="button" onClick={handleAddSolution} className="statement-page__button--form btn light">
               <i className="fi fi-rr-plus"></i>
               Añadir Solución
             </button>

@@ -4,7 +4,7 @@ class SchoolCentersController < ApplicationController
 
   def index
     if params[:school_name].present?
-      @schools = SchoolCenter.where("school_name LIKE ?", "%#{params[:school_name]}%")
+      @schools = SchoolCenter.where("school_name ILIKE ?", "%#{params[:school_name]}%")
     else
       @schools = SchoolCenter.all
     end
@@ -13,7 +13,9 @@ class SchoolCentersController < ApplicationController
 
   def show
     @school = SchoolCenter.find(params[:id])
-    render @school
+    render json: @school, status: :ok
+  rescue ActiveRecord::RecordNotFound
+    render json: { error: "Centro escolar no encontrado" }, status: :not_found
   end
 
   def create

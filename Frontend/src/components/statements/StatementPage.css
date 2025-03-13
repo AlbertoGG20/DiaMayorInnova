@@ -20,8 +20,10 @@
 
 .statement-page__form {
   grid-area: statement-form;
-  padding: var(--gap-xl);
-  border-radius: var(--border-radius);
+  padding: var(--gap-s);
+  border-radius: var(--r-xxs);
+  background-color: var(--Color-White);
+  box-shadow: var(--box-shadow-btn);
 }
 
 .statement-page__form--form {
@@ -32,7 +34,6 @@
   position: sticky;
   top: 0;
 
-  background-color: var(--Color-Neutral-White);
   font-size: var(--text-desktop-subtitles-1);
   font-weight: bold;
   padding-bottom: var(--gap-m);
@@ -46,20 +47,23 @@
   position: sticky;
   top: 0;
   z-index: 10;
-  background-color: var(--Color-Neutral-White);
   font-size: var(--text-desktop-subtitles-1);
   font-weight: bold;
-  margin-bottom: var(--gap-m);
 }
 
 .statement-page__solutions {
   grid-area: statements-solutions;
-  padding: var(--gap-m);
-  border-radius: var(--border-radius);
-  border-left: 1px solid var(--Color-grey-200);
+  padding: var(--gap-s);
+  border-radius: var(--r-xxs);
+  background-color: var(--Color-White);
+  box-shadow: var(--box-shadow-btn);
   overflow-y: auto;
   max-height: 100%;
 
+  & .statement-page__solutions:first-child{
+    box-shadow: none;
+  }
+  
   & div {
     border-left: 0;
   }
@@ -125,14 +129,15 @@
 
 .statement-page__selection {
   grid-area: statement-selection;
-  padding: var(--gap-xl) var(--gap-xxxs) var(--gap-xl) var(--gap-xl);
-  border-top: 1px solid var(--Color-grey-200);
-  border-radius: var(--border-radius);
+  padding: var(--gap-xl);
+  border-radius: var(--r-xxs);
   height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--gap-s);
   overflow: hidden;
+  background-color: var(--Color-White);
+  box-shadow: var(--box-shadow-btn);
 }
 
 .statement-page__selection--content {
@@ -163,7 +168,7 @@
 }
 
 .statement-page__list-item--deleting {
-  opacity: 0.5;
+  opacity: 0.2;
   transition: opacity 0.3s ease;
 }
 
@@ -256,9 +261,10 @@
 
 .statement-page__header--header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
-  padding: var(--gap-l);
+  gap: var(--gap-xs);
+  padding: 0;
   grid-area: statement-header;
 }
 
@@ -283,11 +289,9 @@
 }
 
 .statement-page__header--header .statement-title {
-  font-size: var(--text-desktop-medium);
+  font-size: var(--text-desktop-lead);
   color: var(--Color-Neutral-Dark);
-  font-weight: lighter;
   text-align: center;
-  flex: 1;
 }
 
 /* Statement Form */

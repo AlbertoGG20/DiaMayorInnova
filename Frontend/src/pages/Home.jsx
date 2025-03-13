@@ -11,7 +11,7 @@ import StatementsSelection from "../components/task/StatementsSelection";
 function Home() {
   const { currentRole } = useContext(navContext);
 
-  if (currentRole === 'admin') {
+  if (currentRole === 'admin' || currentRole === 'center_admin') {
     return (
       <>
         <main className="home_section">
@@ -20,7 +20,6 @@ function Home() {
           </section>
           <aside className="aside"></aside>
           <Shortcuts />
-
         </main>
       </>
     )

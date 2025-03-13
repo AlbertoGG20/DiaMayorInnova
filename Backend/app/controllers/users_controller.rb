@@ -1,38 +1,45 @@
 class UsersController < ApplicationController
   skip_before_action :authenticate_user!, only: [:create]
-  before_action :authenticate_admin, except: [:index, :show]
+  before_action :authenticate_admin, except: [:current, :index, :show]
   before_action :set_user, only: [:show, :update, :destroy]
   
   def index
-    current_user = User.find_by(authentication_token: request.headers['AUTH-TOKEN'])
-
-    unless current_user && (current_user.admin? || current_user.role == "teacher")
+    unless current_user&.admin? || current_user&.teacher? || current_user&.school_admin?
       return json_response "Unauthorized", false, {}, :unauthorized
     end
 
-    if params[:name].present?
-      users = User.where("name ILIKE ?", "%#{params[:name]}%")
-    else
-      if params[:class_groups_id].present?
-        users = User.where(role: "student", class_groups_id: params[:class_groups_id])
-      else
-        users = User.all
+    users = User.all
+
+    if current_user.school_admin?
+      users = users.where(school_center_id: current_user.school_center_id)
+    elsif current_user.teacher?
+      users = users.where(role: 'student', school_center_id: current_user.school_center_id)
+    elsif current_user.admin?
+      if params[:school_center_id].present?
+        users = users.where(school_center_id: params[:school_center_id]).where.not(role: ['admin', 'center_admin'])
       end
+    end
+
+    if params[:name].present?
+      users = users.where("name ILIKE ?", "%#{params[:name]}%")
+    elsif params[:class_groups_id].present?
+      users = users.joins(:student_class_groups).where(student_class_groups: { class_group_id: params[:class_groups_id] })
     end
 
     users_data = users.map do |user|
       user_data = user.as_json
-      if user.featured_image.attached?
-        user_data[:featured_image] = { url: rails_blob_url(user.featured_image, only_path: true) }
-      else
-        user_data[:featured_image] = nil
-      end
+      user_data[:featured_image] = user.featured_image.attached? ? { url: rails_blob_url(user.featured_image, only_path: true) } : nil
       user_data
     end
+
     json_response "Users retrieved successfully", true, { users: users_data }, :ok
   end
 
   def show
+    if current_user.school_admin? && @user.school_center_id != current_user.school_center_id
+      return json_response "Unauthorized", false, {}, :unauthorized
+    end
+    
     user_data = @user.as_json
     if @user.featured_image.attached?
       user_data[:featured_image] = { url: rails_blob_url(@user.featured_image, only_path: true) }
@@ -48,6 +55,10 @@ class UsersController < ApplicationController
 
     user = User.new(user_params)
 
+    if current_user.center_admin?
+      user.school_center_id = current_user.school_center_id
+    end
+
     if user.save
       user_data = user.as_json
       if user.featured_image.attached?
@@ -62,6 +73,11 @@ class UsersController < ApplicationController
   end
 
   def update
+
+    if current_user.school_admin? && @user.school_center_id != current_user.school_center_id
+      return json_response "Unauthorized", false, {}, :unauthorized
+    end
+    
     if @user.update(user_params)
       user_data = @user.as_json
       if @user.featured_image.attached?
@@ -76,8 +92,32 @@ class UsersController < ApplicationController
   end
 
   def destroy
+    if current_user.school_admin? && @user.school_center_id != current_user.school_center_id
+      return json_response "Unauthorized", false, {}, :unauthorized
+    end
+
     @user.destroy
     json_response "User deleted successfully", true, {}, :ok
+  end
+
+  def current
+    user_data = current_user.as_json(only: [:id, :email, :name, :role, :school_center_id])
+    if current_user.featured_image.attached?
+      user_data[:featured_image] = { url: rails_blob_url(current_user.featured_image, only_path: true) }
+    else
+      user_data[:featured_image] = nil
+    end
+    render json: { user: user_data }, status: :ok
+  end
+
+  def by_class
+    class_group = ClassGroup.find(params[:id])
+    users = class_group.students
+    render json: {
+      data: {
+        users: users.map { |u| UserSerializer.new(u) }
+      }
+    }
   end
 
   private
@@ -89,12 +129,13 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(:email, :password, :password_confirmation, :name, :first_lastName, :second_lastName, :featured_image, :role)
-  end
+    permitted = params.require(:user).permit(:email, :password, :password_confirmation, :name, :first_lastName, :second_lastName, :featured_image, :role, :school_center_id)
+    permitted.delete(:featured_image) if permitted[:featured_image].is_a?(String)
+    permitted  end
 
   def authenticate_admin
     current_user = User.find_by(authentication_token: request.headers['AUTH-TOKEN'])
-    unless current_user && current_user.admin?
+    unless current_user&.admin? || current_user&.center_admin?
       json_response "Unauthorized", false, {}, :unauthorized
     end
   end

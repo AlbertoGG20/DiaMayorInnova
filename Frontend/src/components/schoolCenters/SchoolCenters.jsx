@@ -1,78 +1,50 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import SchoolServices from "../../services/SchoolsServices.js";
-import "./SchoolCenters.css";
 import ListSchoolCenter from "./list-school-center/ListSchoolCenter.jsx";
 import AddSchoolCenter from "./add-school-center/AddSchoolCenter.jsx";
 import FindNameSchoolCenter from "./find-name-school-center/FindNameSchoolCenter.jsx";
+import "./SchoolCenters.css";
 
 const SchoolCenters = () => {
-    const initialSchoolState = {
-        school_name: "",
-        address: "",
-        phone: "",
-        email: "",
-        website: "",
-        province: ""
-    }
-    const [formData, setFormData] = useState(initialSchoolState);
-    const [updateState, setUpdateState] = useState(false);
-    const [newSchool, setNewSchool] = useState(false);
+    const [schools, setSchools] = useState([]);
+    const [selectedSchool, setSelectedSchool] = useState(null);
+    const [searchSchoolName, setSeachSchoolName] = useState("");
+    const [error, setError] = useState("");
 
-
-    const addSchool = (e) => {
-        e.preventDefault();
-        SchoolServices.create(formData)
-            .then(response => {
-                setNewSchool(true);
-            }).catch(e => {
-                console.log(e);
-            });
-    }
-
-    const deleteSchool = (id) => {
-        SchoolServices.remove(id)
-            .then(response => {
-                setNewSchool(true);
-            }).catch(e => {
-                console.log(e);
-            });
-    }
-
-    const updateForm = (school) => {
-        setUpdateState(true);
-        if (formData != initialSchoolState) {
-            setFormData(initialSchoolState);
-        }
-        setFormData(school);
-    }
-
-    const editSchool = (e) => {
-        e.preventDefault();
-        SchoolServices.update(formData.id, formData)
-            .then(response => {
-                allSchools();
-            }).catch(e => {
-                console.log(e);
-            });
-        setFormData(initialSchoolState);
-    }
+   useEffect(() => {
+       SchoolServices.getAll()
+         .then(({ data }) => {
+           if (data) {
+            setSchools(data);
+           } else {
+             console.error("No se encontraron centros en la respuesta.");
+             setError("No se encontraron centros.");
+           }
+         })
+         .catch(e => {
+           console.error("Error fetching centros", e);
+           setError("Hubo un error al obtener los centros.");
+         });
+     }, []);
+   
+     const filteredCenters = schools.filter(school =>
+       school.school_name.toLowerCase().includes(searchSchoolName.toLowerCase())
+     );
 
     return (
         <main className="school-center_page">
             <ListSchoolCenter
-                newSchool={newSchool}
+                schools={filteredCenters}
+                setSchools={setSchools}
+                setSelectedSchool={setSelectedSchool}
             />
             <AddSchoolCenter
-                addSchool={addSchool}
-                editSchool={editSchool}
-                updateForm={updateForm}
-                deleteSchool={deleteSchool}
-                updateState={updateState}
-                formData={formData}
-                setFormData={setFormData}
+                setSchools={setSchools}
+                selectedSchool={selectedSchool}
+                setSelectedSchool={setSelectedSchool}
             />
-            <FindNameSchoolCenter />
+            <FindNameSchoolCenter searchSchoolName={searchSchoolName} setSeachSchoolName={setSeachSchoolName} />
         </main>
-    )
+    );
 };
 export default SchoolCenters;

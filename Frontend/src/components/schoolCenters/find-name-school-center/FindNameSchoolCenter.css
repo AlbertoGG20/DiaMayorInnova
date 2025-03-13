@@ -9,22 +9,40 @@
 }
 
 .search-school_form {
-  margin-top: var(--gap-xl);
-
   display: flex;
   flex-direction: column;
-  justify-content: start;
-  align-items: end;
-  gap: var(--gap-l);
-
+  justify-content: center;  
+  width: 100%;
+  height: 80%;
 }
 
-.search-form_input {
-  margin-top: 8px;
+.search-school_label #searchSchoolName{
   margin-bottom: 0;
 }
 
-.search-school_label {
-  font-size: var(--text-desktop-tiny);
+@media (max-width: 1024px) {
+  .search-school_container {
+      padding: var(--gap-m);
+  }
 
+  .search-school_form {
+      height: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .search-school_container {
+      border-left: none;
+      border-bottom: none;
+  }
+
+  .search-school_form {
+      flex-direction: column;
+      align-items: center;
+      gap: var(--gap-xs);
+  }
+
+  .search-school_label #searchSchoolName {
+      width: 100%;
+  }
 }
