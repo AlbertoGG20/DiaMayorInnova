@@ -1,33 +1,27 @@
 .account__page {
   padding: 24px;
   width: 100%;
-  height: 91vh;
+  height: 100vh; /* Full viewport height */
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: 0.1fr repeat(2, 1fr);
+  grid-template-rows: auto auto 1fr; /* Dynamic height for form & fixed scroll for list */
   grid-template-areas:
     "btn title empty"
     "form form form"
     "list list list";
+  overflow: hidden; /* Prevent full page scrolling */
 }
 
+/* Button Back */
 .account__btnHome {
   padding: var(--gap-xs);
-  margin: var(--gap-s);
+  margin-left: var(--gap-s);
   width: 120px;
   background-color: #fff;
   color: var(--Color-Principal);
-  border: var(--Color-grey-200) 1px solid;
-  border-radius: 6px;
-  align-self: start;
 }
 
-.account__btnHome:hover {
-  color: var(--Color-Principal-claro);
-  border: var(--Color-Principal-claro) 1px solid;
-  grid-area: btn;
-}
-
+/* Page Title */
 .account__page--title {
   font-size: var(--text-desktop-body-small);
   font-weight: 500;
@@ -39,6 +33,7 @@
   justify-content: center;
 }
 
+/* Add Account Section */
 .account__addAcc {
   grid-area: form;
   padding-bottom: 24px;
@@ -46,53 +41,62 @@
   border-bottom: solid 1px var(--Color-grey-200);
 }
 
+/* Account List with Scroll */
 .account__listAcc {
   grid-area: list;
-  overflow-y: hidden;
-
-  padding: var(--gap-s) var(--gap-s) var(--gap-s);
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: start;
+  height: calc(100vh - 400px); /* Adjusts the height dynamically */
+  overflow-y: auto; /* Enables scrolling only for the account list */
+  padding-right: 10px; /* Space for scrollbar */
+  position: relative;
 }
 
+/* Fixed Table */
+.account__table {
+  width: 100%;
+  border-collapse: collapse;
+  position: relative;
+}
 
-/* media queries */
+/* Keep table header sticky */
+.account__table thead {
+  position: sticky;
+  top: 0;
+  background-color: #fff; /* Ensures visibility */
+  z-index: 2;
+}
 
+/* Header Row Styling */
+.account__table th {
+  padding: 12px;
+  color: var(--Color-Principal);
+  font-weight: bold;
+  text-align: left;
+  border-bottom: 1px solid var(--Color-grey-400);
+  background-color: #FAFAFA;
+}
+
+/* Scrollbar Styling */
+.account__listAcc::-webkit-scrollbar {
+  width: 8px;
+}
+
+.account__listAcc::-webkit-scrollbar-thumb {
+  background: var(--Color-grey-400);
+  border-radius: 10px;
+}
+
+.account__listAcc::-webkit-scrollbar-thumb:hover {
+  background: var(--Color-grey-600);
+}
+
+/* Mobile & Tablet */
 @media (max-width: 768px) {
   .account__page {
-    padding: var(--gap-m);
-    grid-template-rows: 0.1fr 0.4fr 1fr;
-    overflow-y: scroll;
+    grid-template-rows: auto auto 1fr;
   }
 
-  .account__btnHome {
-    padding: var(--gap-xxs);
-    margin-left: var(--gap-s);
-    width: 84px;
-    font-size: var(--text-mobile-body-small);
+  .account__listAcc {
+    height: auto;
+    max-height: 300px; /* Sets max height for scrollability */
   }
-
 }
-
-@media (max-width: 360px) {
-  .account__page {
-    padding: var(--gap-xs);
-  }
-
-  .account__input {
-    font-size: var(--text-mobile-small);
-    width: 100%;
-  }
-
-  .account__page--title {
-    font-size: var(--text-mobile-small);
-  }
-
-  .account__addAcc {
-    height: 310px;
-  }
-
-}
-

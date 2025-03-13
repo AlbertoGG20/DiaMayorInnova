@@ -1,44 +1,41 @@
 .accountingPlan__page {
-  padding: 24px;
+  padding: var(--gap-xxl);
   width: 100%;
-  height: 91vh;
+  height: 91vh; /* Toute la hauteur de l'écran */
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: 0.1fr repeat(2, 1fr);
   grid-template-areas:
-    "btn title empty"
+    "title title title"
     "form form form"
     "list list list";
+  overflow: hidden; /* Empêche le défilement de toute la page */
 }
 
+.accountingPlan__page--header {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  grid-area: title;
+  gap: var(--gap-s);
+}
+
+/* Bouton retour */
 .accountingPlan__btnHome {
   padding: var(--gap-xs);
   margin-left: var(--gap-s);
-  width: 120px;
   background-color: #fff;
   color: var(--Color-Principal);
-  border: var(--Color-grey-200) 1px solid;
-  border-radius: 6px;
-  align-self: start;
 }
 
-.accountingPlan__btnHome:hover {
-  color: var(--Color-Principal-claro);
-  border: var(--Color-Principal-claro) 1px solid;
-  grid-area: btn;
-}
-
+/* Titre de la page */
 .accountingPlan__page--title {
   font-size: var(--text-desktop-body-small);
   font-weight: 500;
   color: var(--Color-Principal);
-  width: 100%;
-  grid-area: title;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
+/* Formulaire */
 .accountingPlan__addPGC {
   grid-area: form;
   padding-bottom: 24px;
@@ -46,45 +43,47 @@
   border-bottom: solid 1px var(--Color-grey-200);
 }
 
+/* Liste des PGC avec défilement */
 .accountingPlan__listPGC {
   grid-area: list;
-  overflow-y: hidden;
+  height: calc(100vh - 400px); /* Ajuste la hauteur pour prendre tout l'espace restant */
+  overflow-y: auto; /* Active le scroll uniquement pour la liste */
+  padding-right: 10px; /* Ajoute un espace pour ne pas coller le bord */
+  position: relative;
 }
 
+/* Rend le tableau plein écran avec une hauteur max */
+.accountingPlan__table {
+  width: 100%;
+  border-collapse: collapse;
+}
 
-/* media queries */
+/* Fixe l'en-tête du tableau */
+.accountingPlan__table thead {
+  position: sticky;
+  top: 0;
+  background-color: #fff; /* Assurez-vous que l'en-tête reste visible */
+  z-index: 2;
+}
 
+/* Amélioration du style des titres */
+.accountingPlan__table th {
+  padding: 12px;
+  color: var(--Color-Principal);
+  font-weight: bold;
+  text-align: left;
+  border-bottom: 1px solid var(--Color-grey-400);
+  background-color:#FAFAFA
+}
+
+/* Mobile et tablettes */
 @media (max-width: 768px) {
   .accountingPlan__page {
-    padding: var(--gap-m);
     grid-template-rows: 0.1fr 0.4fr 1fr;
-    overflow-y: scroll;
   }
 
-  .accountingPlan__btnHome {
-    padding: var(--gap-xxs);
-    margin-left: var(--gap-s);
-    width: 84px;
-    font-size: var(--text-mobile-body-small);
-  }
-
-}
-
-@media (max-width: 360px) {
-  .accountingPlan__page {
-    padding: var(--gap-xs);
-  }
-
-  .accountingPlan__input {
-    font-size: var(--text-mobile-small);
-    width: 100%;
-  }
-
-  .accountingPlan__page--title {
-    font-size: var(--text-mobile-small);
-  }
-
-  .accountingPlan__addPGC {
-    height: 310px;
+  .accountingPlan__listPGC {
+    height: auto;
+    max-height: 300px;
   }
 }

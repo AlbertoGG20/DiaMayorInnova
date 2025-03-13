@@ -63,9 +63,22 @@ const AccountsList = ({ newAcc }) => {
   }
 
   const handleSearchChange = (e) => {
-    setSearchAccount(e.target.value);
-    console.log(searchAccount)
+    const searchTerm = e.target.value.toLowerCase();
+    setSearchAccount(searchTerm);
+  
+    if (!searchTerm) {
+      retrieveAccounts(); // Si le champ est vide, récupérer tous les comptes
+      return;
+    }
+  
+    // Filtrage dynamique des comptes
+    setAccounts((prevAccounts) =>
+      prevAccounts.filter((acc) =>
+        acc.name.toLowerCase().includes(searchTerm)
+      )
+    );
   };
+  
 
   //Accounts sorted by Name column
   const sortAccounts = (order) => {
@@ -94,17 +107,17 @@ const AccountsList = ({ newAcc }) => {
         <div className='account__header'>
           <h2 className='account__header--h2'>Todas las cuentas</h2>
 
-          <form className='search-bar search-bar--acc' onSubmit={findByName}>
-            <input
-              aria-label='Filtrar por nombre de cuenta'
-              className='search-bar_search'
-              type='text'
-              value={searchAccount}
-              onChange={handleSearchChange}
-              placeholder='Filtrar por nombre de cuenta'
-            />
-            <i className='fi fi-rr-search' onClick={findByName}></i>
-          </form>
+          <form className='search-bar search-bar--acc'>
+  <input
+    className='search-bar_search'
+    type='text'
+    value={searchAccount}
+    onChange={handleSearchChange}
+    placeholder='Filtrer par nom de compte'
+  />
+  <i className='fi fi-rr-search'></i> {/* Icône juste décorative */}
+</form>
+
         </div>
 
         <div className='account__table'>

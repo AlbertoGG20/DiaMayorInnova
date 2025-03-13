@@ -109,15 +109,18 @@ th {
   cursor: pointer;
 }
 
-.accountingPlan__button--link:hover {
-  color: var(--Color-grey-900);
+.accountingPlan__button--link.pencil:hover,
+.accountingPlan__button--link.eye:hover,
+.accountingPlan__button--link.download:hover {
+  color: var(--Color-Principal-claro);
 }
 
 .accountingPlan__button--link.pencil,
 .accountingPlan__button--link.eye,
+.accountingPlan__button--link.download,
 .accountingPlan__button--remove.trash {
   margin-right: 8px;
-  color: var(--Color-grey-800);
+  color: var(--Color-Principal);
   font-size: var(--text-desktop-body-small);
 }
 
@@ -138,26 +141,18 @@ th {
   color: var(--Color-red-400);
 }
 
-.accountingPlan__button--edit {
-  display: flex;
-  align-items: center;
-  font-size: var(--text-desktop-small);
-  transition: color 0.3s;
-  background-color: var(--Color-Principal);
-  color: white;
-}
-
 .accountingPlan__form {
-  position: static;
-  padding: var(--gap-xl);
+  max-width: 50%;
+  margin-top: var(--gap-s);
+  padding: var(--gap-s);
   border-radius: var(--border-radius);
-  max-width: 800px;
-  margin: 0 auto;
 }
 
 .accountingPlan__form--row {
   display: flex;
-  gap: 12px;
+  gap: var(--gap-m);
+  align-items: center;
+  width: 100%;
 }
 
 .accountingPlan__form--group {
@@ -171,13 +166,38 @@ th {
   flex: 100%;
 }
 
-.accountingPlan__form--add {
-    margin-top: var(--gap-l);
-    display: flex;
-    justify-content: center;
+.accountingPlan__form--actions {
+  margin-top: var(--gap-m);
+  display: flex;
+  width: 100%;
 }
 
-.accountingPlan__form--actions {
+.accountingPlan__form--add,
+.accountingPlan__form--upload {
+    display: flex;
+    justify-content: start;
+}
+
+.accountingPlan__form--add {
+  width: 190px;
+}
+
+.accountingPlan__form--upload {
+  gap: var(--gap-m);
+  width: 100%;
+  align-items: center;
+
+  & .btn {
+    width: 190px;
+  }
+}
+
+.accountingPlan__file--input {
+  width: 100%;
+  margin-bottom: 0;
+}
+
+.accountingPlan__table--actions {
   display: flex;
   font-family: inherit;
   justify-content: left;
@@ -185,18 +205,6 @@ th {
 
 .accountingPlan__form--actions.details {
   gap: 12px;
-}
-
-.btn.accountingPlan__button--back {
-  background-color: #fff;
-  color: var(--Color-Principal);
-  border: var(--Color-grey-200) 1px solid;
-}
-
-.btn.accountingPlan__button--back:hover {
-  color: var(--Color-Principal-claro);
-  background-color: #fff;
-  border: var(--Color-Principal-claro) 1px solid;
 }
 
 .accountingPlan__error {

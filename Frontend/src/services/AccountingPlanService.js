@@ -20,6 +20,7 @@ const get = async (id) => {
     }
 };
 
+  
 const create = async (data) => {
     try {
         const response = await http.post("/accounting_plans", data);
@@ -70,6 +71,64 @@ const findByName = async (name) => {
     }
 };
 
+
+const getAccountsByPGC = (id) => {
+    return http.get(`/accounting_plans/${id}/accounts_by_PGC`);
+  };
+
+  
+const exportToCSV = async (id) => {
+    try {
+        const response = await http.get(`/accounting_plans/${id}/export_csv`, {
+            headers: {
+                "Accept": "text/csv" // csv response
+            },
+            responseType: "blob", // as file
+        });
+
+        // Verify csv
+        const contentType = response.headers["content-type"];
+        if (!contentType || !contentType.includes("text/csv")) {
+            console.error("El archivo no es un csv");
+            return;
+        }
+
+        // Create url and download file
+        const blob = new Blob([response.data], { type: "text/csv" });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", `pgc_${id}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (error) {
+        console.error("Error exportando CSV:", error);
+    }
+};
+
+const importCSV = async (file) => {
+    try {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const response = await http.post("/accounting_plans/import_csv", formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+        });
+
+        if (response.data.success) {
+            console.log("PGC importado correctamente:", response.data);
+            return response.data;
+        }
+
+    } catch (error) {
+        console.error("Error importando CSV:", error.response?.data || error.message);
+        return null;
+    }
+};
+
+
+
 const AccountingPlanService = {
     getAll,
     get,
@@ -77,7 +136,11 @@ const AccountingPlanService = {
     update,
     remove,
     removeAll,
-    findByName
+    findByName,
+    getAccountsByPGC,
+    exportToCSV,
+    importCSV
 };
+
 
 export default AccountingPlanService;

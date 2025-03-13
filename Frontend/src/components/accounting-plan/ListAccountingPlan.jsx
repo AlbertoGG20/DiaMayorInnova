@@ -1,17 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import AccountingPlanDataService from "../../services/AccountingPlanService"
 import { useNavigate } from "react-router-dom";
 import "./AccountingPlan.css";
+import AccountingPlan from "./AccountingPlan";
+import Modal from "../modal/Modal";
+import AccountsModal from "../modal/AccountModal";
 
-// PGC LIST
+
 const AccountingPlansList = ({ newPGC }) => {
   const [accountingPlans, setAccountingPlans] = useState([]);
+  const [selectedAccountingPlanId, setSelectedAccountingPlanId] = useState(null); // ID del plan a editar
+  const modalRef = useRef(null); // Referencia para la modal
+  const navigate = useNavigate();
   const [currentAccountingPlan, setCurrentAccountingPlan] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(-1);
   const [searchAccPlan, setSearchAccPlan] = useState("");
-  const navigate = useNavigate();
   const [sortOrder, setSortOrder] = useState("ascending") //Sort control state
-
+  const [accounts, setAccounts] = useState([]); // Stocker les comptes récupérés
+  const [isModalOpen, setIsModalOpen] = useState(false); // Gérer l'affichage de la modale
 
 
   useEffect(() => {
@@ -26,25 +32,6 @@ const AccountingPlansList = ({ newPGC }) => {
       .catch(e => {
         console.log(e);
       });
-  };
-
-  const findByName = (e) => {
-    e.preventDefault();
-    if (searchAccPlan) {
-      const searchTerm = searchAccPlan.toLowerCase(); //Convert search parameter to lowercase
-      AccountingPlanDataService.getAll() //Get all plans
-        .then(response => {
-          const filteredPlans = response.data.filter(plan => 
-            plan.name.toLowerCase().includes(searchTerm) //Compare pgc name and search parameters
-          );
-          setAccountingPlans(filteredPlans); //Get plans filter by search param
-        })
-        .catch(e => {
-          console.log(e);
-        });
-    } else {
-      retrieveAccountingPlans();
-    }
   };
 
   const setActiveAccountingPlan = (accountingPlan, index) => {
@@ -66,8 +53,22 @@ const AccountingPlansList = ({ newPGC }) => {
   };
 
   const handleSearchChange = (e) => {
-    setSearchAccPlan(e.target.value);
+    const searchTerm = e.target.value.toLowerCase();
+    setSearchAccPlan(searchTerm);
+  
+    if (!searchTerm) {
+      retrieveAccountingPlans(); // Si le champ est vide, récupérer tous les PGC
+      return;
+    }
+  
+    // Filtrage dynamique des plans comptables
+    setAccountingPlans((prevPlans) =>
+      prevPlans.filter((plan) =>
+        plan.name.toLowerCase().includes(searchTerm)
+      )
+    );
   };
+  
 
   //PGC sorted by Name column
   const sortAccountinPlans = (order) => {
@@ -89,35 +90,65 @@ const AccountingPlansList = ({ newPGC }) => {
     sortAccountinPlans(newOrder);
   }
 
+  const openEditModal = (id) => {
+    setSelectedAccountingPlanId(id);
+    modalRef.current?.showModal(); 
+  };
+
+  const closeEditModal = () => {
+    setSelectedAccountingPlanId(null);
+    modalRef.current?.close();
+  };
+
+  const handleSaveSuccess = () => {
+    retrieveAccountingPlans();
+  };
+  
+  // Download CSV
+  const handleExportToCSV = (id) => {
+    AccountingPlanDataService.exportToCSV(id);
+  };
+  
+  
+
+  const fetchAccountsByPGC = (pgcId) => {
+    AccountingPlanDataService.getAccountsByPGC(pgcId)
+      .then(response => {
+        setAccounts(response.data);
+        setIsModalOpen(true); // Ouvrir la modale après récupération des comptes
+      })
+      .catch(error => {
+        console.error("Erreur lors de la récupération des comptes :", error);
+      });
+  };
+
   return (
     <>
-
       <section className="accountingPlan__pgcList">
         <div className="accountingPlan__header">
           <h2 className="accountingPlan__header--h2">Todos los planes</h2>
 
-          <form className="search-bar search-bar--pgc" onSubmit={findByName}>
+          <form className="search-bar search-bar--pgc">
             <input
-              aria-label="Filtrar por nombre"
-              className="search-bar_search" 
+              className="search-bar_search"
               type="text"
               value={searchAccPlan}
               onChange={handleSearchChange}
-              placeholder="Filtrar por nombre"
+              placeholder="Buscar por nombre"
             />
-            <i className="fi fi-rr-search" onClick={findByName}></i>
+            <i className="fi fi-rr-search"></i> {/* Icône uniquement décorative */}
           </form>
+
         </div>
         
 
         <div className="accountingPlan__table">
-          {accountingPlans.length === 0 ? ( // Usability upgrade #3 -> Show message if there is no data
+          {accountingPlans.length === 0 ? (
             <p>No hay PGCs disponibles</p>
           ) : (
             <table className="accountingPlan_tbody">
               <thead>
                 <tr>
-                  {/*Order table by Name column */}
                   <th onClick={handleSortClick} style={{cursor: "pointer"}}>
                     Nombre PGC {sortOrder === "ascending" ? <i className="fi fi-rr-angle-small-down"/> : <i className="fi fi-rr-angle-small-up"/>}
                   </th>
@@ -127,17 +158,20 @@ const AccountingPlansList = ({ newPGC }) => {
                 </tr>
               </thead>
               <tbody>
-                {accountingPlans && accountingPlans.map((accountingPlan, index) => (
-                  <tr className="accountingPlan__pgcList-item" key={index} onClick={() => setActiveAccountingPlan(accountingPlan, index)}>
+                {accountingPlans.map((accountingPlan, index) => (
+                  <tr key={index}>
                     <td>{accountingPlan.name}</td>
                     <td>{accountingPlan.acronym}</td>
                     <td>{accountingPlan.description}</td>
-                    <td className="accountingPlan__form--actions">
-                      <button className="accountingPlan__button--link eye" onClick={()=>navigate("/accounts")}>
-                          <i className="fi-rr-eye" /> Ver cuentas
+                    <td className="accountingPlan__table--actions">
+                      <button className="accountingPlan__button--link eye" onClick={() => fetchAccountsByPGC(accountingPlan.id)}>
+                        <i className="fi-rr-eye" />
                       </button>
-                      <button className="accountingPlan__button--link pencil" onClick={()=>navigate("/accounting-plans/" + accountingPlan.id)}>
-                          <i className="fi-rr-pencil" /> Editar
+                      <button className="accountingPlan__button--link pencil" onClick={() => openEditModal(accountingPlan.id)}>
+                        <i className="fi-rr-pencil" />
+                      </button>
+                      <button className="accountingPlan__button--link download" onClick={() => handleExportToCSV(accountingPlan.id)}>
+                        <i className="fi-rr-download" /> CSV
                       </button>
                       <button aria-label="Eliminar PGC" className="accountingPlan__button--remove trash"
                         onClick={(e) => {
@@ -153,9 +187,18 @@ const AccountingPlansList = ({ newPGC }) => {
             </table>
           )}
         </div>
-
       </section>
+      <AccountsModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} accounts={accounts} />
 
+      <Modal ref={modalRef} modalTitle="Editar PGC" showButton = {false}>
+        {selectedAccountingPlanId && (
+          <AccountingPlan 
+            id={selectedAccountingPlanId} 
+            onSaveSuccess={handleSaveSuccess}
+            onCloseModal={closeEditModal}
+          />
+        )}
+      </Modal>
     </>
   );
 };

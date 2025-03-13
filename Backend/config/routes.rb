@@ -1,7 +1,15 @@
 Rails.application.routes.draw do
 
   resources :class_groups
-  resources :accounting_plans
+  resources :accounting_plans do
+    member do
+      get 'export_csv'
+    end
+    collection do
+      post 'import_csv'
+    end
+  end
+  
   resources :school_centers
   resources :accounts do
     get 'find_by_account_number', on: :collection
@@ -10,6 +18,10 @@ Rails.application.routes.draw do
   resources :help_examples do
     get 'find_by_account_id', on: :collection
   end
+  
+resources :accounting_plans do
+  get 'accounts_by_PGC', on: :member
+end
   
   resources :teacher_class_groups
   resources :annotations
@@ -65,3 +77,4 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   root to: 'sessions#create'
 end
+

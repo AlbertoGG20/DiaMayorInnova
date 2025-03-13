@@ -1,0 +1,47 @@
+.editForm__container{
+    padding: var(--gap-m);
+}
+
+.editForm__form--row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: flex-start; /* Asegura que los labels e inputs se alineen correctamente */
+    width: 100%;
+}
+
+.editForm__form--group {
+    flex: 1; 
+    display: flex;
+    flex-direction: column;
+    padding-top: var(--gap-m);
+}
+
+.editForm__form--group label {
+    font-weight: bold;
+    text-align: left;
+}
+
+.editForm__form--group.full-width {
+    flex: 100%;
+}
+
+.editForm__input {
+    width: 100%;
+}
+
+.editForm__form--save {
+    background-color: var(--Color-principal-700);
+    color: var(--Color-Neutral-White);
+    border: none;
+    padding: var(--gap-s);
+    margin-top: var(--gap-m);
+    cursor: pointer;
+    border-radius: var(--r-xxs);
+    font-size: var(--text-desktop-small);
+    width: 100%;
+  }
+  
+  .editForm__form--save:hover {
+    background-color: var(--Color-grey-100);
+  }
