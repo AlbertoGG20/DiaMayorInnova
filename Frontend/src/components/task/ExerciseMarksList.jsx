@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import getStudentsMarkList from "../../services/exerciseMarksList";
+import { getStudentsMarkList, exportMarksToExcel } from "../../services/exerciseMarksList";
 import "./MarkList.css"
 import DataTable from 'datatables.net-react';
 import DT from 'datatables.net-dt';
@@ -15,14 +15,22 @@ const ExerciseMarksList = () => {
 
     DataTable.use(DT);
 
-    const taskId = location.state?.task_id;
+    const exerciseId = location.state?.exercise_id || id;
+    
+    const handleExportExcel = async () => {
+        try {
+            await exportMarksToExcel(exerciseId); // Utiliser exerciseId au lieu de taskId
+        } catch (error) {
+            console.error("Erreur lors de l'exportation des notes :", error);
+        }
+    };
 
     useEffect(() => {
-        if (!taskId) return;
+        if (!exerciseId) return;
 
         const fetchMarkList = async () => {
             try {
-                const { data } = await getStudentsMarkList(taskId);
+                const { data } = await getStudentsMarkList(exerciseId);
                 setExerciseMarksList(data);
             } catch (error) {
                 console.error("Error devolviendo la lista", error);
@@ -30,7 +38,7 @@ const ExerciseMarksList = () => {
         };
 
         fetchMarkList();
-    }, [taskId]);
+    }, [exerciseId]);
 
     const columns = [
         { title: 'Fecha', data: 'date', className: 'left-align statement__date--header' },
@@ -72,7 +80,6 @@ const ExerciseMarksList = () => {
             }
         },
     ];
-    <progress value={0.5}></progress>
 
     return (
         <div className="mark_list__page">
@@ -81,6 +88,9 @@ const ExerciseMarksList = () => {
                     <i className="fi fi-rr-arrow-small-left" />
                 </button>
                 <h1 className="mark_list__page--title">Notas de los estudiantes</h1>
+                <button className="btn light" onClick={handleExportExcel}>
+                    <i className="fi fi-rr-download" /> Exporter en Excel
+                </button>
             </div>
 
             {exerciseMarksList.length > 0 && (

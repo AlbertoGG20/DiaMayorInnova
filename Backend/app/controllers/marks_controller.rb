@@ -1,3 +1,6 @@
+require 'caxlsx'
+
+
 class MarksController < ApplicationController
   before_action :authenticate_user!
   before_action :set_mark, only: [:show, :update]
@@ -72,6 +75,37 @@ class MarksController < ApplicationController
     @mark = Mark.find(params[:id])
     @mark.destroy
     render json: @marks
+  end
+
+  def export_xlsx
+    exercise_id = params[:exercise_id]
+    
+    if exercise_id.present?
+      begin
+        marks = Mark.where(exercise_id: exercise_id).includes(:exercise => :user)
+        
+        package = Axlsx::Package.new
+        workbook = package.workbook
+
+        workbook.add_worksheet(name: "Notes des élèves") do |sheet|
+          sheet.add_row ["Date", "Nom de l'élève", "Note", "Commentaire"]
+          marks.each do |mark|
+            user = mark.exercise.user
+            user_name = user ? "#{user.name} #{user.first_lastName} #{user.second_lastName}" : "Utilisateur non trouvé"
+            sheet.add_row [mark.created_at, user_name, mark.mark, mark.comment]
+          end
+        end
+
+        send_data package.to_stream.read,
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          disposition: 'attachment',
+          filename: "notes_eleves.xlsx"
+      rescue => e
+        render json: { error: "Une erreur s'est produite lors de l'exportation : #{e.message}" }, status: :internal_server_error
+      end
+    else
+      render json: { error: "L'ID de l'exercice est manquant" }, status: :bad_request
+    end
   end
 
   private

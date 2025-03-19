@@ -37,6 +37,9 @@ end
   resources :student_annotations
   resources :marks do
     put 'update_multiple', on: :collection
+    collection do
+      get 'export_xlsx' # Ajoute cette ligne pour la route d'exportation
+    end
   end
 
   resources :student_exercises, only: [:index, :show, :create, :update] do
