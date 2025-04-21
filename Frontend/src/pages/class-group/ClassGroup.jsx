@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import ClassGroupDataService from "../../services/ClassGroupService";
 import ClassGroupForm from "../../components/class-group/ClassGroupForm";
 import ClassGroupsList from "../../components/class-group/ClassGroupList";
 import { useAuth } from "../../context/AuthContext";
 import "./ClassGroup.css";
+import Breadcrumbs from "../../components/breadcrumbs/Breadcrumbs";
+import ButtonBack from "../../components/button-back/ButtonBack";
 
 const ClassGroup = () => {
   const auth = useAuth();
-  const navigate = useNavigate();
   const initialClassGroupState = () => ({
     id: null,
     course: 0,
@@ -27,7 +27,7 @@ const ClassGroup = () => {
   const [studentCounts, setStudentCounts] = useState({});
 
   const handleEditClassGroup = (group) => {
-    const editedGroup = auth.user.role !== "admin" 
+    const editedGroup = auth.user.role !== "admin"
       ? { ...group, school_center_id: auth.user.school_center_id }
       : group;
     setFormData(editedGroup);
@@ -89,12 +89,9 @@ const ClassGroup = () => {
   return (
     <main className="class-group-page">
       <header className="class-group-page__header">
-        <button className="btn light" onClick={() => navigate("/home")}>
-          <i className="fi fi-rr-arrow-small-left"></i>
-        </button>
+        <ButtonBack />
         <div className="class-group-page__title">
-          {/*<h1>{editMode ? "Edición de Grupo de clase" : "Creación de Grupo de clase"}</h1>*/}
-          <h1>Crear Grupo de Clase</h1>
+          <Breadcrumbs />
         </div>
       </header>
       <ClassGroupForm

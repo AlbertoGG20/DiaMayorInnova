@@ -38,16 +38,13 @@ const TaskDetails = ({ selectedTask, onDeleteStatement, onDeleteTask, onCloseMod
 
   return (
     <article className="task-details">
-      <header className="task-details__header">
-        <h3 className="task-details__header--title">{selectedTask.title}</h3>
-      </header>
       <section className="task-details__task-content">
         <p className="task-details__task-content--date">
-          <strong>Fecha de apertura:{" "}</strong>
+          <span>Fecha de apertura:{" "}</span>
           {new Date(selectedTask.opening_date).toLocaleString()}
         </p>
         <p className="task-details__task-content--date">
-          <strong>Fecha de cierre:{" "}</strong>
+          <span>Fecha de cierre:{" "}</span>
           {new Date(selectedTask.closing_date).toLocaleString()}
         </p>
       </section>
@@ -60,8 +57,10 @@ const TaskDetails = ({ selectedTask, onDeleteStatement, onDeleteTask, onCloseMod
                 key={`${statement.id}-${statement.created_at}`}
                 className="task-details__statement-item"
               >
-                <strong>Definición:</strong>
-                <p>{statement.definition}</p>
+                <div className="task-details__statement-item--info">
+                  <strong>Definición:</strong>
+                  <p>{statement.definition}</p>
+                </div>
                 <button
                   onClick={() => onDeleteStatement(selectedTask.id, statement.id)}
                   className="task-details__statement-item--delete-btn"

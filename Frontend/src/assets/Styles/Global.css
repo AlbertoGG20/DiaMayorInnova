@@ -175,6 +175,10 @@
 
   --Color-letra-claro: var(--Color-grey-100);
   --Color-letra-oscuro: var(--Color-Neutral-Black);
+
+  --icon-l: var(--text-desktop-body-large);
+  --icon-m: var(--text-desktop-body-small);
+  --icon-s: var(--text-desktop-small);
 }
 
 *,
@@ -237,6 +241,16 @@ a {
   justify-content: center;
   align-items: start;
   overflow: auto;
+
+  & .dt-search {
+    margin-bottom: var(--gap-xxxs);
+    height: auto;
+  }
+
+  & .dt-input {
+    margin-bottom: 0;
+    height: auto;
+  }
 }
 
 .left-align {
@@ -361,6 +375,23 @@ a {
     background-color: var(--Color-Neutral-White);
     color: var(--Color-Principal-oscuro);
   }
+}
+
+.btn__icon {
+  background: none;
+  box-shadow: none;
+  color: var(--Color-Principal);
+  font-size: var(--icon-m);
+
+  .fi {
+    font-size: var(--icon-m);
+  }
+}
+
+.btn__icon:hover {
+  background: none;
+  box-shadow: none;
+  color: var(--Color-Principal-claro);
 }
 
 .btn__tabs {
@@ -542,6 +573,45 @@ input::placeholder {
   background-color: var(--Color-grey-50);
   color: var(--Color-principal-100);
 }
+
+.dt-paging-button:hover:disabled {
+  background-color: var(--Color-grey-50);
+  color: var(--Color-principal-100);
+  cursor: default;
+}
+
+.statement-list__pagination {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  gap: var(--gap-xxs);
+
+  & .paging-text {
+    padding: 0 var(--gap-xxs);
+  }
+}
+
+
+
+.dt-paging-button {
+  display: flex;
+  width: 40px;
+  height: 30px;
+  padding: 0;
+  margin: 0;
+  justify-content: center;
+  align-items: center;
+  box-shadow: var(--box-shadow-btn);
+  border-radius: var(--r-xs);
+  background-color: var(--Color-White);
+  color: var(--Color-principal-700);
+
+  &:hover {
+    background-color: var(--Color-Neutral-White);
+    color: var(--Color-Principal-oscuro);
+  }
+}
+
 
 @media (width > 1025px) {
   .app-main {

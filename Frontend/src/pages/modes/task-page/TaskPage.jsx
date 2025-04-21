@@ -38,7 +38,7 @@ const TaskPage = () => {
               entry_number: entry.entry_number,
               entry_date: entry.entry_date
             })),
-            annotations: entries.flatMap(entry => 
+            annotations: entries.flatMap(entry =>
               entry.annotations.map(anno => ({
                 ...anno,
                 student_entry_id: entry.entry_number
@@ -63,6 +63,7 @@ const TaskPage = () => {
           setCloseDate(clDate);
 
           const now = new Date();
+          console.log("Current time:", now);
           const isClosed = now > clDate;
           const isAvailable = now >= opDate && now <= clDate;
 
@@ -129,8 +130,8 @@ const TaskPage = () => {
   let availabilityMessage = '';
   if (!canStartTask) {
     availabilityMessage = currentTime < openDate
-    ? `La tarea estará disponible el ${openDate?.toLocaleString?.() || "fecha no disponible"}`
-    : `La tarea cerró el ${closeDate?.toLocaleString?.() || "fecha no disponible"}`;
+      ? `La tarea estará disponible el ${openDate?.toLocaleString?.() || "fecha no disponible"}`
+      : `La tarea cerró el ${closeDate?.toLocaleString?.() || "fecha no disponible"}`;
   }
 
   const handleSaveProgress = async (statementId, data) => {
@@ -138,7 +139,7 @@ const TaskPage = () => {
       const existingMark = exercise.marks.find(
         (mark) => mark.statement_id === parseInt(statementId)
       );
-  
+
       const payload = {
         exercise: {
           marks_attributes: [
@@ -165,15 +166,15 @@ const TaskPage = () => {
           ],
         },
       };
-  
+
       const response = await userExerciseDataService.updateTask(exercise.id, payload);
-  
+
       if (response?.status === 200) {
         setExercise(prev => {
           // Verificación en profundidad de la respuesta
           const serverData = response.data?.exercise || {};
           const serverMarks = serverData.marks || [];
-          
+
           // Procesar marcas del servidor
           const processedMarks = serverMarks.map(mark => ({
             ...mark,
@@ -185,9 +186,9 @@ const TaskPage = () => {
                   .filter(anno => !anno._destroy)
               }))
           }));
-  
+
           // Crear nuevo estado
-          const newState = { 
+          const newState = {
             ...prev,
             marks: prev.marks.map(prevMark => {
               // Buscar si existe en la respuesta
@@ -197,14 +198,14 @@ const TaskPage = () => {
               return updatedMark || prevMark;
             })
           };
-  
+
           // Añadir nuevas marcas si no existían
           processedMarks.forEach(mark => {
             if (!newState.marks.some(m => m.statement_id === mark.statement_id)) {
               newState.marks.push(mark);
             }
           });
-  
+
           return newState;
         });
       }
@@ -226,41 +227,41 @@ const TaskPage = () => {
             <p className='exam-available'><strong>{availabilityMessage}</strong></p>
           )}
         </div>
-      ) }
-        <>
-          <div className="task-page_header">
-            <h1 className='head-task_tittle'>Modo Tarea - {exercise?.task?.title}</h1>
-          </div>
-          {exercise && (
-            <EntriesSection
-              taskSubmit={submitTask}
-              taskId={exercise.task.id}
-              existingExerciseId={exercise.id}
-              examStarted={canEditTask}
-              exercise={exercise}
-              selectedStatement={selectedStatement}
-              onStatementComplete={handleSaveProgress}
-              savedMarks={exercise?.marks || []}
-              handleSave={setHandleSave}
-              onEntriesChange={handleEntriesChange}
-            />
-          )}
-          <AuxSection
-            statements={exercise?.task.statements}
-            isTaskActive={canEditTask}
-            onSelectStatement={handleSelectStatement}
-            examStarted={taskStarted}
-            helpAvailable={exercise.task.help_available}
-            entries={Object.values(statementData).flatMap(data => 
-              data.entries?.map(entry => ({
-                ...entry,
-                annotations: data.annotations?.filter(
-                  anno => anno.student_entry_id === entry.entry_number && !anno._destroy
-                ) || []
-              })) || []
-            )}
+      )}
+      <>
+        <div className="task-page_header">
+          <h1 className='head-task_tittle'>Modo Tarea - {exercise?.task?.title}</h1>
+        </div>
+        {exercise && (
+          <EntriesSection
+            taskSubmit={submitTask}
+            taskId={exercise.task.id}
+            existingExerciseId={exercise.id}
+            examStarted={canEditTask}
+            exercise={exercise}
+            selectedStatement={selectedStatement}
+            onStatementComplete={handleSaveProgress}
+            savedMarks={exercise?.marks || []}
+            handleSave={setHandleSave}
+            onEntriesChange={handleEntriesChange}
           />
-        </>
+        )}
+        <AuxSection
+          statements={exercise?.task.statements}
+          isTaskActive={canEditTask}
+          onSelectStatement={handleSelectStatement}
+          examStarted={taskStarted}
+          helpAvailable={exercise.task.help_available}
+          entries={Object.values(statementData).flatMap(data =>
+            data.entries?.map(entry => ({
+              ...entry,
+              annotations: data.annotations?.filter(
+                anno => anno.student_entry_id === entry.entry_number && !anno._destroy
+              ) || []
+            })) || []
+          )}
+        />
+      </>
     </div>
   )
 }

@@ -6,6 +6,7 @@ import DataTable from 'datatables.net-react';
 import DT from 'datatables.net-dt';
 import Table from "../table/Table";
 import { renderToString } from "react-dom/server";
+import Breadcrumbs from "../breadcrumbs/Breadcrumbs";
 
 const ExerciseMarksList = () => {
     const { id } = useParams();
@@ -95,36 +96,39 @@ const ExerciseMarksList = () => {
                 <button className="btn light" onClick={() => navigate(-1)}>
                     <i className="fi fi-rr-arrow-small-left" />
                 </button>
-                <h1 className="mark_list__page--title">Notas de los estudiantes</h1>
+                <h1 className="mark_list__page--title"><Breadcrumbs /></h1>
                 <button className="btn light" onClick={handleExportToXlsx}>
                     <i className="fi fi-rr-download" /> Exportar en XLSX
                 </button>
             </div>
 
-            {exerciseMarksList.length > 0 && (
-                <h2 className="mark_list__page--task">{exerciseMarksList[0].task_tittle}</h2>
-            )}
+            {
+                exerciseMarksList.length > 0 && (
+                    <h2 className="mark_list__page--task">{exerciseMarksList[0].task_tittle}</h2>
+                )
+            }
             <div className="mask_list_table__container">
                 <Table
                     data={exerciseMarksList}
                     columns={columns}
                     id={id}
+                    isMarkTable={true}
                 />
             </div>
             <div className="mark-list__pagination">
-              <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => handlePageChange(1)}>
-                <i className='fi fi-rr-angle-double-small-left'/>
-              </button>
-              <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => handlePageChange(currentPage - 1)}>
-                <i className='fi fi-rr-angle-small-left'/>
-              </button>
-              <span>Página {currentPage} de {totalPages}</span>
-              <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => handlePageChange(currentPage + 1)}>
-                <i className='fi fi-rr-angle-small-right'/>
-              </button>
-              <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => handlePageChange(totalPages)}>
-                <i className='fi fi-rr-angle-double-small-right'/>
-              </button>
+                <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => handlePageChange(1)}>
+                    <i className='fi fi-rr-angle-double-small-left' />
+                </button>
+                <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => handlePageChange(currentPage - 1)}>
+                    <i className='fi fi-rr-angle-small-left' />
+                </button>
+                <span>Página {currentPage} de {totalPages}</span>
+                <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => handlePageChange(currentPage + 1)}>
+                    <i className='fi fi-rr-angle-small-right' />
+                </button>
+                <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => handlePageChange(totalPages)}>
+                    <i className='fi fi-rr-angle-double-small-right' />
+                </button>
             </div>
         </div >
     )

@@ -4,36 +4,30 @@
   left: 0;
   right: 0;
   bottom: 0;
-  /*background-color: rgba(0, 0, 0, 0.5);*/
-  backdrop-filter: blur(2px);
+  backdrop-filter: blur(1px);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+
 }
 
-.modal-content {
-  padding: 20px;
-  border-radius: var(--r-xs);
-  width: 80%;
-  height: auto;
-  max-width: 1200px;
-  max-height: 80vh;
-  box-shadow: var(--box-shadow-M3);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+.modal-overlay__container {
+  max-width: 900px;
+  min-width: 600px;
+  max-height: 800px;
+  background-color: var(--Color-Neutral-White);
+  border-radius: var(--r-s);
+  border: none;
+  padding: var(--gap-m) var(--gap-xxl);
   overflow: hidden;
 }
 
-.task-modal__button--close {
-  background-color: var(--Color-Neutral-Dark);
-  color: var(--Color-Neutral-White);
-  border-radius: var(--r-xs);
-  margin-top: var(--gap-xxs);
-  padding: var(--gap-xxs) var(--gap-xs);
-  box-shadow: var(--box-shadow-btn);
+.modal-content {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-height: 70vh;
 }
 
 .task-details__footer--edit-btn:hover,
@@ -43,12 +37,8 @@
 }
 
 .task-details {
-  background-color: var(--Color-principal-50);
-  border-radius: var(--r-xs);
-  box-shadow: var(--box-shadow-M3);
   max-height: 70vh;
   overflow-y: auto;
-  padding: var(--gap-xs);
 }
 
 .task-details__header {
@@ -60,18 +50,12 @@
   font-size: var(--text-desktop-subtitles-1);
 }
 
-.task-details__task-content {
-  padding: var(--gap-xs);
-  border-bottom: 1px solid var(--Color-principal-100);
-  font-size: var(--text-desktop-small);
-}
-
-.task-details__task-content--date strong {
-  padding-right: var(--gap-xxs);
-}
 
 .task-details__statement-content {
-  padding: var(--gap-xxs);
+  overflow: hidden;
+  max-height: 560px;
+  display: flex;
+  flex-direction: column;
 }
 
 .task-details__statements-title {
@@ -81,12 +65,14 @@
 }
 
 .task-details__statements-items {
-  padding: var(--gap-xs);
+  padding: var(--gap-xs) var(--gap-xs) 0 0;
+  height: 100%;
+  overflow-y: auto;
 }
 
 .task-details__statement-item {
-  background-color: var(--Color-principal-50);
-
+  background-color: var(--Color-grey-50);
+  border-radius: var(--gap-xxxs);
   gap: var(--gap-xxs);
 }
 
@@ -113,8 +99,8 @@
 
 .task-details__footer {
   display: flex;
-  gap: var(--gap-l);
-  padding: var(--gap-xxs);
+  gap: var(--gap-xs);
+  padding: var(--gap-xs) 0 var(--gap-xxxs) 0;
 }
 
 .task-details__footer--edit-btn,

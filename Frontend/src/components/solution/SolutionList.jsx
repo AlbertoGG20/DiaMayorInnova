@@ -1,10 +1,12 @@
 import React from "react";
 import SolutionForm from "./SolutionForm.jsx";
+import Modal from "../modal/Modal.jsx";
+import EditSolutionModal from "../modal/EditSolutionModal.jsx";
 
-const SolutionList = ({ solutions, onEditSolution, onDeleteSolution, solutionToDeleteIndex }) => {
+const SolutionList = ({ solutions, onEditSolution, onDeleteSolution, solutionToDeleteIndex, solutionIndex, setSolutions, onSave, onClose, solution }) => {
 
   return (
-    <div className="statement-page__solutions">
+    <>
       <h3 className="statement-page__solutions-header">Soluciones del Enunciado</h3>
       <ul className="statement-page__list">
         {solutions.map((solution, index) => (
@@ -13,16 +15,27 @@ const SolutionList = ({ solutions, onEditSolution, onDeleteSolution, solutionToD
               <h4 className="statement-page__definition-solution">{`Solución ${index + 1}`}</h4>
             </div>
             <div className="statement-page__actions">
-              <button onClick={() => onEditSolution(index)} className="statement-page__button-text">Editar</button>
-              <button onClick={() => onDeleteSolution(index)} className="statement-page__button-text--delete">
-                <i className="fi fi-rr-trash"></i>
-                Eliminar
-              </button>
+              <Modal
+                saveBtn={true}
+                btnNoBg={true}
+                btnText={<i className="fi fi-rr-pencil"></i>}
+                modalTitle="Editar Solución"
+              >
+                <EditSolutionModal
+                  solution={solution}
+                  solutionIndex={solutionIndex}
+                  solutions={solutions}
+                  setSolutions={setSolutions}
+                  onClose={onClose}
+                  onSave={onSave}
+                />
+              </Modal>
+              <button onClick={() => onDeleteSolution(index)} className="statement-page__button-text--delete btn__icon"><i className="fi fi-rr-trash"></i></button>
             </div>
           </li>
         ))}
       </ul>
-    </div>
+    </>
   );
 };
 

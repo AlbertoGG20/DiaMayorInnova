@@ -58,7 +58,7 @@ const ExamStatement = ({ statement_id, statement_title, index, mark, student_ent
             </div>
           </div>
         </div>
-        <p>{statement_title.definition}</p>
+        <p>{statement_title?.definition || 'Sin enunciado'}</p>
       </header >
       {
         isOpen && (

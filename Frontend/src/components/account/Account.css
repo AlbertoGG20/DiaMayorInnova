@@ -78,7 +78,7 @@
   }
 }
 
-th {
+.account__page th {
   color: var(--Color-Principal);
   border-bottom: solid 1px var(--Color-Principal);
   padding: var(--gap-xs) 0;
@@ -113,8 +113,7 @@ th {
 
 .account__button--link.pencil,
 .account__button--link.inter,
-.account__button--remove.trash
-{
+.account__button--remove.trash {
   margin-right: 8px;
   color: var(--Color-Principal);
   font-size: var(--text-desktop-body-small);
@@ -189,6 +188,7 @@ th {
 
 .account__pagination {
   padding-left: var(--gap-m);
+
   & span {
     padding: var(--gap-s);
     color: var(--Color-Principal);
@@ -219,6 +219,7 @@ th {
 
 .account__tbody {
   height: 100%;
+
   & tbody {
     height: 100%;
   }

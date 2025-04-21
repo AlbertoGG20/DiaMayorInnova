@@ -6,6 +6,9 @@ import SolutionList from "../solution/SolutionList";
 import EditSolutionModal from "../modal/EditSolutionModal";
 import http from "../../http-common";
 import "./StatementPage.css";
+import ButtonBack from "../button-back/ButtonBack";
+import Breadcrumbs from "../breadcrumbs/Breadcrumbs";
+import Modal from "../modal/Modal";
 
 const StatementCreateForm = () => {
   const navigate = useNavigate();
@@ -88,7 +91,7 @@ const StatementCreateForm = () => {
 
   const handleDeleteSolution = (index) => {
     setSolutionToDeleteIndex(index);
-    setPrevSolutions((prevSolutions) => 
+    setPrevSolutions((prevSolutions) =>
       prevSolutions.map((solution, i) =>
         i === index ? { ...solution, _destroy: true } : solution
       )
@@ -120,10 +123,8 @@ const StatementCreateForm = () => {
   return (
     <main className="statement-page">
       <header className="statement-page__header--header">
-        <button className="btn light" onClick={() => navigate("/home")}>
-          <i className="fi fi-rr-arrow-small-left"></i>
-        </button>
-        <h1 className="statement-title">Creación de Enunciado</h1>
+        <ButtonBack />
+        <Breadcrumbs />
       </header>
 
       <section className="statement-page__form">
@@ -144,17 +145,15 @@ const StatementCreateForm = () => {
           onEditSolution={handleEditSolution}
           onDeleteSolution={handleDeleteSolution}
           solutionToDeleteIndex={solutionToDeleteIndex}
+          solution={solutions[selectedSolutionIndex]}
+          solutionIndex={selectedSolutionIndex}
+          setSolutions={setPrevSolutions}
+          onClose={handleCloseModal}
+          onSave={handleSaveSolution}
         />
-        {isModalOpen && selectedSolutionIndex !== null && (
-          <EditSolutionModal
-            solution={solutions[selectedSolutionIndex]}
-            solutionIndex={selectedSolutionIndex}
-            solutions={solutions}
-            setSolutions={setPrevSolutions}
-            onClose={handleCloseModal}
-            onSave={handleSaveSolution}
-          />
-        )}
+        {/* {isModalOpen && selectedSolutionIndex !== null && (
+         
+        )} */}
       </aside>
 
       <section className="statement-page__selection">

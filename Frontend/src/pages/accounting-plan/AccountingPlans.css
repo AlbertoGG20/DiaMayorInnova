@@ -1,15 +1,16 @@
 .accountingPlan__page {
-  padding: var(--gap-xxl);
+  padding: var(--gap-s);
   width: 100%;
-  height: 91vh; /* Toute la hauteur de l'écran */
+  height: 91vh;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: 0.1fr repeat(2, 1fr);
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: 0.1fr 0.8fr 1.2fr;
   grid-template-areas:
-    "title title title"
-    "form form form"
-    "list list list";
-  overflow: hidden; /* Empêche le défilement de toute la page */
+    "title title "
+    "form preview"
+    "list list";
+  overflow: hidden;
+  gap: var(--gap-s);
 }
 
 .accountingPlan__page--header {
@@ -38,18 +39,25 @@
 /* Formulaire */
 .accountingPlan__addPGC {
   grid-area: form;
-  padding-bottom: 24px;
-  height: 340px;
-  border-bottom: solid 1px var(--Color-grey-200);
+  padding: var(--gap-s);
+  height: auto;
+  background-color: var(--Color-White);
+  border-radius: var(--gap-xxs);
+  box-shadow: var(--box-shadow-btn);
 }
 
 /* Liste des PGC avec défilement */
 .accountingPlan__listPGC {
   grid-area: list;
-  height: calc(100vh - 400px); /* Ajuste la hauteur pour prendre tout l'espace restant */
-  overflow-y: auto; /* Active le scroll uniquement pour la liste */
-  padding-right: 10px; /* Ajoute un espace pour ne pas coller le bord */
+  height: auto;
+  overflow-y: hidden;
+  padding-right: 10px;
   position: relative;
+  background-color: var(--Color-White);
+  box-shadow: var(--box-shadow-btn);
+  border-radius: var(--r-xs);
+  display: flex;
+  width: 100%;
 }
 
 /* Rend le tableau plein écran avec une hauteur max */
@@ -62,18 +70,9 @@
 .accountingPlan__table thead {
   position: sticky;
   top: 0;
-  background-color: #fff; /* Assurez-vous que l'en-tête reste visible */
+  background-color: #fff;
+  /* Assurez-vous que l'en-tête reste visible */
   z-index: 2;
-}
-
-/* Amélioration du style des titres */
-.accountingPlan__table th {
-  padding: 12px;
-  color: var(--Color-Principal);
-  font-weight: bold;
-  text-align: left;
-  border-bottom: 1px solid var(--Color-grey-400);
-  background-color:#FAFAFA
 }
 
 /* Mobile et tablettes */

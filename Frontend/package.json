@@ -20,7 +20,8 @@
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.28.0",
     "react-tooltip": "^5.28.0",
-    "url-pattern": "^1.0.3"
+    "url-pattern": "^1.0.3",
+    "use-react-router-breadcrumbs": "^4.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",

@@ -7,16 +7,6 @@
   }
 }
 
-.dt-paging-button {
-  background-color: var(--Color-White);
-  color: var(--Color-principal-700);
-
-  &:hover {
-    background-color: var(--Color-Neutral-White);
-    color: var(--Color-Principal-oscuro);
-  }
-}
-
 .dt-info {
   border-top: 1px solid var(--Color-grey-200);
   padding: var(--gap-s) 0;
@@ -46,12 +36,6 @@
   }
 }
 
-.dt-paging-button {
-  margin-right: var(--gap-xxxs);
-  box-shadow: var(--box-shadow-btn);
-  padding: var(--gap-xxs) var(--gap-s);
-  border-radius: var(--r-xs);
-}
 
 .dataTable tr:nth-child(2n) {
   background-color: var(--Color-White);

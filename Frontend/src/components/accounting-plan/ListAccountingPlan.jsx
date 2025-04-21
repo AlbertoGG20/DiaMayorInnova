@@ -128,46 +128,47 @@ const AccountingPlansList = ({ newPGC }) => {
       <section className="accountingPlan__pgcList">
         <div className="accountingPlan__header">
           <h2 className="accountingPlan__header--h2">Todos los planes</h2>
-            <div className="accountingPlan__form--row">
-              <form className="search-bar search-bar--pgc">
-                <input
-                  className="search-bar_search"
-                  type="text"
-                  value={searchAccPlan}
-                  onChange={handleSearchChange}
-                  placeholder="Buscar por nombre"
-                />
-                <i className="fi fi-rr-search"></i> {/* Icône uniquement décorative */}
-              </form>
+          <div className="accountingPlan__form--row">
+            <form className="search-bar search-bar--pgc">
+              <input
+                className="search-bar_search"
+                type="text"
+                value={searchAccPlan}
+                onChange={handleSearchChange}
+                placeholder="Buscar por nombre"
+              />
+              <i className="fi fi-rr-search"></i> {/* Icône uniquement décorative */}
+            </form>
 
-              <div className="accountingPlan__pagination">
-                <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage(1)}>
-                  <i className='fi fi-rr-angle-double-small-left'/>
-                </button>
-                <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)}>
-                  <i className='fi fi-rr-angle-small-left'/>
-                </button>
-                <span>Página {currentPage} de {totalPages}</span>
-                <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage((prev) => prev + 1)}>
-                  <i className='fi fi-rr-angle-small-right'/>
-                </button>
-                <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage(totalPages)}>
-                  <i className='fi fi-rr-angle-double-small-right'/>
-                </button>
-              </div>
+            <div className="accountingPlan__pagination">
+              <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage(1)}>
+                <i className='fi fi-rr-angle-double-small-left' />
+              </button>
+              <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)}>
+                <i className='fi fi-rr-angle-small-left' />
+              </button>
+              <span>Página {currentPage} de {totalPages}</span>
+              <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage((prev) => prev + 1)}>
+                <i className='fi fi-rr-angle-small-right' />
+              </button>
+              <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage(totalPages)}>
+                <i className='fi fi-rr-angle-double-small-right' />
+              </button>
             </div>
+          </div>
         </div>
-        
 
-        <div className="accountingPlan__table">
+
+        <div className="accountingPlan__table--container">
           {accountingPlans.length === 0 ? (
             <p>No hay PGCs disponibles</p>
           ) : (
-            <table className="accountingPlan_tbody">
+            <table className="accountingPlan__table">
               <thead>
                 <tr>
-                  <th onClick={handleSortClick} style={{cursor: "pointer"}}>
-                    Nombre PGC {sortOrder === "ascending" ? <i className="fi fi-rr-angle-small-down"/> : <i className="fi fi-rr-angle-small-up"/>}
+                  <th onClick={handleSortClick} className="accountingPlan__table--name-field" >
+                    Nombre PGC
+                    {sortOrder === "ascending" ? <i className="fi fi-rr-angle-small-down" /> : <i className="fi fi-rr-angle-small-up" />}
                   </th>
                   <th>Acrónimo</th>
                   <th>Descripción</th>
@@ -206,7 +207,7 @@ const AccountingPlansList = ({ newPGC }) => {
         </div>
       </section>
 
-      <Modal ref={accountsModalRef} modalTitle="Cuentas del PGC" showButton = {false}>
+      <Modal ref={accountsModalRef} modalTitle="Cuentas del PGC" showButton={false}>
         {accounts.length > 0 ? (
           <table className="modal-table">
             <thead>

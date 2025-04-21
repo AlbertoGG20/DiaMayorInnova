@@ -118,7 +118,7 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
           totalDebit += debit;
           totalCredit += credit;
         });
-        
+
         if (totalDebit !== totalCredit) {
           errors += `El asiento ${entryIndex + 1} de la solución ${solutionIndex + 1} no está balanceado. La suma de débitos (${totalDebit}) no es igual a la suma de créditos (${totalCredit}).\n`;
         }
@@ -223,7 +223,7 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
           <label className="statement-page__label--explanation" htmlFor="explanation">Explicación:</label>
           <textarea
             id="explanation"
-            className="statement-page__input"
+            className="statement-page__input--explanation"
             value={explanation}
             onChange={(e) => setExplanation(e.target.value)}
           />
@@ -231,29 +231,29 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
         </div>
 
         <div className="statement-page__buttons-container">
-          <div className="statement-page__visibility--container">
-            <label className="statement-page__label--visibility" htmlFor="isPublic">
-              Público:
-            </label>
-            <input
-              type="checkbox"
-              id="isPublic"
-              checked={isPublic}
-              onChange={(e) => setIsPublic(e.target.checked)}
-              className="statement-page__checkbox--visibility"
-            />
-          </div>
           <div className="statement-page__buttons--actions">
-            <button type="submit" className="statement-page__button--form">{statement ? "Actualizar" : "Crear"}</button>
+            <button type="submit" className="btn">{statement ? "Actualizar" : "Crear"}</button>
             {statement && (
-              <button type="button" onClick={handleCancel} className="statement-page__button--form btn light">
+              <button type="button" onClick={handleCancel} className=" btn light">
                 Cancelar
               </button>
             )}
-            <button type="button" onClick={handleAddSolution} className="statement-page__button--form btn light">
+            <button type="button" onClick={handleAddSolution} className="btn light">
               <i className="fi fi-rr-plus"></i>
               Añadir Solución
             </button>
+            <div className="statement-page__visibility--container">
+              <label className="statement-page__label--visibility" htmlFor="isPublic">
+                Público:
+              </label>
+              <input
+                type="checkbox"
+                id="isPublic"
+                checked={isPublic}
+                onChange={(e) => setIsPublic(e.target.checked)}
+                className="statement-page__checkbox--visibility"
+              />
+            </div>
             {errorMessage && <div className="error-message">{errorMessage.split("\n").map((line, index) => (
               <div key={index}>{line}</div>
             ))}</div>}
@@ -262,6 +262,7 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
                 {successMessage}
               </div>
             )}
+
           </div>
         </div>
       </form>

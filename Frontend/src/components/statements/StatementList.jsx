@@ -113,7 +113,7 @@ const StatementsList = ({ onSelectStatement }) => {
   };
 
   const changePage = (newPage) => {
-    if (newPage < 1 || newPage > totalPages) return; // Evita páginas fuera de rango
+    if (newPage < 1 || newPage > totalPages) return;
     setCurrentPage(newPage);
   };
 
@@ -121,11 +121,11 @@ const StatementsList = ({ onSelectStatement }) => {
     const searchTerm = e.target.value.toLowerCase();
     setSearchTerm(searchTerm);
     setCurrentPage(1);
-  };  
+  };
 
   return (
     <div className="statement-page__selection--content">
-      <div className="statement-page__row" style={{display: "flex", gap: "var(--gap-m)", alignItems: "center", width: "100%"}}>
+      <div className="statement-page__row" style={{ display: "flex", gap: "var(--gap-m)", alignItems: "center", width: "100%" }}>
         <h3 className="statement-page__list--header">Enunciados</h3>
 
         <form className='search-bar search-bar--statement'>
@@ -165,27 +165,12 @@ const StatementsList = ({ onSelectStatement }) => {
               <div className="statement-page__statement-container">
                 <span className="statement-page__definition">{statement.definition}</span>
                 <div className="statement-page__actions">
-                  <button
-                    onClick={() => openDeleteModal(statement)}
-                    className={`statement-page__button--delete ${isPublicAndNotOwned ? "disabled" : ""}`}
-                    disabled={isPublicAndNotOwned}
-                  >
-                    <i className="fi-rr-trash"></i>
-                    <span className="statement-page__button-text--delete">Borrar</span>
-                  </button>
-                  <button
-                    onClick={() => handleStatementSelection(statement)}
-                    className={`statement-page__button--edit ${isPublicAndNotOwned ? "disabled" : ""}`}
-                    disabled={isPublicAndNotOwned}
-                  >
-                    <i className="fi-rr-pencil"></i>
-                    <span className="statement-page__button-text">Editar</span>
-                  </button>
+
                   <div className="statement-page__toggle-visibility">
                     <button
-                      onClick={() => toggleVisibility(statement.id, false)} // Cambiar a "Privado"
+                      onClick={() => toggleVisibility(statement.id, false)}
                       className={`toggle-option ${!statement.is_public ? "active" : ""}`}
-                      disabled={isPublicAndNotOwned} // Deshabilitar si es público y no es del usuario
+                      disabled={isPublicAndNotOwned}
                     >
                       Privado
                     </button>
@@ -197,6 +182,20 @@ const StatementsList = ({ onSelectStatement }) => {
                       Público
                     </button>
                   </div>
+                  <button
+                    onClick={() => handleStatementSelection(statement)}
+                    className={`statement-page__button--edit btn__icon ${isPublicAndNotOwned ? "disabled" : ""}`}
+                    disabled={isPublicAndNotOwned}
+                  >
+                    <i className="fi-rr-pencil"></i>
+                  </button>
+                  <button
+                    onClick={() => openDeleteModal(statement)}
+                    className={`statement-page__button--delete btn__icon ${isPublicAndNotOwned ? "disabled" : ""}`}
+                    disabled={isPublicAndNotOwned}
+                  >
+                    <i className="fi-rr-trash"></i>
+                  </button>
                 </div>
               </div>
             </li>
@@ -210,7 +209,21 @@ const StatementsList = ({ onSelectStatement }) => {
         onDelete={() => handleDelete(statementToDelete?.id)}
         onClose={() => setIsDeleteModalOpen(false)}
       />
-
+      <div className="statement-list__pagination">
+        <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => changePage(1)}>
+          <i className='fi fi-rr-angle-double-small-left' />
+        </button>
+        <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => changePage(currentPage - 1)}>
+          <i className='fi fi-rr-angle-small-left' />
+        </button>
+        <span className="paging-text" >Página {currentPage} de {totalPages}</span>
+        <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => changePage(currentPage + 1)}>
+          <i className='fi fi-rr-angle-small-right' />
+        </button>
+        <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => changePage(totalPages)}>
+          <i className='fi fi-rr-angle-double-small-right' />
+        </button>
+      </div>
     </div>
   );
 };

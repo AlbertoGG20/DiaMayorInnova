@@ -11,7 +11,7 @@
   border: none;
   max-width: 900px;
   min-width: 600px;
-  max-height: 80vh;
+  max-height: 800px;
   overflow: hidden;
   position: fixed;
   z-index: 1000;
@@ -22,7 +22,7 @@
 }
 
 .modal__content {
-  display: flex;
+
   flex-direction: column;
   overflow: hidden;
   max-height: 70vh;
@@ -35,6 +35,8 @@
   gap: var(--gap-xxl);
   border-bottom: 1px solid var(--Color-grey-100);
   padding-bottom: var(--gap-s);
+  margin-bottom: var(--gap-xxs);
+  color: var(--Color-Principal);
 }
 
 .modal__h2 {

@@ -44,7 +44,10 @@ const TaskListAndDetails = () => {
           throw new Error("La respuesta no tiene la estructura esperada.");
         }
 
-        setTasks(response.tasks);
+        // Filtrar tareas del usuario actual
+        const filteredTasks = response.tasks.filter((task) => task.created_by === user.id);
+
+        setTasks(filteredTasks);
         setTotalPages(response.meta?.total_pages || 1);
 
       } catch (err) {
@@ -54,7 +57,6 @@ const TaskListAndDetails = () => {
         setLoading(false);
       }
     };
-
 
     if (user?.id) {
       fetchTasks();
@@ -173,14 +175,14 @@ const TaskListAndDetails = () => {
                     {showActiveTasks ? "Tareas Activas" : "Tareas Cerradas"}
                   </h2>
                   <div className="task-list__filter">
-                    <button 
+                    <button
                       className={`task-list__filter-button ${showActiveTasks ? 'active' : ''}`}
                       onClick={() => handleFilterChange(true)}
                     >
                       <i className="fi fi-rr-clock"></i>
                       Activas
                     </button>
-                    <button 
+                    <button
                       className={`task-list__filter-button ${!showActiveTasks ? 'active' : ''}`}
                       onClick={() => handleFilterChange(false)}
                     >
@@ -250,7 +252,7 @@ const TaskListAndDetails = () => {
             </div>
           </section>
 
-          <TaskModal show={modalVisible} onClose={handleCloseModal}>
+          <TaskModal show={modalVisible} onClose={handleCloseModal} modalTitle={selectedTask?.title}>
             <TaskDetails
               selectedTask={selectedTask}
               onDeleteStatement={handleDeleteStatement}

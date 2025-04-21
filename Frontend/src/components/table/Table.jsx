@@ -13,7 +13,7 @@ DataTable.use(dt);
 DataTable.use(dtResponsive);
 DataTable.use(dtResponsiveDt);
 
-const Table = ({ data, columns, id }) => {
+const Table = ({ data, columns, id, isMarkTable = false }) => {
   const navigate = useNavigate();
   const tableRef = useRef(null);
 
@@ -35,27 +35,30 @@ const Table = ({ data, columns, id }) => {
       emptyTable: 'No hay datos disponibles en la tabla',
     }
   };
+  console.log(data);
 
-  useEffect(() => {
-    const handleClick = (event) => {
-      const btn = event.target.closest('.view-result');
-      if (btn) {
-        const exerciseId = btn.getAttribute('data-id');
-        navigate(`/notas-estudiantes/${id}/examen/${exerciseId}`);
-      }
-    };
+  if (isMarkTable) {
+    useEffect(() => {
+      const handleClick = (event) => {
+        const btn = event.target.closest('.view-result');
+        if (btn) {
+          const exerciseId = btn.getAttribute('data-id');
+          navigate(`/notas-estudiantes/${id}/examen/${exerciseId}`);
+        }
+      };
 
-    const tableElement = tableRef.current;
-    if (tableElement) {
-      tableElement.addEventListener('click', handleClick);
-    }
-
-    return () => {
+      const tableElement = tableRef.current;
       if (tableElement) {
-        tableElement.removeEventListener('click', handleClick);
+        tableElement.addEventListener('click', handleClick);
       }
-    };
-  }, [navigate, id]);
+
+      return () => {
+        if (tableElement) {
+          tableElement.removeEventListener('click', handleClick);
+        }
+      };
+    }, [navigate, id]);
+  }
 
   return (
     <div ref={tableRef}>

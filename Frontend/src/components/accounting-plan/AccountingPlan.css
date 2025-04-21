@@ -1,9 +1,11 @@
 .accountingPlan__pgcList {
   padding: var(--gap-s) var(--gap-s) 0 var(--gap-s);
   height: 100%;
+  overflow-y: scroll;
   display: flex;
   flex-direction: column;
   justify-content: start;
+  width: 100%;
 
   & .search-bar--pgc {
     width: 50%;
@@ -14,15 +16,14 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  align-items: left;
-  margin-bottom: var(--gap-m);
-  gap: var(--gap-xl);
+  align-items: start;
+  margin-bottom: var(--gap-xxs);
+  gap: var(--gap-s);
 }
 
 .accountingPlan__pgcList-item {
   padding: var(--gap-s);
   margin-bottom: var(--gap-s);
-  border-bottom: 1px solid var(--Color-grey-200);
   border-radius: var(--border-radius);
   justify-content: space-between;
   align-items: center;
@@ -70,7 +71,7 @@
   padding-bottom: var(--gap-s);
 }
 
-.accountingPlan__table {
+.accountingPlan__table--container {
   width: 100%;
   border-collapse: collapse;
   margin-top: var(--gap-xs);
@@ -87,7 +88,6 @@
 }
 
 th {
-  border-bottom: solid 1px var(--Color-Principal);
   padding: var(--gap-xs) 0;
   margin: var(--gap-xs);
 
@@ -146,16 +146,14 @@ th {
 }
 
 .accountingPlan__form {
-  max-width: 50%;
-  margin-top: var(--gap-s);
-  padding: var(--gap-s);
   border-radius: var(--border-radius);
 }
 
 .accountingPlan__form--row {
   display: flex;
-  gap: var(--gap-m);
+  gap: var(--gap-s);
   align-items: center;
+  justify-content: start;
   width: 100%;
 }
 
@@ -173,27 +171,93 @@ th {
 .accountingPlan__form--actions {
   margin-top: var(--gap-m);
   display: flex;
+  justify-content: start;
+  align-items: center;
   width: 100%;
 }
 
 .accountingPlan__form--add,
 .accountingPlan__form--upload {
-    display: flex;
-    justify-content: start;
+  display: flex;
+  justify-content: start;
+  align-items: center;
 }
 
 .accountingPlan__form--add {
-  width: 190px;
+  width: 135px;
+}
+
+.accountingPlan__table--name-field {
+  cursor: pointer;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  margin: 0;
+
+
+  & .fi {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: large;
+    height: 100%;
+    width: 40px;
+  }
 }
 
 .accountingPlan__form--upload {
-  gap: var(--gap-m);
-  width: 100%;
+  gap: var(--gap-s);
   align-items: center;
+  justify-content: end;
 
-  & .btn {
-    width: 190px;
+  & .btn:nth-child(1) {
+    width: 140px;
   }
+
+  & .btn:nth-child(2) {
+    width: auto;
+  }
+}
+
+/* Ocultar el input file */
+.accountingPlan__file--input {
+  display: none;
+
+}
+
+/* Estilo del botón personalizado */
+.accountingPlan__file--label {
+  display: flex;
+  cursor: pointer;
+
+  p {
+    border-right: 1px solid var(--Color-grey-200);
+    padding-right: var(--gap-xs);
+    width: 80px;
+  }
+}
+
+.accountingPlan__file--label:hover {
+  background-color: #0056b3;
+}
+
+.accountingPlan__file--name {
+  font-size: var(--text-desktop-small);
+  color: var(--Color-Principal-claro);
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 140px;
+}
+
+.input_csv__container {
+  display: flex;
+  border: 1px solid var(--Color-grey-200);
+  border-radius: var(--gap-xxs);
+  padding: var(--gap-xxs);
+  gap: var(--gap-xs);
+  justify-content: start;
+  align-items: center;
 }
 
 .accountingPlan__file--input {
@@ -209,6 +273,7 @@ th {
 
 .accountingPlan__pagination {
   padding-left: var(--gap-m);
+
   & span {
     padding: var(--gap-s);
     color: var(--Color-Principal);
@@ -221,15 +286,22 @@ th {
 
 .accountingPlan__error {
   color: var(--Color-red-400);
-  text-align: center;
-  margin-top: var(--gap-m);
+  text-align: start;
+  margin-top: var(--gap-xxs);
 }
 
-.accountingPlan_tbody {
-  height: 100%;
+.accountingPlan__table {
+
+  thead {
+    tr {
+      background-color: var(--Color-White);
+      padding: var(--gap-l) 0;
+    }
+  }
 
   & tbody {
     height: 100%;
+    overflow-y: scroll;
   }
 
   & .fi-rr-angle-small-down {
@@ -239,12 +311,12 @@ th {
   }
 }
 
-.accountingPlan__table::-webkit-scrollbar {
+.accountingPlan__table--container::-webkit-scrollbar {
   width: 0px;
   height: 0px;
 }
 
-.accountingPlan__table::-webkit-scrollbar-thumb {
+.accountingPlan__table--container::-webkit-scrollbar-thumb {
   background: transparent;
 }
 
@@ -267,7 +339,7 @@ th {
     text-align: center;
   }
 
-  .accountingPlan__table {
+  .accountingPlan__table--container {
     margin-top: 16px;
   }
 
@@ -275,7 +347,7 @@ th {
     padding: var(--gap-xs);
   }
 
-  .accountingPlan_tbody {
+  .accountingPlan__table {
     font-size: var(--text-mobile-body-small);
   }
 
@@ -310,7 +382,7 @@ th {
     width: 100%;
   }
 
-  .accountingPlan_tbody {
+  .accountingPlan__table {
     font-size: var(--text-mobile-small);
   }
 }

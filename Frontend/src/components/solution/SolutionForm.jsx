@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import EntryForm from "../entry/EntryForm.jsx";
+import Modal from "../modal/Modal.jsx";
 
 const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
 
@@ -67,7 +68,7 @@ const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
   const totals = calculateTotals();
 
   return (
-    <div className="statement-page__form-modal">
+    <>
       <div className="statement-page__form-modal--solution">
         <h5>Solución {solutionIndex + 1}:</h5>
         <textarea
@@ -141,7 +142,7 @@ const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
           <span>Total Haber: {totals.credit.toFixed(2)}</span>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

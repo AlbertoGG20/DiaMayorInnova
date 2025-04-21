@@ -1,0 +1,17 @@
+.breadcrumb__container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  list-style: none;
+}
+
+.breadcrumb__item {
+  color: var(--Color-Principal-claro);
+  font-weight: 600;
+  font-size: var(--text-desktop-small);
+}
+
+
+.breadcrumb__item--active {
+  color: var(--Color-Principal);
+}
