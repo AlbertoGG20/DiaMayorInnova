@@ -25,7 +25,7 @@ const TaskForm = ({
     <section className="task-page__form">
       <form className="task-page__form--form">
         <header className="task-page__form--header">
-          <h2 className="task-page__header">Crear Tarea</h2>
+          <h2 className="task-page__header">{id ? "Actualizar Tarea" : "Crear Tarea"}</h2>
         </header>
         <div>
           <label className="task-page__label--title" htmlFor="title">Tarea:</label>

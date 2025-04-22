@@ -4,7 +4,17 @@ import Modal from "../modal/Modal.jsx";
 import EditSolutionModal from "../modal/EditSolutionModal.jsx";
 
 const SolutionList = ({ solutions, onEditSolution, onDeleteSolution, solutionToDeleteIndex, solutionIndex, setSolutions, onSave, onClose, solution }) => {
+  console.log(solutionIndex, " solution list")
 
+  const handleSave = () => {
+    setSolutions((prevSolutions) => {
+      const updatedSolutions = [...prevSolutions];
+      updatedSolutions[solutionIndex] = editedSolution;
+      console.log('BBBB', updatedSolutions);
+      return updatedSolutions;
+    });
+    onClose();
+  };
   return (
     <>
       <h3 className="statement-page__solutions-header">Soluciones del Enunciado</h3>
@@ -20,10 +30,11 @@ const SolutionList = ({ solutions, onEditSolution, onDeleteSolution, solutionToD
                 btnNoBg={true}
                 btnText={<i className="fi fi-rr-pencil"></i>}
                 modalTitle="Editar Solución"
+                auxFunction={handleSave}
               >
                 <EditSolutionModal
                   solution={solution}
-                  solutionIndex={solutionIndex}
+                  solutionIndex={index}
                   solutions={solutions}
                   setSolutions={setSolutions}
                   onClose={onClose}
@@ -34,6 +45,13 @@ const SolutionList = ({ solutions, onEditSolution, onDeleteSolution, solutionToD
             </div>
           </li>
         ))}
+        {
+          (solutions.length < 1) ?
+            <div className="statement-page__list--empty">
+              <p>No se han Añadido soluciones.</p>
+            </div>
+            : null
+        }
       </ul>
     </>
   );

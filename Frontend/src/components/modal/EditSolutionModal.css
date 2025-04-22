@@ -86,6 +86,7 @@ textarea {
   gap: var(--gap-xs);
   padding-top: var(--gap-m);
   height: auto;
+  margin-bottom: var(--gap-xs);
 }
 
 .statement-page-modal__actions-buttons {

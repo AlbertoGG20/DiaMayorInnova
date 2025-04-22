@@ -2,6 +2,7 @@ import React from "react";
 import AnnotationForm from "../annotation/AnnotationForm.jsx";
 
 const EntryForm = ({ solutionIndex, entry, entryIndex, solutions, setSolutions }) => {
+  console.log("solution form index", solutionIndex)
   const handleEntryChange = (event) => {
     if (!event.target || !event.target.name) {
       console.error("Error: event.target o event.target.name no están definidos");

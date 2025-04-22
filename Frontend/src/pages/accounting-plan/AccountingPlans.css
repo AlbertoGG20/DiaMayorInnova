@@ -1,7 +1,7 @@
 .accountingPlan__page {
   padding: var(--gap-s);
   width: 100%;
-  height: 91vh;
+  height: 100%;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   grid-template-rows: 0.1fr 0.8fr 1.2fr;
@@ -72,11 +72,15 @@
   top: 0;
   background-color: #fff;
   /* Assurez-vous que l'en-tête reste visible */
-  z-index: 2;
+}
+
+.full-width .accountingPlan__input {
+  height: 80px;
+  resize: none;
 }
 
 /* Mobile et tablettes */
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
   .accountingPlan__page {
     grid-template-rows: 0.1fr 0.4fr 1fr;
   }
@@ -85,4 +89,76 @@
     height: auto;
     max-height: 300px;
   }
+} */
+
+
+@media (max-width: 1024px) {
+
+  /* ----- General-Tablet -----*/
+
+
+}
+
+@media (max-width: 768px) {
+  .accountingPlan__header--h2 {
+    margin-bottom: 0;
+    font-size: var(--text-mobile-subtitles-2);
+  }
+
+  .accountingPlan__page {
+    display: flex;
+    flex-direction: column;
+    overflow-y: visible;
+    height: auto;
+  }
+
+  .accountingPlan__form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-m);
+
+  }
+
+  .accountingPlan__form--actions {
+    margin-top: 0;
+  }
+
+  .accountingPlan__form .accountingPlan__form--row {
+    flex-direction: column;
+    gap: var(--gap-m);
+  }
+
+  .accountingPlan__form--row .search-bar--pgc {
+    width: 100%;
+  }
+
+  .accountingPlan__form--group {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: var(--text-desktop-small);
+  }
+
+  .accountingPlan__input {
+    font-size: var(--text-desktop-small);
+
+    &::placeholder {
+      color: var(--Color-Principal-claro);
+      font-size: var(--text-desktop-small);
+    }
+  }
+
+  .accountingPlan__form--add {
+    align-self: flex-start;
+  }
+
+  .accountingPlan__table--container {
+    background-color: lightpink;
+    justify-content: start;
+  }
+
+  .accountingPlan__table {
+    background-color: coral;
+  }
+
 }

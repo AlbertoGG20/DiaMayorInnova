@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import EntryForm from "../entry/EntryForm.jsx";
-import Modal from "../modal/Modal.jsx";
 
 const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
 
@@ -110,7 +109,7 @@ const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
               setSolutions={setSolutions}
             />
           )}
-          {/* En caso de querer un botón "Eliminar Asiento", por Asiento.
+
           <button
             type="button"
             className="statement-page__button--remove-entry"
@@ -118,14 +117,14 @@ const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
           >
             <i className="fi fi-rr-trash"></i>
             <span className="statement-page__span--remove-entry">Asiento</span>
-          </button> */}
+          </button>
         </div>
       ))}
 
 
       <div className="statement-page-modal__actions" >
         <div className="statement-page-modal__actions-buttons" >
-          <button type="button" onClick={addEntry} className="statement-page__button--add-entry">
+          <button type="button" onClick={addEntry} className="btn">
             + Asiento
           </button>
           <button
@@ -134,7 +133,6 @@ const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
             onClick={removeLastEntry}
           >
             <i className="fi fi-rr-trash"></i>
-            <span className="statement-page__span--remove-entry">Asiento</span>
           </button>
         </div>
         <div className="statement-page__totals">

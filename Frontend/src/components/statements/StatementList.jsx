@@ -209,7 +209,7 @@ const StatementsList = ({ onSelectStatement }) => {
         onDelete={() => handleDelete(statementToDelete?.id)}
         onClose={() => setIsDeleteModalOpen(false)}
       />
-      <div className="statement-list__pagination">
+      <div className="section-table__pagination">
         <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => changePage(1)}>
           <i className='fi fi-rr-angle-double-small-left' />
         </button>

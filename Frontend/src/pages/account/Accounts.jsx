@@ -17,8 +17,10 @@ const Accounts = () => {
     <>
 
       <section className="account__page">
-        <ButtonBack />
-        <Breadcrumbs />
+        <div className="account__page--header">
+          <ButtonBack />
+          <Breadcrumbs />
+        </div>
 
         <section className="account__addAcc" >
           <AddAccount setNewAcc={setNewAcc} />

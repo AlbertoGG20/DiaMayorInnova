@@ -1,16 +1,18 @@
 .account__page {
-  padding: var(--gap-xxl);
+  padding: var(--gap-s);
   width: 100%;
-  height: 91vh; /* Full viewport height */
+  height: 100%;
+  /* Full viewport height */
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   grid-template-rows: auto auto 1fr;
   /* Dynamic height for form & fixed scroll for list */
   grid-template-areas:
-    "title title title"
-    "form form form"
-    "list list list";
+    "title title "
+    "form empty "
+    "list list ";
   overflow: hidden;
+  gap: var(--gap-s);
   /* Prevent full page scrolling */
 }
 
@@ -42,31 +44,51 @@
   grid-area: form;
   padding-bottom: 24px;
   height: 340px;
-  border-bottom: solid 1px var(--Color-grey-200);
+  background-color: var(--Color-White);
+  border-radius: var(--gap-xxs);
+  box-shadow: var(--box-shadow-btn);
 }
 
 /* Account List with Scroll */
 .account__listAcc {
   padding: var(--gap-s);
   grid-area: list;
-  height: calc(100vh - 400px); /* Adjusts the height dynamically */
-  overflow-y: auto; /* Enables scrolling only for the account list */
-  padding-right: 10px; /* Space for scrollbar */
-  position: relative;
+  overflow-y: hidden;
+  height: 100%;
+  background-color: var(--Color-White);
+  border-radius: var(--gap-xxs);
+  box-shadow: var(--box-shadow-btn);
 }
 
 /* Fixed Table */
 .account__table {
   width: 100%;
+  height: 100%;
   border-collapse: collapse;
   position: relative;
+  overflow-y: auto;
+}
+
+.account_tbody {
+  height: 100%;
+
+  & tbody {
+    overflow-y: scroll;
+    height: 100%;
+  }
+
+}
+
+.account_accList {
+  height: 100%;
 }
 
 /* Keep table header sticky */
 .account__table thead {
   position: sticky;
   top: 0;
-  background-color: #fff; /* Ensures visibility */
+  background-color: #fff;
+  /* Ensures visibility */
   z-index: 2;
 }
 
@@ -94,14 +116,38 @@
   background: var(--Color-grey-600);
 }
 
-/* Mobile & Tablet */
+/* Media query */
+
+@media (max-width: 1024px) {}
+
 @media (max-width: 768px) {
   .account__page {
-    grid-template-rows: auto auto 1fr;
+    display: flex;
+    flex-direction: column;
+    overflow-y: visible;
+  }
+
+  .account__addAcc {
+    overflow-y: visible;
+    height: auto;
+    padding: 0;
   }
 
   .account__listAcc {
     height: auto;
-    max-height: 300px; /* Sets max height for scrollability */
+    overflow-y: visible;
   }
+
+  .account__form {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+  }
+
+  .account__header .search-bar--acc {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
 }

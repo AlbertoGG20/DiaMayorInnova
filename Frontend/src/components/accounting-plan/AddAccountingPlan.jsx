@@ -103,7 +103,7 @@ const AddAccountingPlan = ({ setNewPGC }) => {
           <button><Link to={"/accounting-plans"}>Atrás</Link></button>
         </div>
       ) : (
-        <div>
+        <>
           <div className="accountingPlan__form">
             <h2 className="accountingPlan__header--h2">Nuevo plan de contabilidad</h2>
             <div className="accountingPlan__form--row">
@@ -140,16 +140,15 @@ const AddAccountingPlan = ({ setNewPGC }) => {
             <div className="accountingPlan__form--row">
               <div className="accountingPlan__form--group full-width">
                 <label>Descripción
-                  <input
+                  <textarea
                     className="accountingPlan__input"
                     placeholder="Descripción PGC"
-                    type="text"
                     id="description"
                     required
                     value={accountingPlan.description}
                     onChange={handleInputChange}
                     name="description">
-                  </input></label>
+                  </textarea></label>
               </div>
             </div>
 
@@ -186,7 +185,7 @@ const AddAccountingPlan = ({ setNewPGC }) => {
             </div>
             {error && <div className="accountingPlan__error">{error}</div>}
           </div>
-        </div>
+        </>
       )}
     </>
   );

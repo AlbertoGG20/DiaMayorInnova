@@ -28,7 +28,7 @@ const AccountingPlansList = ({ newPGC }) => {
     retrieveAccountingPlans(currentPage, searchAccPlan);
   }, [newPGC, currentPage, searchAccPlan]);
 
-  const retrieveAccountingPlans = async(page, name) => {
+  const retrieveAccountingPlans = async (page, name) => {
     setIsLoading(true);
     try {
       const data = await AccountingPlanDataService.getAll(page, 10, name);
@@ -66,9 +66,21 @@ const AccountingPlansList = ({ newPGC }) => {
   const handleSearchChange = (e) => {
     const searchTerm = e.target.value.toLowerCase();
     setSearchAccPlan(searchTerm);
-    setCurrentPage(1);
+
+    if (!searchTerm) {
+      retrieveAccountingPlans(); // Si le champ est vide, récupérer tous les PGC
+      return;
+    }
+
+    // Filtrage dynamique des plans comptables
+    setAccountingPlans((prevPlans) =>
+      prevPlans.filter((plan) => {
+        plan.name.toLowerCase().includes(searchTerm);
+        setCurrentPage(1);
+      })
+    );
   };
-  
+
 
   //PGC sorted by Name column
   const sortAccountinPlans = (order) => {
@@ -92,7 +104,7 @@ const AccountingPlansList = ({ newPGC }) => {
 
   const openEditModal = (id) => {
     setSelectedAccountingPlanId(id);
-    modalRef.current?.showModal(); 
+    modalRef.current?.showModal();
   };
 
   const closeEditModal = () => {
@@ -103,20 +115,20 @@ const AccountingPlansList = ({ newPGC }) => {
   const handleSaveSuccess = () => {
     retrieveAccountingPlans();
   };
-  
+
   // Download CSV
   const handleExportToCSV = (id) => {
     AccountingPlanDataService.exportToCSV(id);
   };
-  
-  
+
+
 
   const fetchAccountsByPGC = (pgcId) => {
     AccountingPlanDataService.getAccountsByPGC(pgcId)
       .then(response => {
         setAccounts(response.data);
         setIsModalOpen(true);
-        accountsModalRef.current?.showModal(); 
+        accountsModalRef.current?.showModal();
       })
       .catch(error => {
         console.error("Erreur lors de la récupération des comptes :", error);
@@ -139,22 +151,6 @@ const AccountingPlansList = ({ newPGC }) => {
               />
               <i className="fi fi-rr-search"></i> {/* Icône uniquement décorative */}
             </form>
-
-            <div className="accountingPlan__pagination">
-              <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage(1)}>
-                <i className='fi fi-rr-angle-double-small-left' />
-              </button>
-              <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)}>
-                <i className='fi fi-rr-angle-small-left' />
-              </button>
-              <span>Página {currentPage} de {totalPages}</span>
-              <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage((prev) => prev + 1)}>
-                <i className='fi fi-rr-angle-small-right' />
-              </button>
-              <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage(totalPages)}>
-                <i className='fi fi-rr-angle-double-small-right' />
-              </button>
-            </div>
           </div>
         </div>
 
@@ -205,6 +201,21 @@ const AccountingPlansList = ({ newPGC }) => {
             </table>
           )}
         </div>
+        <div className="section-table__pagination">
+          <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage(1)}>
+            <i className='fi fi-rr-angle-double-small-left' />
+          </button>
+          <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)}>
+            <i className='fi fi-rr-angle-small-left' />
+          </button>
+          <span>Página {currentPage} de {totalPages}</span>
+          <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage((prev) => prev + 1)}>
+            <i className='fi fi-rr-angle-small-right' />
+          </button>
+          <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage(totalPages)}>
+            <i className='fi fi-rr-angle-double-small-right' />
+          </button>
+        </div>
       </section>
 
       <Modal ref={accountsModalRef} modalTitle="Cuentas del PGC" showButton={false}>
@@ -232,10 +243,10 @@ const AccountingPlansList = ({ newPGC }) => {
         )}
       </Modal>
 
-      <Modal ref={modalRef} modalTitle="Editar PGC" showButton = {false}>
+      <Modal ref={modalRef} modalTitle="Editar PGC" showButton={false}>
         {selectedAccountingPlanId && (
-          <AccountingPlan 
-            id={selectedAccountingPlanId} 
+          <AccountingPlan
+            id={selectedAccountingPlanId}
             onSaveSuccess={handleSaveSuccess}
             onCloseModal={closeEditModal}
           />

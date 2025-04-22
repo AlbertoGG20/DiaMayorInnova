@@ -580,11 +580,12 @@ input::placeholder {
   cursor: default;
 }
 
-.statement-list__pagination {
+.section-table__pagination {
   display: flex;
   justify-content: start;
   align-items: center;
   gap: var(--gap-xxs);
+  margin-top: var(--gap-xxs);
 
   & .paging-text {
     padding: 0 var(--gap-xxs);
