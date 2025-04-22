@@ -8,7 +8,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--gap-xxs);
-
 }
 
 
@@ -38,6 +37,14 @@
 .school-list_section {
   display: flex;
   justify-content: space-between;
+}
+
+.school-list__pagination {
+  padding-top: var(--gap-s);
+  & span {
+    padding: var(--gap-s);
+    color: var(--Color-Principal);
+  }
 }
 
 @media (max-width: 1024px) {

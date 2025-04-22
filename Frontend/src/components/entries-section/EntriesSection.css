@@ -1,26 +1,30 @@
-.entry_container {
-  padding: var(--gap-xxl) var(--gap-xxxs);
+.entry__container {
+  padding: var(--gap-l) var(--gap-m);
   background-color: var(--Color-White);
   border-radius: var(--r-xs);
   grid-area: entry;
   display: flex;
   flex-direction: column;
-  gap: var(--r-s);
+  gap: var(--r-xxs);
   overflow-y: scroll;
-  box-shadow: var(--box-shadow-M3);
+  box-shadow: var(--box-shadow-btn);
   width: 100%;
 }
 
-.entry_container::-webkit-scrollbar {
+.entry__container::-webkit-scrollbar {
   display: none;
 }
 
-.modes-entries-containner {
+.modes-entries-container {
   height: 100%;
-  overflow-y: scroll;
+  width: 100%;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: var(--r-s);
+  padding: var(--gap-s) 0 0 0;
+  justify-content: start;
+  align-items: center;
 }
 
 .modes-entries-container--buttons {

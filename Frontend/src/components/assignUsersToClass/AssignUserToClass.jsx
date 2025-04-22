@@ -24,12 +24,13 @@ const AssignUserToClass = ({
   const [loading, setLoading] = useState(false);
   const modalRef = useRef(null);
 
-  const groupedUsers = allUsers.reduce((acc, user) => {
+  const groupedUsers = (Array.isArray(allUsers) ? allUsers : []).reduce((acc, user) => {
     const role = user.role;
     if (!acc[role]) acc[role] = [];
     acc[role].push(user);
     return acc;
   }, {});
+  
 
   const rolesOrder = ['teacher', 'student'];
 

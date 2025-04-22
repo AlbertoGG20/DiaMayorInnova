@@ -27,6 +27,7 @@ class Ability
       can :manage, Task
       can :manage, Statement
       can :manage, Solution
+      can :manage, Mark
       # Asume que los maestros también pueden gestionar anotaciones
       can :manage, StudentAnnotation
       can :manage_users, ClassGroup do |class_group|

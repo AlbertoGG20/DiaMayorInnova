@@ -14,20 +14,21 @@ const Accounts = () => {
   return (
     <>
 
-      <section className="account__page">
-        
-          <button className="account__btnHome" onClick={() => navigate("/home")}>
-            <i className="fi-rr-arrow-small-left"/> Volver
+      <main className="account__page">
+        <div className="account__page--header">
+          <button className="btn light account__btnHome" onClick={() => navigate("/home")}>
+            <i className="fi-rr-arrow-small-left"/>
           </button>
           <h1 className="account__page--title">Crear Cuenta</h1>
-        
-          <section className="account__addAcc" >
-            <AddAccount setNewAcc={setNewAcc}/>
-          </section>
-          <section className="account__listAcc" >
-            <AccountsList newAcc={newAcc}/>
-          </section>
-      </section>
+        </div>
+
+        <section className="account__addAcc" >
+          <AddAccount setNewAcc={setNewAcc}/>
+        </section>
+        <section className="account__listAcc" >
+          <AccountsList newAcc={newAcc}/>
+        </section>
+      </main>
       
     </>
   )

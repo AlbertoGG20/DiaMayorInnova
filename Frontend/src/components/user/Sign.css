@@ -2,6 +2,10 @@
     display: none;
 }
 
+.log__main {
+    margin: auto;
+}
+
 .log__section {
     max-width: 280px;
     height: 100%;

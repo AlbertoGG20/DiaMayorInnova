@@ -68,4 +68,8 @@ group :development, :test do
 
   # SimpleCov is a code coverage analysis tool for Ruby.
   gem 'simplecov', require: false
+
+  # Kaminari for an efficient pagination of data records 
+  gem 'kaminari'
+
 end

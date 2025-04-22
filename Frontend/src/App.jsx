@@ -33,6 +33,7 @@ import 'react-tooltip/dist/react-tooltip.css'
 import './App.css';
 import './assets/Styles/Global.css';
 import UserManagement from './components/user/UserManagement';
+import ExamInformation from './components/task/ExamInformation/ExamInformation';
 
 function App() {
 
@@ -48,10 +49,8 @@ function App() {
                 <Route path="*" element={<Home />} />
                 <Route element={<PrivateRoute allowedRoles={['admin', 'center_admin', 'teacher', 'student']} />}>
                   <Route path="/home" element={<Home />} />
-                  <Route path="/accounting-plans-test" element={<AccountingPlanList />} />
-                  <Route path="/accounting-plans-test/:id" element={<AccountingPlan />} />
                   <Route path="/modes" element={<Modes />} >
-                    <Route path='tarea/' element={<TaskPage />} />
+                    <Route path="tarea/:exerciseId" element={<TaskPage />} />
                     <Route path='practica/' element={<PracticePage />} />
                     <Route path='examen/:exerciseId' element={<ExamPage />} />
                   </Route>
@@ -65,7 +64,8 @@ function App() {
                     <Route path="/accounts/:id" element={<Account />} />
                     <Route path="/tasks" element={<TaskListAndDetails />} />
                     <Route path="/task-edit" element={<TaskCreateForm />} />
-                    <Route path="/student-marks" element={<ExerciseMarksList/>}/>
+                    <Route path="/notas-estudiantes/:id" element={<ExerciseMarksList />} />
+                    <Route path="/notas-estudiantes/:id/examen/:exerciseId" element={<ExamInformation />} />
                     <Route path="/statements" element={<StatementsList />} />
                     <Route path="/add-statements" element={<StatementCreateForm />} />
                     <Route path="/add-accounting-plan" element={<AddAccountingPlan />} />

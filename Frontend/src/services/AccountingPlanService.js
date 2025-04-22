@@ -1,9 +1,11 @@
 import http from "../http-common";
 
-const getAll = async () => {
+const getAll = async (page = 1, perPage = 10, name = "") => {
     try {
-        const response = http.get("/accounting_plans"); // "Backend/config/routes.rb"
-        return response;
+        const response = await http.get("/accounting_plans", {// "Backend/config/routes.rb"
+            params: {page, per_page: perPage, name}
+        });
+        return response.data;
     } catch (error) {
         console.error("Error en la petición getAll: ", error);
         return null;

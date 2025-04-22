@@ -87,9 +87,13 @@
 }
 
 th {
-  border-bottom: solid 1px var(--Color-grey-200);
+  border-bottom: solid 1px var(--Color-Principal);
   padding: var(--gap-xs) 0;
   margin: var(--gap-xs);
+
+  & i {
+    font-size: x-large;
+  }
 }
 
 .accountingPlan__button {
@@ -201,6 +205,14 @@ th {
   display: flex;
   font-family: inherit;
   justify-content: left;
+}
+
+.accountingPlan__pagination {
+  padding-left: var(--gap-m);
+  & span {
+    padding: var(--gap-s);
+    color: var(--Color-Principal);
+  }
 }
 
 .accountingPlan__form--actions.details {

@@ -1,21 +1,22 @@
 import React from "react";
 import "./TaskPage.css";
+import useStatements from "../../hooks/useStatements";
 
 const TaskPreview = ({ 
   title, 
   openingDate, 
-  closingDate, 
-  statements, 
+  closingDate,
   selectedStatements, 
   handleRemoveStatement,
   additionalInformation,
   isExam
 }) => {
 
-  const validSelectedStatements = selectedStatements.filter((statementId) =>
-    statements.some((s) => s.id === statementId)
-  );
+  const { allStatements } = useStatements();
 
+  const validSelectedStatements = selectedStatements.map((statementId) =>
+    allStatements.find((s) => s.id === statementId) || { id: statementId, definition: "Cargando..." }
+  );
 
   return (
     <section className="task-page__preview">
@@ -35,11 +36,11 @@ const TaskPreview = ({
         </div>
         {validSelectedStatements.length > 0 ? (
           <ul className="task-page__list">
-            {validSelectedStatements.map((statementId) => {
-              const statement = statements.find((s) => s.id === statementId);
+            {validSelectedStatements.map((statement) => {
+
 
               if (!statement) {
-                console.warn(`No se encontró un enunciado con el ID: ${statementId}`);
+                console.warn(`No se encontró un enunciado con el ID: ${statement.id}`);
                 return null;
               }
 

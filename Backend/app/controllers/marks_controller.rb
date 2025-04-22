@@ -1,5 +1,6 @@
 class MarksController < ApplicationController
   before_action :authenticate_user!
+  before_action :set_mark, only: [:show, :update]
   load_and_authorize_resource
 
   def index
@@ -13,7 +14,6 @@ class MarksController < ApplicationController
   end
   
   def show
-    @mark = Mark.find(params[:id])
     render json: @mark
   end
   
@@ -28,13 +28,44 @@ class MarksController < ApplicationController
   end
   
   def update
-    @mark = Mark.find(params[:id])
     if @mark.update(mark_params)
       render json: @mark
     else
       render json: @mark.errors, status: :unprocessable_entity
     end
   end
+
+  def update_multiple
+    marks_params = params.require(:marks).map do |mark_param|
+      mark_param.permit(:id, :mark, :comment)
+    end
+  
+    errors = []
+  
+    Mark.transaction do
+      marks_params.each do |mark_param|
+        mark = Mark.find_by(id: mark_param[:id])
+  
+        if mark
+          unless mark.update(mark: mark_param[:mark], comment: mark_param[:comment])
+            errors << { id: mark.id, errors: mark.errors.full_messages }
+            raise ActiveRecord::Rollback 
+          end
+        else
+          errors << { id: mark_param[:id], error: "No se encontró la marca" }
+          raise ActiveRecord::Rollback 
+        end
+      end
+    end
+  
+    if errors.any?
+      render json: { status: 'error', errors: errors }, status: :unprocessable_entity
+    else
+      render json: { status: 'success' }, status: :ok
+    end
+  end
+  
+  
   
   def destroy
     @marks = Mark.all
@@ -45,8 +76,12 @@ class MarksController < ApplicationController
 
   private
 
+    def set_mark
+      @mark = Mark.find(params[:id])
+    end
+
     def mark_params
-      params.require(:mark).permit(:mark, :exercise_id)
+      params.require(:mark).permit(:mark, :exercise_id, :comment)
     end
 
 end

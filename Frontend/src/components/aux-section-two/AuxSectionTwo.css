@@ -1,8 +1,7 @@
 .aux-section_two__container {
   grid-area: section1;
   background-color: var(--Color-White);
-  border-radius: var(--r-xxs);
-  box-shadow: var(--box-shadow-M3);
+  border-radius: 0 var(--r-xs) var(--r-xs) var(--r-xs);
   width: 100%;
   padding: var(--gap-m);
   display: flex;
@@ -40,7 +39,7 @@
   width: 25%;
 }
 
-.help_secction_tittle {
+.help_section_title {
   font-size: var(--text-mobile-subtitles-2);
 }
 
@@ -66,29 +65,6 @@
     width: 100px;
     height: 40px;
     margin: 0;
-  }
-}
-
-.statement-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--gap-xs);
-
-  & .statement-button {
-    width: 64px;
-    background-color: var(--Color-grey-100);
-    border-radius: var(--r-xs);
-    cursor: pointer;
-    box-shadow: var(--box-shadow-btn);
-  }
-
-  & .statement-button.selected {
-    background-color: var(--Color-green-600);
-    border: solid 1px var(--Color-green-800);
-  }
-
-  & .statement-button.visited {
-    background-color: var(--Color-green-300);
   }
 }
 

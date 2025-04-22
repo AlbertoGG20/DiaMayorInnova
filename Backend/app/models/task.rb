@@ -2,6 +2,7 @@ class Task < ApplicationRecord
   has_and_belongs_to_many :statements, join_table: :task_statements
   belongs_to :user, foreign_key: :created_by
   has_many :users, through: :exercises
+  has_many :exercises, dependent: :destroy
 
   scope :ordered_by_closing_date, -> { order(closing_date: :asc) }
 
@@ -9,6 +10,7 @@ class Task < ApplicationRecord
   validates :title, :opening_date, :closing_date, presence: true
   validates :additional_information, presence: true, allow_blank: true
   validates :is_exam, inclusion: { in: [true, false] }
+  validates :help_available, inclusion: { in: [true, false] }
 
   private
 

@@ -3,10 +3,10 @@ class User < ApplicationRecord
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   has_one_attached :featured_image
 
-  has_many :statements
+  has_many :statements, dependent: :destroy #Para poder borrar el usuario es necesario borrar sus enunciados y soluciones. Otra posibilidad sería modificar a nullify
   has_many :tasks, through: :exercises
   has_many :exercises, dependent: :destroy
-  has_many :teacher_class_groups
+  has_many :teacher_class_groups, dependent: :destroy
   has_many :class_groups, through: :teacher_class_groups
   has_many :student_class_groups
   has_many :class_groups, through: :student_class_groups

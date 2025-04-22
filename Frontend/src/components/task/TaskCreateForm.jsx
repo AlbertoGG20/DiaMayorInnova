@@ -25,6 +25,7 @@ const TaskCreateForm = ({ onTaskCreated }) => {
   const [assignedUsers, setAssignedUsers] = useState([]);
   const [additionalInformation, setAdditionalInformation] = useState(task?.additional_information || "");
   const [isExam, setIsExam] = useState(task?.is_exam || false);
+  const [isHelpAvailable, setIsHelpAvailable] = useState(task?.help_available || false);
   const [errors, setErrors] = useState({
     title: "",
     openingDate: "",
@@ -34,7 +35,6 @@ const TaskCreateForm = ({ onTaskCreated }) => {
   const usersByTaskId = (id) => {
     exerciseServices.getByTaskId(id)
       .then(({ data }) => {
-        console.log(data)
         setCurrentUsers(data)
         setAssignedUsers(data)
       });
@@ -160,6 +160,7 @@ const TaskCreateForm = ({ onTaskCreated }) => {
       closing_date: closingDate,
       additional_information: additionalInformation,
       is_exam: isExam,
+      help_available: isHelpAvailable,
       statement_ids: selectedStatements,
       created_by: user.id,
     };
@@ -202,6 +203,8 @@ const TaskCreateForm = ({ onTaskCreated }) => {
         setAdditionalInformation={setAdditionalInformation}
         isExam={isExam}
         setIsExam={setIsExam}
+        isHelpAvailable={isHelpAvailable}
+        setIsHelpAvailable={setIsHelpAvailable}
         handleSubmit={handleSubmit}
         errors={errors}
         id={task && task.id}

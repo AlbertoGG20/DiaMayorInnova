@@ -97,6 +97,14 @@
   font-weight: bold;
 }
 
+.task-page__header-row {
+  display: flex;
+  gap: var(--gap-m);
+  align-items: center;
+  width: 100%;
+}
+
+
 .task-page__header--h2 {
   font-size: var(--text-desktop-subtitles-2);
   font-weight: bold;
@@ -694,6 +702,15 @@
 
 .modal-solutionViewer__entry-item--info strong {
   margin-right: var(--gap-xxs);
+}
+
+.task-page__checkbox_container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: end;
+  gap: var(--gap-xxs);
+  padding-right: var(--gap-l);
 }
 
 @media (max-width: 1024px) {

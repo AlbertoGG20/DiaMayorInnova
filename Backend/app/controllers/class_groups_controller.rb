@@ -23,7 +23,18 @@ class ClassGroupsController < ApplicationController
       @classGroups = @classGroups.joins(:teacher_class_groups).where(teacher_class_groups: { user_id: params[:user_id] })
     end
 
-    render json: @classGroups
+    paginated_class_groups = @classGroups.page(params[:page]).per(params[:per_page] || 10)
+
+    render json: {
+      data: {
+        class_groups: paginated_class_groups,
+        meta: {
+          current_page: paginated_class_groups.current_page,
+          total_pages: paginated_class_groups.total_pages,
+          total_count: paginated_class_groups.total_count
+        }
+      }
+    }
   end
     
   def show

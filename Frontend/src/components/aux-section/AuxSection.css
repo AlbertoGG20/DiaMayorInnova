@@ -1,0 +1,13 @@
+.practice__section_2 {
+  grid-area: auxSection;
+  background-color: var(--Color-White);
+  border-radius: var(--r-xs);
+  box-shadow: var(--box-shadow-btn);
+  height: 100%;
+}
+
+@media (width < 770px) {
+  .practice__section_2 {
+    height: 800px;
+  }
+}

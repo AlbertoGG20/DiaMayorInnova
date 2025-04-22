@@ -1,13 +1,17 @@
 .entry_form_wrapper {
   width: 100%;
-  padding: 0 var(--gap-xxs);
+  padding: 0;
   display: flex;
   justify-content: start;
   align-items: center;
   gap: var(--gap-xxxl);
 
   @container parent (width < 609px) {
-    gap: var(--gap-m);
+    gap: var(--gap-xxl);
+  }
+
+  @container parent (width < 400px) {
+    gap: var(--gap-l);
   }
 }
 
@@ -16,12 +20,17 @@
   display: flex;
   justify-content: left;
   align-items: center;
+  justify-content: space-between;
   gap: var(--gap-xl);
   max-width: none;
 
   @container parent (width < 609px) {
     gap: 0;
   }
+}
+
+.entry_form_inputs__wrapper {
+  display: flex;
 }
 
 .form_inputs_container {
@@ -57,36 +66,107 @@
 }
 
 .form_group {
-  font-size: var(--text-desktop-small);
+  font-size: var(--text-mobile-small);
 
   >input {
     width: 100px;
     margin: 0;
 
     @container parent (width < 809px) {
-      width: 84px;
+      width: 60px;
+      height: 36px;
     }
 
+    @container parent (width < 400px) {
+      width: 60px;
+      margin-right: var(--gap-xxxs);
+    }
+
+  }
+}
+
+.form_group:nth-child(1) {
+  >input {
+    margin-right: var(--gap-xxs);
+
+    @container parent (width < 809px) {
+      width: 100px;
+    }
+
+    @container parent (width < 600px) {
+      width: 72px;
+      margin-right: var(--gap-xxxs);
+    }
+
+    @container parent (width < 400px) {
+      width: 80px;
+      margin-right: var(--gap-xxxs);
+    }
   }
 }
 
 .form_group:nth-child(2) {
 
   >input {
-    width: 220px;
+    width: 260px;
+    margin-right: var(--gap-xxs);
 
     @container parent (width < 809px) {
-      width: 144px;
+      width: 164px;
+
     }
 
     @container parent (width < 600px) {
-      width: 100px;
+      width: 114px;
+    }
+  }
+}
+
+.form_group:nth-child(3) {
+  >input {
+    margin-right: var(--gap-xxs);
+    width: 140px;
+
+    @container parent (width < 809px) {
+      width: 120px;
+    }
+
+    @container parent (width < 600px) {
+      width: 70px;
+      margin-right: var(--gap-xxxs);
+    }
+
+    @container parent (width < 400px) {
+      width: 60px;
+      margin-right: var(--gap-xxxs);
+    }
+  }
+}
+
+.form_group:nth-child(4) {
+  >input {
+    margin-right: var(--gap-xxs);
+    width: 140px;
+
+    @container parent (width < 809px) {
+      width: 120px;
+    }
+
+    @container parent (width < 600px) {
+      width: 70px;
+      margin-right: var(--gap-xxxs);
+    }
+
+    @container parent (width < 400px) {
+      width: 60px;
+      margin-right: var(--gap-xxxs);
     }
   }
 }
 
 
-@media (width < 640px) {
+
+/* @media (width < 640px) {
   .entry_wrapper {
     padding: var(--gap-s) var(--gap-xxs);
   }
@@ -99,4 +179,104 @@
   .entry_form_wrapper {
     width: 100%;
   }
+} */
+
+@media (width > 480px) {}
+
+@media (width > 820px) {
+  .form_group {
+    font-size: var(--text-desktop-small);
+  }
+
+  .entry_form_wrapper {
+    width: 100%;
+    padding: 0 var(--gap-xxs);
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    gap: var(--gap-xxxl);
+
+    @container parent (width < 809px) {
+      gap: var(--gap-xl);
+    }
+
+    @container parent (width < 609px) {
+      gap: var(--gap-m);
+    }
+  }
+
+  .entry_form {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: var(--gap-xl);
+    max-width: none;
+
+    @container parent (width < 609px) {
+      gap: 0;
+    }
+  }
+
+  .form_inputs_container {
+    width: 100%;
+    gap: var(--gap-xl);
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+
+    @container parent (width < 609px) {
+      gap: var(--gap-s);
+    }
+  }
+
+  .entry_apt {
+    width: 8px;
+  }
+
+  .btn-trash {
+    height: 34px;
+    width: 34px;
+    padding: var(--gap-xxxs);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+    color: var(--Color-red-700);
+    font-size: larger;
+
+    >.fi {
+      display: flex;
+    }
+  }
+
+  .form_group {
+    font-size: var(--text-mobile-small);
+
+    >input {
+      width: 100px;
+      margin: 0;
+
+      @container parent (width < 809px) {
+        width: 60px;
+        height: 36px;
+      }
+
+    }
+  }
+
+  /* 
+  .form_group:nth-child(2) {
+
+    >input {
+      width: 220px;
+
+      @container parent (width < 809px) {
+        width: 144px;
+      }
+
+      @container parent (width < 600px) {
+        width: 100px;
+      }
+    }
+  } */
 }

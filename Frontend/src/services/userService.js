@@ -1,7 +1,15 @@
 import http from "../http-common";
 
-const getAllUsers = (params = {}) => {
-  return http.get('/users', { params });
+const getAllUsers = async (page = 1, perPage = 10) => {
+  try {
+    const response = await http.get('/users' , {
+      params: {page, per_page: perPage}
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error al obtener los usuarios", error);
+    return null;
+  }
 };
 
 const createUser = (formData) => http.post('/users', formData, {
@@ -37,7 +45,7 @@ const getTeacherClassGroups = async (userId) => {
 
 const getCurrentUser = async () => {
   try {
-    const response = await http.get('/users/current');
+    const response = await http.get('/users/current_user');
     return response.data.user; // Asumiendo que el endpoint devuelve { user: { ... } }
   } catch (error) {
     console.error("Error al obtener el usuario actual:", error);

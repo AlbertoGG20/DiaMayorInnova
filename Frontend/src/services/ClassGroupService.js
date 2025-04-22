@@ -1,8 +1,10 @@
 import http from "../http-common";
 
-const getAll = async () => {
+const getAll = async (page = 1, perPage = 10) => {
     try {
-        const response = await http.get("/class_groups");
+        const response = await http.get("/class_groups", {
+            params: { page, per_page: perPage }
+        });
         return response;
     } catch (error) {
         console.error("Error en la petición:", error);

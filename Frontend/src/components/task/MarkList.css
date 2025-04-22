@@ -1,63 +1,105 @@
-.markList__page {
-    padding: var(--gap-m);
-    width: 100%;
-    height: 91vh;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: auto auto 1fr;
-    grid-template-areas:
-      "btn title empty"
-      "task task task"
-      "list list list";
-  }
+.mark_list__page {
+  width: 100%;
+  height: 100%;
+}
 
-.markList__btnHome {
-    margin-left: var(--gap-s);
-    width: 120px;
-    background-color: #fff;
-    color: var(--Color-Principal);
-    border: var(--Color-grey-200) 1px solid;
-    border-radius: 6px;
-    align-self: start;
-    grid-area: btn;
-  }
-  
-  .markList__btnHome:hover {
-    color: var(--Color-Principal-claro);
-    border: var(--Color-Principal-claro) 1px solid;
-  }
-  
-  .markList__page--title {
-    font-size: var(--text-desktop-body-small);
-    font-weight: 500;
-    color: var(--Color-Principal);
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    grid-area: title;
-  }
-
-.markList__page--task{
+.statements__pagination {
+  & span {
     padding: var(--gap-s);
-    font-size: var(--text-desktop-subtitles-2);
-    align-self: self-start;
-    font-weight: bold;
-    grid-area: task;
+    color: var(--Color-Principal);
+  }
+}
+
+.mark_list__btnHome {
+  margin-left: var(--gap-s);
+  width: 120px;
+  background-color: #fff;
+  color: var(--Color-Principal);
+  border: var(--Color-grey-200) 1px solid;
+  border-radius: 6px;
+  align-self: start;
+  grid-area: btn;
+}
+
+.mark_list__btnHome:hover {
+  color: var(--Color-Principal-claro);
+  border: var(--Color-Principal-claro) 1px solid;
+}
+
+.mark_list__page--title {
+  font-size: var(--text-desktop-body-large);
+  font-weight: 600;
+  color: var(--Color-Principal-claro);
+}
+
+.mark_list__page--task {
+  margin-top: var(--gap-xs);
+  padding: var(--gap-s) var(--gap-xxl);
+  font-size: var(--text-desktop-lead);
+  font-weight: 600;
+  color: var(--Color-Principal);
+  border-bottom: solid 1px var(--Color-grey-200);
+  margin-bottom: var(--gap-s);
+}
+
+.mark_list__header {
+  display: flex;
+  gap: var(--gap-l);
+  justify-content: left;
+  align-items: center;
+  padding: var(--gap-xxl) var(--gap-xxl) 0 var(--gap-xxl);
+}
+
+.mark_list__header {
+  display: flex;
+  gap: var(--gap-s);
+  align-items: center;
+}
+
+.mask_list_table__container {
+  padding: 0 var(--gap-xxl);
+
+  progress {
+    border-radius: var(--r-xs);
+    width: 100%;
+    height: 8px;
+    box-shadow: var(--box-shadow-btn);
   }
 
-.markList__page--list{
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap-m);
-    padding: var(--gap-s);
-    grid-area: list;
+  progress::-webkit-progress-bar {
+    background-color: var(--Color-grey-50);
+    border-radius: var(--r-xs);
 
-    & .modal__custom {
-        width: 50%;
-        max-width: 400px;
-        text-align: center;
-        margin: auto;
-        cursor: pointer;
-    }
+  }
+
+  progress::-webkit-progress-value {
+    background-color: var(--Color-Principal);
+    border-radius: var(--r-xs);
+  }
+
+}
+
+.statement__date--header {
+  width: 200px;
+}
+
+.statement__state--header {
+  width: 68px;
+}
+
+.statement__action--header {
+  width: 120px;
+}
+
+.statement__state {
+  display: flex;
+  justify-content: center;
+}
+
+.mark-list__pagination {
+  padding-left: var(--gap-m);
+  & span {
+    padding: var(--gap-s);
+    color: var(--Color-Principal);
+  }
 }

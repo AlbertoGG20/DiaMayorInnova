@@ -13,19 +13,22 @@ const StatementsList = ({ onSelectStatement }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [statementToDelete, setStatementToDelete] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1); //Pagination
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     const fetchStatements = async () => {
       try {
         setLoading(true);
-        const response = await statementService.getAllStatements();
+        const response = await statementService.getAllStatements(currentPage, 10);
 
-        console.log("Datos de enunciados obtenidos:", response.data);
-        if (Array.isArray(response.data)) {
-          const filteredStatements = response.data.filter(
+        console.log("Datos de enunciados obtenidos:", response.data.statements);
+        if (Array.isArray(response.data.statements)) {
+          const filteredStatements = response.data.statements.filter(
             (statement) => statement.is_public || statement.user_id === user?.id
           );
           setStatements(filteredStatements);
+          setTotalPages(response.data.meta.total_pages || 1)
         } else {
           console.error("Error: La respuesta no es un arreglo válido.");
         }
@@ -36,7 +39,7 @@ const StatementsList = ({ onSelectStatement }) => {
       }
     };
     fetchStatements();
-  }, [user]);
+  }, [user, currentPage, totalPages]);
 
   const handleDelete = async (id) => {
     try {
@@ -100,10 +103,6 @@ const StatementsList = ({ onSelectStatement }) => {
     return <p>Cargando usuario...</p>;
   }
 
-  if (loading) {
-    return <p>Cargando enunciados...</p>;
-  }
-
   if (!statements.length) {
     return <p>No hay enunciados disponibles.</p>;
   }
@@ -114,9 +113,31 @@ const StatementsList = ({ onSelectStatement }) => {
     setFormVisible(false);
   };
 
+  const changePage = (newPage) => {
+    if (newPage < 1 || newPage > totalPages) return; // Evita páginas fuera de rango
+    setCurrentPage(newPage);
+  };
+
   return (
     <div className="statement-page__selection--content">
-      <h3 className="statement-page__list--header">Enunciados</h3>
+      <div className="statement-page__row" style={{display: "flex", gap: "var(--gap-m)", alignItems: "center", width: "100%"}}>
+        <h3 className="statement-page__list--header">Enunciados</h3>
+        <div className="statement-list__pagination">
+          <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => changePage(1)}>
+            <i className='fi fi-rr-angle-double-small-left' />
+          </button>
+          <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => changePage(currentPage - 1)}>
+            <i className='fi fi-rr-angle-small-left' />
+          </button>
+          <span style={{ padding: "var(--gap-s)", color: "var(--Color-Principal)" }}>Página {currentPage} de {totalPages}</span>
+          <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => changePage(currentPage + 1)}>
+            <i className='fi fi-rr-angle-small-right' />
+          </button>
+          <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => changePage(totalPages)}>
+            <i className='fi fi-rr-angle-double-small-right' />
+          </button>
+        </div>
+      </div>
       {errorMessage && <div className="error-message">{errorMessage}</div>}
       <ul className="statement-page__list">
         {statements.map((statement) => {

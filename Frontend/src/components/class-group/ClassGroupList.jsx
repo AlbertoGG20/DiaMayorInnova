@@ -12,13 +12,16 @@ const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange, maxStud
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [groupToDelete, setGroupToDelete] = useState(null);
   const [assignedUsers, setAssignedUsers] = useState({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const fetchClassGroups = async () => {
     setLoading(true);
     try {
       const response = await ClassGroupService.getAll();
-      if (response && response.data) {
-        setClassGroups(response.data);
+      if (response?.data?.data?.class_groups) {
+        setClassGroups(response?.data?.data?.class_groups);
+        setTotalPages(response?.data?.data?.meta?.total_pages || 1);
       } else {
         console.error("No se recibieron datos válidos");
       }
@@ -32,6 +35,7 @@ const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange, maxStud
   const fetchCurrentUser = async () => {
     try {
       const user = await userService.getCurrentUser();
+      console.log("PROBANDOOOO", user);
       setCurrentUser(user);
       if (user.role === "teacher") {
         const teacherGroups = await userService.getTeacherClassGroups(user.id);
@@ -45,7 +49,7 @@ const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange, maxStud
   useEffect(() => {
     fetchClassGroups();
     fetchCurrentUser();
-  }, [refreshTrigger]);
+  }, [refreshTrigger, currentPage]);
 
   const isButtonDisabled = (group) => {
     if (!currentUser) return true;
@@ -101,7 +105,27 @@ const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange, maxStud
 
   return (
     <div className="class-group-page__list">
-      <h2>Lista de Grupos de Clase</h2>
+      <div className="class-group-row">
+        <h2>Lista de Grupos de Clase</h2>
+
+        <div className="class-group-list__pagination">
+          <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage(1)}>
+            <i className='fi fi-rr-angle-double-small-left'/>
+          </button>
+          <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)}>
+            <i className='fi fi-rr-angle-small-left'/>
+          </button>
+          <span>Página {currentPage} de {totalPages}</span>
+          <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage((prev) => prev + 1)}>
+            <i className='fi fi-rr-angle-small-right'/>
+          </button>
+          <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage(totalPages)}>
+            <i className='fi fi-rr-angle-double-small-right'/>
+          </button>
+        </div>  
+      </div>
+      
+
       {classGroups.length === 0 ? (
         <p>No hay grupos de clase creados.</p>
       ) : (

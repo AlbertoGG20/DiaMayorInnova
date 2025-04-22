@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_03_06_131450) do
+ActiveRecord::Schema[7.2].define(version: 2025_03_18_125758) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -124,6 +124,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_06_131450) do
     t.datetime "updated_at", null: false
     t.bigint "exercise_id", null: false
     t.integer "statement_id"
+    t.string "comment", default: ""
     t.index ["exercise_id"], name: "index_marks_on_exercise_id"
   end
 
@@ -160,8 +161,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_06_131450) do
     t.bigint "account_id"
     t.integer "number"
     t.integer "account_number"
-    t.integer "credit"
-    t.integer "debit"
+    t.decimal "credit"
+    t.decimal "debit"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "student_entry_id", null: false
@@ -205,6 +206,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_06_131450) do
     t.integer "created_by"
     t.text "additional_information"
     t.boolean "is_exam", default: false
+    t.boolean "help_available", default: false
   end
 
   create_table "teacher_class_groups", force: :cascade do |t|

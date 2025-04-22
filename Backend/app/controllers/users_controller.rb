@@ -26,13 +26,24 @@ class UsersController < ApplicationController
       users = users.joins(:student_class_groups).where(student_class_groups: { class_group_id: params[:class_groups_id] })
     end
 
-    users_data = users.map do |user|
+    paginated_users  = users.page(params[:page]).per(params[:per_page] || 10)
+
+    users_data = paginated_users.map do |user|
       user_data = user.as_json
       user_data[:featured_image] = user.featured_image.attached? ? { url: rails_blob_url(user.featured_image, only_path: true) } : nil
       user_data
     end
 
-    json_response "Users retrieved successfully", true, { users: users_data }, :ok
+    json_response "Users retrieved successfully", true, {
+      data: {
+        users: users_data,
+        meta: {
+          current_page: paginated_users.current_page,
+          total_pages: paginated_users.total_pages,
+          total_count: paginated_users.total_count
+        }
+      }
+    }, :ok
   end
 
   def show

@@ -79,9 +79,14 @@
 }
 
 th {
-  border-bottom: solid 1px var(--Color-grey-200);
+  color: var(--Color-Principal);
+  border-bottom: solid 1px var(--Color-Principal);
   padding: var(--gap-xs) 0;
   margin: var(--gap-xs);
+
+  & i {
+    font-size: x-large;
+  }
 }
 
 .account__button {
@@ -96,14 +101,14 @@ th {
 .account__button--link {
   padding: var(--gap-s) var(--gap-m);
   background-color: transparent;
-  color: var(--Color-grey-400);
   border: none;
   border-radius: var(--border-radius);
   cursor: pointer;
 }
 
-.account__button--link:hover {
-  color: var(--Color-grey-900);
+.account__button--link.pencil:hover,
+.account__button--link.inter:hover {
+  color: var(--Color-Principal-claro);
 }
 
 .account__button--link.pencil,
@@ -111,7 +116,7 @@ th {
 .account__button--remove.trash
 {
   margin-right: 8px;
-  color: var(--Color-grey-800);
+  color: var(--Color-Principal);
   font-size: var(--text-desktop-body-small);
 }
 
@@ -142,16 +147,16 @@ th {
 }
 
 .account__form {
-  position: static;
-  padding: var(--gap-xl);
+  max-width: 50%;
+  margin-top: var(--gap-s);
+  padding: var(--gap-s);
   border-radius: var(--border-radius);
-  max-width: 800px;
-  margin: 0 auto;
 }
 
 .account__form--row {
   display: flex;
   gap: 12px;
+  align-items: center;
 }
 
 .account__form--group {
@@ -173,11 +178,21 @@ th {
 
 .account__form--actions {
   display: flex;
-  justify-content: left;
+  width: 100%;
+}
+
+.account__table--actions {
+  display: flex;
   font-family: inherit;
-  /* & .account__button {
-    margin-top: 16px;
-  } */
+  justify-content: left;
+}
+
+.account__pagination {
+  padding-left: var(--gap-m);
+  & span {
+    padding: var(--gap-s);
+    color: var(--Color-Principal);
+  }
 }
 
 .account__form--actions.details {

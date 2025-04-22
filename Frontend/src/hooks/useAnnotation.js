@@ -5,13 +5,13 @@ const useAnnotation = () => {
   const [annotations, setAnnotations] = useState([]);
   const generateUid = () => `id-${Math.random().toString(36).substr(2, 9)}`;
 
-  const addAnnotation = (entryId) => {
-    const entryAnnotations = annotations.filter(annotation => annotation.student_entry_id === entryId);
+  const addAnnotation = (entryUid) => {
+    const entryAnnotations = annotations.filter(annotation => annotation.student_entry_uid === entryUid);
     const nextAnnotationNumber = entryAnnotations.length + 1;
 
     const initialAnnotation = {
       uid: generateUid(),
-      student_entry_id: entryId,
+      student_entry_uid: entryUid,
       account_id: 1,
       number: nextAnnotationNumber,
       account_number: "",
@@ -21,7 +21,7 @@ const useAnnotation = () => {
     setAnnotations(prevAnnotations => [...prevAnnotations, initialAnnotation]);
   };
 
-  const updateAnnotation = (annotationUid, updatedAnnotation) => {
+  const updateAnnotation = (selectedStatementId, annotationUid, updatedAnnotation) => {
     const newAnnotations = annotations.map(annotation =>
       annotation.uid === annotationUid ? { ...annotation, ...updatedAnnotation } : annotation
     );

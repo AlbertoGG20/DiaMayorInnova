@@ -160,6 +160,14 @@
   }
 }
 
+.task-list__pagination {
+  text-align: center;
+  & span {
+    padding: var(--gap-s);
+    color: var(--Color-Principal);
+  }
+}
+
 .task-list__button {
   padding: var(--gap-xxs) var(--gap-s);
   background-color: var(--Color-Neutral-Dark);

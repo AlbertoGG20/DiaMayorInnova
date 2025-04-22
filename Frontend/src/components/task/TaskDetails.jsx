@@ -33,7 +33,7 @@ const TaskDetails = ({ selectedTask, onDeleteStatement, onDeleteTask, onCloseMod
   };
 
   const handleShowMarks = () => {
-    navigate("/student-marks", { state: { task_id: selectedTask.id } });
+    navigate(`/notas-estudiantes/${selectedTask.id}`, { state: { task_id: selectedTask.id } });
   }
 
   return (

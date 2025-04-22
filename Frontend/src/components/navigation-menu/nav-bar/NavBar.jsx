@@ -15,7 +15,6 @@ const NavBar = () => {
   const closeModal = () => setIsModalOpen(false);
 
   if (location.pathname === "/sign_in") {
-    console.log("dentro del location");
     return null;
   }
 

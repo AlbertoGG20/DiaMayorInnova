@@ -3,12 +3,19 @@ class AccountingPlansController < ApplicationController
     load_and_authorize_resource
     
     def index
-        if params[:name].present?
-            @accountingPlans = AccountingPlan.where("name LIKE ?", "%#{params[:name]}%")
-        else
-            @accountingPlans = AccountingPlan.all
-        end
-        render json: @accountingPlans
+        accountingPlans = AccountingPlan.all
+        accountingPlans = accountingPlans.where("name LIKE ?", "%#{params[:name]}%")
+
+        paginated_pgc = accountingPlans.page(params[:page]).per(params[:per_page] || 10)
+
+        render json: {
+            accountingPlans: paginated_pgc,
+            meta: {
+                current_page: paginated_pgc.current_page,
+                total_pages: paginated_pgc.total_pages,
+                total_count: paginated_pgc.total_count
+            }
+        }
     end
 
     def show

@@ -15,38 +15,18 @@ const StudentAside = () => {
 
   const handleClick = (exerciseId) => {
     const selectedExercise = exercises.find((ex) => ex.id === exerciseId);
-    if (selectedExercise && selectedExercise.started) {
-      modalRef.current?.showModal();
-      return;
-    }
-    navigate(`/modes/examen/${exerciseId}`);
+
+    if (!selectedExercise?.task) return;
+
+    const route = selectedExercise.task.is_exam 
+      ? `/modes/examen/${exerciseId}`
+      : `/modes/tarea/${exerciseId}`;
+
+    navigate(route);
   };
 
   useEffect(() => {
     if (!user?.id) return;
-    /*
-        const fetchExercises = async () => {
-          try {
-            const response = await exerciseService.getAll();
-            if (response?.data) {
-              console.log("Ejercicios obtenidos:", response.data);
-              const currentDate = new Date();
-              const filteredExercises = response.data.filter((exercise) => {
-                const closingDate = new Date(exercise.task.closing_date);
-                return closingDate > currentDate;
-              });
-              setExercises(filteredExercises);
-            } else {
-              console.log("No hay datos de ejercicios");
-              setExercises([]);
-            }
-          } catch (error) {
-            console.error("Error obteniendo los ejercicios:", error);
-            setExercises([]);
-          } finally {
-            setLoading(false);
-          }
-    */
     const fetchExercises = async () => {
       try {
         const response = await exerciseService.getAll();
@@ -82,7 +62,7 @@ const StudentAside = () => {
               <div className="student-aside__list-info">
                 <div className="student-aside__info-header">
                   <p><strong>Tarea:</strong> {exercise.task.title || "Sin título"}</p>
-                  <div className="student-aside__square">
+                  <div className={`student-aside__square ${exercise.task.is_exam ? 'exam' : 'task'}`}>
                     <i className="fi fi-rr-book-alt"></i>
                   </div>
                 </div>

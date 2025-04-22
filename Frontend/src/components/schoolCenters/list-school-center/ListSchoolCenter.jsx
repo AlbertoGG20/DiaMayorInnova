@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import SchoolsServices from '../../../services/SchoolsServices';
 import ConfirmDeleteModal from '../../modal/ConfirmDeleteModal';
 import "./ListSchoolCenter.css"
@@ -6,6 +6,30 @@ import "./ListSchoolCenter.css"
 const ListSchoolCenter = ({ schools, setSchools, setSelectedSchool }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [schoolToDelete, setSchoolToDelete] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1); //Pagination
+  const [totalPages, setTotalPages] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const allSchools = async(page, school_name) => {
+    setIsLoading(true);
+    try {
+      const data = await SchoolsServices.getAll(page, 10, school_name);
+      if (data) {
+        setSchools(data.schools);
+        setTotalPages(data.meta.total_pages)
+      }
+    }
+    catch (e) {
+      console.log(e);
+    }
+    finally {
+      setIsLoading(false)
+    }
+  };
+
+  useEffect(() => {
+    allSchools();
+  }, [currentPage]);
 
   const deleteSchool = (schoolId) => {
     SchoolsServices.remove(schoolId)
@@ -43,6 +67,22 @@ const ListSchoolCenter = ({ schools, setSchools, setSelectedSchool }) => {
             </li>
           </ul>
         ))}
+
+        <div className="school-list__pagination">
+          <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage(1)}>
+            <i className='fi fi-rr-angle-double-small-left'/>
+          </button>
+          <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)}>
+            <i className='fi fi-rr-angle-small-left'/>
+          </button>
+          <span>Página {currentPage} de {totalPages}</span>
+          <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage((prev) => prev + 1)}>
+            <i className='fi fi-rr-angle-small-right'/>
+          </button>
+          <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage(totalPages)}>
+            <i className='fi fi-rr-angle-double-small-right'/>
+          </button>
+         </div>
       </section>
 
       <ConfirmDeleteModal

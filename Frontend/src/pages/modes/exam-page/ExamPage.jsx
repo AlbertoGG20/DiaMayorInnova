@@ -6,6 +6,7 @@ import HelpSection from '../../../components/help-section/HelpSection';
 import userExerciseDataService from "../../../services/userExerciseDataService";
 import Modal from "../../../components/modal/Modal"
 import "./ExamPage.css";
+import { AuxSection } from '../../../components/aux-section/AuxSection';
 
 const ExamPage = () => {
   const { exerciseId } = useParams();
@@ -18,6 +19,7 @@ const ExamPage = () => {
   const modalNotAvailableRef = useRef(null);
   const modalTimeExpiredRef = useRef(null);
   const modalFinishedRef = useRef(null);
+  const modalTestSentRef = useRef(null);
   const navigate = useNavigate();
 
   const formatTime = (timeInSeconds) => {
@@ -27,23 +29,32 @@ const ExamPage = () => {
   };
 
   useEffect(() => {
+    const checkIfFinished = async () => {
+      try {
+        const response = await userExerciseDataService.getById(exerciseId);
+        if (response?.exercise?.finished) {
+          modalTestSentRef.current?.showModal();
+          return;
+        }
+      } catch (error) {
+        console.error("Error verificando estado del examen:", error);
+      }
+    };
+    checkIfFinished();
+  }, [exerciseId]);
+
+  useEffect(() => {
     const fetchExercise = async () => {
       try {
         const response = await userExerciseDataService.getById(exerciseId);
-        // console.log("Response data:", response); // Depuración
 
-        if (!response || !response.data) {
+        if (!response || !response.exercise) {
           throw new Error("Respuesta vacía o malformada");
         }
+        setExercise(response.exercise);
+        setStatements(response.exercise.task.statements || []);
 
-        const { exercise, statements, time_remaining } = response.data;
-        // console.log("Opening date:", exercise.task.opening_date); // Depuración
-        // console.log("Closing date:", exercise.task.closing_date); // Depuración
-        // console.log("Tiempo restante recibido:", time_remaining); // Depuración
-        // console.log("Hora actual:", new Date()); // Depuración
-        if (exercise) {
-          setExercise(exercise);
-          setStatements(statements || []);
+        const { exercise, statements, time_remaining } = response;
 
           if (exercise.task?.is_exam && exercise.started) {
             setExamStarted(true);
@@ -52,14 +63,13 @@ const ExamPage = () => {
             setExamStarted(false);
             setTimeRemaining(0);
           }
-        }
       } catch (err) {
         console.error("Error fetching exercise:", err);
       }
     };
 
     fetchExercise();
-  }, [exerciseId]);
+  }, [exerciseId, navigate]);
 
   useEffect(() => {
     const handleBeforeUnload = (e) => {
@@ -124,13 +134,14 @@ const ExamPage = () => {
   }, [examStarted]);
 
   useEffect(() => {
-    if (timeRemaining === 0 && examStarted) {
+    if (timeRemaining === 0 && examStarted && !exercise?.finished) {
       modalTimeExpiredRef.current?.showModal();
       navigate("/home");
     }
-  }, [timeRemaining, examStarted, navigate]);
+  }, [timeRemaining, examStarted, navigate, exercise]);
 
   const startExam = async () => {
+    if (!exercise?.task) return;
     const now = new Date();
     const openingDate = new Date(exercise.task.opening_date);
     if (now < openingDate) {
@@ -142,9 +153,12 @@ const ExamPage = () => {
       const response = await userExerciseDataService.start(exerciseId);
       if (response && response.status === 200) {
         console.log("Examen iniciado con éxito");
-        setExamStarted(true);
+
         const closingDate = new Date(exercise.task.closing_date);
-        const remaining = Math.floor((closingDate - new Date()) / 1000);
+        const now = new Date();
+        const remaining = Math.floor((closingDate - now) / 1000);
+
+        setExamStarted(true);
         setTimeRemaining(remaining);
         setExercise({ ...exercise, started: true });
       } else {
@@ -156,8 +170,6 @@ const ExamPage = () => {
   };
 
   const handleStatementComplete = (statementId, statementData) => {
-    // console.log("Statement completado:", statementId, statementData); // Depuración
-
     setCompletedStatements((prevData) => ({
       ...prevData,
       [statementId]: statementData,
@@ -172,26 +184,47 @@ const ExamPage = () => {
   if (!exercise) return <p>Cargando...</p>;
   const now = new Date();
   const openingDate = new Date(exercise.task.opening_date);
-  const examAvailable = now >= openingDate;
+  const closingDate = new Date(exercise.task.closing_date);
+  const examAvailable = now >= openingDate && now <= closingDate && !exercise.finished;
 
+  let availabilityMessage = '';
+  if (!examAvailable) {
+    availabilityMessage = now < openingDate
+      ? `La tarea estará disponible el ${openingDate?.toLocaleString?.() || "fecha no disponible"}`
+      : `La tarea cerró el ${closingDate?.toLocaleString?.() || "fecha no disponible"}`;
+  }
+
+  console.log("EXAAAM_STARTED:", examStarted);
+  console.log("LOS STATEMENTS", statements)
   return (
     <div className='modes_page_container exam-color'>
       <p className='head_task'>Modo Examen - {exercise.task.title}</p>
-      {!examStarted && (
-        <div className='modes_page_container--button'>
-          <button className="btn" onClick={startExam} disabled={!examAvailable}>
-            Comenzar examen
-          </button>
-          {!examAvailable && (
-            <p className='exam-available'><strong>El examen estará disponible a: {new Date(exercise.task.opening_date).toLocaleString()}</strong></p>
-          )}
-        </div>
-      )}
-      {examStarted && (
-        <div className="timer">
-          <p>Tiempo restante: {formatTime(timeRemaining)}</p>
-        </div>
-      )}
+      <div className='modes_page_container--button'>
+        {!examStarted && (
+          <>
+            <button className="btn" onClick={startExam} disabled={!examAvailable}>
+              {exercise.finished ? "Examen enviado" : "Comenzar examen"}
+            </button>
+            {!examAvailable && (
+              <p className='exam-available'>
+                <strong>{availabilityMessage}</strong>
+              </p>
+            )}
+
+            {exercise.finished && (
+              <p className='exam-available'>
+                <strong>El examen ya fue enviado el: {new Date(exercise.updated_at).toLocaleString()}</strong>
+              </p>
+            )}
+          </>
+        )}
+
+        {examStarted && (
+          <div className="timer">
+            <p>Tiempo restante: {formatTime(timeRemaining)}</p>
+          </div>
+        )}
+      </div>
       <EntriesSection
         selectedStatement={selectedStatement}
         taskId={exercise.task.id}
@@ -201,11 +234,11 @@ const ExamPage = () => {
         exercise={exercise}
         examStarted={examStarted}
       />
-      <HelpSection />
-      <AuxSectionTwo
+      <AuxSection
         statements={statements}
         examStarted={examStarted}
         onSelectStatement={setSelectedStatement}
+        helpAvailable={exercise.task.help_available}
       />
 
       <Modal
@@ -240,6 +273,23 @@ const ExamPage = () => {
           className="btn light"
           onClick={() => {
             modalTimeExpiredRef.current?.close();
+            navigate("/home");
+          }}
+        >
+          Cerrar
+        </button>
+      </Modal>
+
+      <Modal
+        ref={modalTestSentRef}
+        modalTitle="Examen enviado"
+        showButton={false}
+      >
+        <p>El examen ya fue enviado el: {exercise?.updated_at && new Date(exercise.updated_at).toLocaleString()}</p>
+        <button
+          className="btn light"
+          onClick={() => {
+            modalTestSentRef.current?.close();
             navigate("/home");
           }}
         >

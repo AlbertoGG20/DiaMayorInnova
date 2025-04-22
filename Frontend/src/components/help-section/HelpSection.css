@@ -1,27 +1,26 @@
-.help_secction__container {
+.help_section__container {
   grid-area: section2;
   background-color: var(--Color-White);
-  border-radius: var(--r-xxs);
-  box-shadow: var(--box-shadow-M3);
+  border-radius: 0 0 var(--r-xs) var(--r-xs) var(--r-xs);
   padding: var(--gap-m);
   display: flex;
   flex-direction: column;
   align-items: start;
   gap: var(--gap-xs);
-  height: 100%;
   overflow: hidden;
   width: 100%;
+  border-top: 1px solid var(--Color-grey-100);
 
   & input {
     margin: 0;
     height: 28px;
-    width: 294px;
+
     align-self: center;
   }
 
 }
 
-:where(.help_secction__container) p {
+:where(.help_section__container) p {
   color: var(--Color-Principal);
   font-size: var(--text-desktop-small);
 }
@@ -40,12 +39,12 @@
 }
 
 
-.help_secction_tittle {
+.help_section_tittle {
   font-size: var(--text-desktop-subtitles-2);
   color: var(--Color-Principal);
 }
 
-.help_section__subtittle {
+.help_section__subtitle {
   font-size: var(--text-desktop-lead);
   font-weight: 600;
   color: var(--Color-principal-500);

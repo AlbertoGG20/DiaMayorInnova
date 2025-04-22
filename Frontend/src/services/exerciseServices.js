@@ -16,6 +16,14 @@ const getByTaskId = async (id) => {
   }
 };
 
+const getByExerciseId = async (id) => {
+  try {
+    const response = await http.get(`/exercises/find_by_exercise_id?exercise_id=${id}`);
+    return response;
+  } catch (error) {
+    return null;
+  }
+};
 
 const create = async (data) => {
   console.log(data)
@@ -45,5 +53,6 @@ export default {
   getAll,
   create,
   getByTaskId,
+  getByExerciseId,
   deleteOnGroup,
 };

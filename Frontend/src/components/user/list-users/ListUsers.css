@@ -85,3 +85,11 @@
   background-color: var(--Color-Neutral-Dark);
   opacity: 0.8;
 }
+
+.user-list_pagination {
+  text-align: center;
+  & span {
+    padding: var(--gap-s);
+    color: var(--Color-Principal);
+  }
+}

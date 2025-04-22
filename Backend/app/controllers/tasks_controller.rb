@@ -4,20 +4,38 @@ class TasksController < ApplicationController
   before_action :authorize_task_access, only: [:show, :update, :destroy, :destroy_statement]
   
   def index
-    if current_user.student?
-      render json: { error: "No autorizado" }, status: :unauthorized
-    else
-      if current_user.admin?
-        @tasks = Task.ordered_by_closing_date
-      else
-        @tasks = Task.where(created_by: current_user.id).ordered_by_closing_date
-      end
-      if params[:title].present?
-        @tasks = @tasks.where("title ILIKE ?", "%#{params[:title]}%")
-      end
-      render json: @tasks
-    end
-  end
+    return render json: { error: "No autorizado" }, status: :unauthorized if current_user.student?
+  
+    tasks = current_user.admin? ? Task.ordered_by_closing_date : Task.where(created_by: current_user.id).ordered_by_closing_date
+    tasks = tasks.where("title ILIKE ?", "%#{params[:title]}%") if params[:title].present?
+  
+    paginated_tasks = tasks.page(params[:page]).per(params[:per_page] || 10)
+  
+    render json: {
+      tasks: paginated_tasks,
+      meta: {
+        current_page: paginated_tasks.current_page,
+        total_pages: paginated_tasks.total_pages,
+        total_count: paginated_tasks.total_count
+      }
+    }
+  end  
+
+  # def index
+  #   if current_user.student?
+  #     render json: { error: "No autorizado" }, status: :unauthorized
+  #   else
+  #     if current_user.admin?
+  #       @tasks = Task.ordered_by_closing_date
+  #     else
+  #       @tasks = Task.where(created_by: current_user.id).ordered_by_closing_date
+  #     end
+  #     if params[:title].present?
+  #       @tasks = @tasks.where("title ILIKE ?", "%#{params[:title]}%")
+  #     end
+  #     render json: @tasks
+  #   end
+  # end
 
   def show
     @task = Task.includes(:statements).find(params[:id])
@@ -109,7 +127,7 @@ class TasksController < ApplicationController
   end
 
   def task_params
-    params.require(:task).permit(:title, :opening_date, :closing_date, :additional_information, :is_exam, statement_ids: [])
+    params.require(:task).permit(:title, :opening_date, :closing_date, :additional_information, :is_exam, :help_available , statement_ids: [])
   end
 
   def set_task

@@ -35,12 +35,16 @@ end
   resources :solutions
   resources :student_entries
   resources :student_annotations
-  resources :marks
+  resources :marks do
+    put 'update_multiple', on: :collection
+  end
 
   resources :student_exercises, only: [:index, :show, :create, :update] do
     member do
       post 'start'
-      post 'finish'
+      put 'finish'
+      put 'update_student_exercise'
+      put 'update_student_task'
     end
     collection do
       get 'students_mark_list'
@@ -51,6 +55,7 @@ end
   resources :exercises do
     delete 'destroy_on_group', on: :collection
     get 'find_by_task_id', on: :collection
+    get 'find_by_exercise_id', on: :collection
   end
 
   resources :tasks, param: :id do
@@ -76,7 +81,7 @@ end
 
   resources :users, only: [:index, :show, :create, :update, :destroy] do
     collection do
-      get 'current'
+      get 'current_user', to: 'users#current'
       get '/users/by_class/:id', to: 'users#by_class'
     end
   end

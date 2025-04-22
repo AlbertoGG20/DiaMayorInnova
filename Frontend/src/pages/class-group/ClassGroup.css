@@ -85,6 +85,21 @@
   flex-wrap: wrap;
 }
 
+.class-group-row {
+  display: flex;
+  gap: var(--gap-m);
+  align-items: center;
+  width: 100%;
+}
+
+.class-group-list__pagination {
+  padding-left: var(--gap-m);
+  & span {
+    padding: var(--gap-s);
+    color: var(--Color-Principal);
+  }
+}
+
 .form-group {
   display: flex;
   flex-direction: column;

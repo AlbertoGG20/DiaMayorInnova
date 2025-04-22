@@ -21,37 +21,81 @@ const TaskListAndDetails = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1); //Pagination
+  const [totalPages, setTotalPages] = useState(1);
+
 
   useEffect(() => {
     if (location.state?.createTask) {
       setIsCreatingTask(true);
     }
+  
     const fetchTasks = async () => {
       setLoading(true);
       try {
-        //console.log("Solicitando tareas al servicio...");
-        const response = await taskService.getAllTasks();
-        //console.log("Tareas recibidas:", response.data);
-        const filteredTasks = response.data.filter((task) => task.created_by === user.id);
+        const response = await taskService.getAllTasks(currentPage, 10, searchTerm || "");
+    
+        if (!response) {
+          throw new Error("No se recibió ninguna respuesta del servidor.");
+        }
+    
+        if (!response.tasks) {
+          throw new Error("La respuesta no tiene la estructura esperada.");
+        }
+    
+        // Filtrar tareas del usuario actual
+        const filteredTasks = response.tasks.filter((task) => task.created_by === user.id);
+    
         setTasks(filteredTasks);
+        setTotalPages(response.meta?.total_pages || 1);
       } catch (err) {
-        setError("Error al cargar las tareas.");
+        setError(err.message);
         console.error("Error fetching tasks:", err);
       } finally {
-        //console.log("Finalizando la carga de tareas.");
         setLoading(false);
       }
     };
-    //console.log("Usuario actual:", user);
+    
+  
     if (user?.id) {
-      //console.log("Cargando tareas para el usuario:", user.id);
       fetchTasks();
     } else {
-      //console.log("Usuario no autenticado o ID faltante.");
       setLoading(false);
       setTasks([]);
     }
-  }, [user, location.state]);
+  }, [user, location.state, currentPage, searchTerm]);
+  
+
+  // useEffect(() => {
+  //   if (location.state?.createTask) {
+  //     setIsCreatingTask(true);
+  //   }
+  //   const fetchTasks = async () => {
+  //     setLoading(true);
+  //     try {
+  //       //console.log("Solicitando tareas al servicio...");
+  //       const response = await taskService.getAllTasks();
+  //       //console.log("Tareas recibidas:", response.data);
+  //       const filteredTasks = response.data.filter((task) => task.created_by === user.id);
+  //       setTasks(filteredTasks);
+  //     } catch (err) {
+  //       setError("Error al cargar las tareas.");
+  //       console.error("Error fetching tasks:", err);
+  //     } finally {
+  //       //console.log("Finalizando la carga de tareas.");
+  //       setLoading(false);
+  //     }
+  //   };
+  //   //console.log("Usuario actual:", user);
+  //   if (user?.id) {
+  //     //console.log("Cargando tareas para el usuario:", user.id);
+  //     fetchTasks();
+  //   } else {
+  //     //console.log("Usuario no autenticado o ID faltante.");
+  //     setLoading(false);
+  //     setTasks([]);
+  //   }
+  // }, [user, location.state]);
 
   const fetchTaskDetails = async (taskId) => {
     setLoading(true);
@@ -171,6 +215,22 @@ const TaskListAndDetails = () => {
                 </li>
               ))}
             </ul>
+
+            <div className="task-list__pagination">
+              <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage(1)}>
+                <i className='fi fi-rr-angle-double-small-left'/>
+              </button>
+              <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)}>
+                <i className='fi fi-rr-angle-small-left'/>
+              </button>
+              <span>Página {currentPage} de {totalPages}</span>
+              <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage((prev) => prev + 1)}>
+                <i className='fi fi-rr-angle-small-right'/>
+              </button>
+              <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage(totalPages)}>
+                <i className='fi fi-rr-angle-double-small-right'/>
+              </button>
+            </div>
           </section>
 
           <TaskModal show={modalVisible} onClose={handleCloseModal}>

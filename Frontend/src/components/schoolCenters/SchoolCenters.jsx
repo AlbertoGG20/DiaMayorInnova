@@ -6,30 +6,30 @@ import FindNameSchoolCenter from "./find-name-school-center/FindNameSchoolCenter
 import "./SchoolCenters.css";
 
 const SchoolCenters = () => {
-    const [schools, setSchools] = useState([]);
-    const [selectedSchool, setSelectedSchool] = useState(null);
-    const [searchSchoolName, setSeachSchoolName] = useState("");
-    const [error, setError] = useState("");
+  const [schools, setSchools] = useState([]);
+  const [selectedSchool, setSelectedSchool] = useState(null);
+  const [searchSchoolName, setSeachSchoolName] = useState("");
+  const [error, setError] = useState("");
 
-   useEffect(() => {
-       SchoolServices.getAll()
-         .then(({ data }) => {
-           if (data) {
-            setSchools(data);
-           } else {
-             console.error("No se encontraron centros en la respuesta.");
-             setError("No se encontraron centros.");
-           }
-         })
-         .catch(e => {
-           console.error("Error fetching centros", e);
-           setError("Hubo un error al obtener los centros.");
-         });
-     }, []);
-   
-     const filteredCenters = schools.filter(school =>
-       school.school_name.toLowerCase().includes(searchSchoolName.toLowerCase())
-     );
+ useEffect(() => {
+     SchoolServices.getAll()
+       .then((response) => {
+         if (response) {
+          setSchools(response.schools);
+         } else {
+           console.error("No se encontraron centros en la respuesta.");
+           setError("No se encontraron centros.");
+         }
+       })
+       .catch(e => {
+         console.error("Error fetching centros", e);
+         setError("Hubo un error al obtener los centros.");
+       });
+   }, []);
+ 
+   const filteredCenters = schools.filter(school =>
+     school.school_name.toLowerCase().includes(searchSchoolName.toLowerCase())
+   );
 
     return (
         <main className="school-center_page">

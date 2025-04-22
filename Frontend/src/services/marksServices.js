@@ -25,13 +25,30 @@ const create = async (data) => {
 
 const update = async (id, data) => {
   try {
-    const response = await http.put(`/mark/${id}`, { mark: data });
+    const response = await http.put(`/marks/${id}`, { mark: data });
     return response;
   } catch (error) {
     console.error("Error en la actualización:", error);
     return null;
   }
 };
+
+const manual_update_mark = async (marks) => {
+  try {
+    // Verifica que la URL es correcta y los datos son los esperados
+    console.log("Enviando datos:", marks);
+
+    const response = await http.put("/marks/update_multiple", { marks: marks });
+    // Devuelve la respuesta
+    return response.data;
+  } catch (error) {
+    console.error("Error en la actualización:", error);
+    return null;
+  }
+};
+
+
+
 
 const remove = async (id) => {
   try {
@@ -48,4 +65,5 @@ const remove = async (id) => {
 export default {
   getAll,
   create,
+  manual_update_mark,
 };
