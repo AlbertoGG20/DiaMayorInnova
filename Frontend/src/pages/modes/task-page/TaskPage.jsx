@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useParams } from 'react-router-dom';
 import userExerciseDataService from "../../../services/userExerciseDataService";
 import EntriesSection from '../../../components/entries-section/EntriesSection'
@@ -22,10 +22,34 @@ const TaskPage = () => {
   const [isTaskClosed, setIsTaskClosed] = useState(false);
   const [canStartTask, setCanStartTask] = useState(false);
   const [handleSave, setHandleSave] = useState(false);
+  const [statementData, setStatementData] = useState({});
 
   const handleSelectStatement = (statement) => {
     setSelectedStatement(statement);
   };
+
+  const handleEntriesChange = useCallback((entries) => {
+    if (selectedStatement) {
+      setStatementData(prev => {
+        const newData = {
+          ...prev,
+          [selectedStatement.id]: {
+            entries: entries.map(entry => ({
+              entry_number: entry.entry_number,
+              entry_date: entry.entry_date
+            })),
+            annotations: entries.flatMap(entry => 
+              entry.annotations.map(anno => ({
+                ...anno,
+                student_entry_id: entry.entry_number
+              }))
+            )
+          }
+        };
+        return newData;
+      });
+    }
+  }, [selectedStatement]);
 
   useEffect(() => {
     const fetchExercise = async () => {
@@ -218,6 +242,7 @@ const TaskPage = () => {
               onStatementComplete={handleSaveProgress}
               savedMarks={exercise?.marks || []}
               handleSave={setHandleSave}
+              onEntriesChange={handleEntriesChange}
             />
           )}
           <AuxSection
@@ -226,6 +251,14 @@ const TaskPage = () => {
             onSelectStatement={handleSelectStatement}
             examStarted={taskStarted}
             helpAvailable={exercise.task.help_available}
+            entries={Object.values(statementData).flatMap(data => 
+              data.entries?.map(entry => ({
+                ...entry,
+                annotations: data.annotations?.filter(
+                  anno => anno.student_entry_id === entry.entry_number && !anno._destroy
+                ) || []
+              })) || []
+            )}
           />
         </>
     </div>

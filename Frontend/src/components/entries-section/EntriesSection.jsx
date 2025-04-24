@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import taskSubmitService from '../../services/taskSubmitService'
 import EntryHeader from './entry-header/EntryHeader'
 import Entry from './entry/Entry'
@@ -6,7 +6,7 @@ import Modal from '../modal/Modal';
 import { useNavigate } from 'react-router-dom'
 import "./EntriesSection.css"
 
-const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComplete, exercise, examStarted, handleSave }) => {
+const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComplete, exercise, examStarted, handleSave, onEntriesChange }) => {
   const [statementData, setStatementData] = useState({});
   const [allStatementsData, setAllStatementsData] = useState({});
   const accounts = exercise?.chartOfAccounts || [];
@@ -15,8 +15,8 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
   const [entriesData, setEntriesData] = useState([]);
 
   const currentStatementData = selectedStatement ? statementData[selectedStatement.id] : null;
-  const entries = currentStatementData?.entries || [];
-  const annotations = currentStatementData?.annotations || [];
+  const entries = useMemo(() => currentStatementData?.entries || [], [currentStatementData]);
+  const annotations = useMemo(() => currentStatementData?.annotations || [], [currentStatementData]);
 
   useEffect(() => {
     if (savedMarks && savedMarks.length > 0) {
@@ -82,9 +82,9 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
   
       setStatementData(newStatementData);
     }
-  }, [exercise]);
+  }, [exercise?.marks]);
 
-  const addEntry = (statementId) => {
+  const addEntry = useCallback((statementId) => {
     const currentEntries = statementData[statementId]?.entries || [];
     const newEntryNumber = currentEntries.length > 0 
       ? Math.max(...currentEntries.map(e => e.entry_number)) + 1 
@@ -102,12 +102,11 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
         entries: [...(prev[statementId]?.entries || []), newEntry],
       },
     }));
-  };
+  }, [statementData]);
 
-  const removeEntry = (entryNumber) => {
+  const removeEntry = useCallback((entryNumber) => {
     if (!selectedStatement) return;
   
-    // Marcar entrada para eliminación en lugar de borrar directamente
     setStatementData((prevData) => ({
       ...prevData,
       [selectedStatement.id]: {
@@ -118,14 +117,14 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
         ),
         annotations: prevData[selectedStatement.id].annotations.map(anno => 
           anno.student_entry_id === entryNumber
-            ? { ...anno, _destroy: true } // Marcar anotaciones relacionadas
+            ? { ...anno, _destroy: true } 
             : anno
         )
       },
     }));
-  };
+  }, [selectedStatement]);
 
-  const addAnnotation = (statementId, entryId) => {
+  const addAnnotation = useCallback((statementId, entryId) => {
     const newAnnotation = {
       uid: `annotation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       student_entry_id: entryId,
@@ -145,16 +144,14 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
         ],
       },
     }));
-  };
+  }, []);
 
-  const updateAnnotation = (statementId, annotationUid, updatedAnnotation) => {
+  const updateAnnotation = useCallback((statementId, annotationUid, updatedAnnotation) => {
     if (!statementId || !statementData[statementId]) return;
 
     if (updatedAnnotation.account_number !== undefined) {
-      const foundAccount = updatedAnnotation.account_id
-
-      updatedAnnotation.account_id = foundAccount
-
+      const foundAccount = updatedAnnotation.account_id;
+      updatedAnnotation.account_id = foundAccount;
     }
 
     setStatementData((prevData) => ({
@@ -166,9 +163,9 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
         ),
       },
     }));
-  };
+  }, [statementData]);
 
-  const handleDeleteAnnotation = (annotationUid) => {
+  const handleDeleteAnnotation = useCallback((annotationUid) => {
     if (!selectedStatement) return;
   
     setStatementData((prevData) => ({
@@ -177,14 +174,14 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
         entries: entries,
         annotations: prevData[selectedStatement.id].annotations.map(annotation => 
           annotation.uid === annotationUid 
-            ? { ...annotation, _destroy: true } // Marcar para eliminación
+            ? { ...annotation, _destroy: true }
             : annotation
         )
       },
     }));
-  };
+  }, [selectedStatement, entries]);
 
-  const handleSubmitStatement = () => {
+  const handleSubmitStatement = useCallback(() => {
     if (!selectedStatement) return;
     if(exercise?.task?.is_exam === false){
       handleSave(true);
@@ -201,9 +198,9 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
     if (onStatementComplete) {
       onStatementComplete(selectedStatement.id, { entries, annotations });
     }
-  };
+  }, [selectedStatement, exercise?.task?.is_exam, handleSave, entries, annotations, onStatementComplete]);
 
-  const handleFinalSubmit = () => {
+  const handleFinalSubmit = useCallback(() => {
     if (!exercise || !exercise.id) {
       console.error("El objeto exercise no está definido correctamente:", exercise);
       return;
@@ -211,21 +208,29 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
 
     const updatedStatementsData = { ...allStatementsData, ...statementData };
 
-    if (Object.keys(updatedStatementsData).length === 0) {
-      console.error("❌ Error: No hay datos en updatedStatementsData", updatedStatementsData);
+    const filteredStatementsData = Object.entries(updatedStatementsData).reduce((acc, [statementId, data]) => {
+      acc[statementId] = {
+        entries: data.entries,
+        annotations: data.annotations.filter(anno => !anno._destroy)
+      };
+      return acc;
+    }, {});
+
+    if (Object.keys(filteredStatementsData).length === 0) {
+      console.error("❌ Error: No hay datos en updatedStatementsData", filteredStatementsData);
       return;
     }
 
     const dataToSubmit = {
-      statementsData: updatedStatementsData,
+      statementsData: filteredStatementsData,
       taskId: exercise.task.id,
       exerciseId: exercise.id,
     };
 
     taskSubmitService(dataToSubmit, navigate);
-  };
+  }, [allStatementsData, statementData, exercise, navigate]);
 
-  const updateEntryDate = (statementId, entryNumber, newDate) => {
+  const updateEntryDate = useCallback((statementId, entryNumber, newDate) => {
     setStatementData((prevData) => ({
       ...prevData,
       [statementId]: {
@@ -235,7 +240,24 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
         ),
       },
     }));
-  };
+  }, []);
+
+  useEffect(() => {
+    if (onEntriesChange && selectedStatement) {
+      const formattedEntries = entries
+        .filter(entry => !entry._destroy)
+        .map(entry => ({
+          ...entry,
+          annotations: annotations
+            .filter(anno => anno.student_entry_id === entry.entry_number && !anno._destroy)
+            .map(anno => ({
+              ...anno,
+              _destroy: anno._destroy || false
+            }))
+        }));
+      onEntriesChange(formattedEntries);
+    }
+  }, [entries, annotations, onEntriesChange, selectedStatement?.id]);
 
 
   return (

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import "../../aux-section-two/AuxSectionTwo.css"
 import exerciseServices from "../../../services/exerciseServices";
 import marksServices from "../../../services/marksServices";
+import RealTimeTrialBalance from "../../trial-balance/RealTimeTrialBalance";
 
 const ExamInformation = () => {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ const ExamInformation = () => {
   const [correctStatements, setCorrectStatements] = useState(0);
   const [incorrectStatements, setIncorrectStatements] = useState(0);
   const [incompleteStatements, setIncompleteStatements] = useState(0);
+  const [activeTab, setActiveTab] = useState("statements");
 
   const handleStatementClick = (statement) => {
     if (!visitedStatements.includes(statement.id)) {
@@ -131,18 +133,10 @@ const ExamInformation = () => {
     calculateStats();
   }, [statements]);
 
-
-
-  return (
-    <div className="exam_statements">
-      <header className="exam_statements__header">
-        <button className="btn light" onClick={() => navigate(-1)}> <i className="fi fi-rr-arrow-small-left"></i> </button>
-        <h1 className="exam_statements__title">{name}</h1>
-      </header>
-      <main className="exam_statements__main">
-        <h2 className="exam_statement__statement">Enunciados</h2>
-        <div className="exam_statements__container">
-
+  const renderContent = () => {
+    switch (activeTab) {
+      case "statements":
+        return (
           <div className="exam_statement__list">
             {(statements.length > 0) ?
               statements.map((mark, index) => {
@@ -165,8 +159,105 @@ const ExamInformation = () => {
               }) : <p className="exam_statements__empty">No hay respuestas</p>
             }
           </div>
+        );
+      case "mayor":
+        return (
+          <div className="exam_statement__list">
+            <p>Diario Mayor (en desarrollo)</p>
+          </div>
+        );
+      case "balance":
+        return (
+          <RealTimeTrialBalance 
+            entries={statements.flatMap(statement => 
+              statement.student_entries?.map(entry => ({
+                ...entry,
+                annotations: entry.student_annotations
+              })) || []
+            )} 
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="exam_statements">
+      <header className="exam_statements__header">
+        <button className="btn light" onClick={() => navigate(-1)}> <i className="fi fi-rr-arrow-small-left"></i> </button>
+        <h1 className="exam_statements__title">{name}</h1>
+      </header>
+      <main className="exam_statements__main">
+        <h2 className="exam_statement__statement">
+          {activeTab === "statements" ? "Enunciados" : 
+           activeTab === "mayor" ? "Diario Mayor" : 
+           "Balance"}
+        </h2>
+        <div className="exam_statements__container">
+          {activeTab === "statements" && (
+            <div className="exam_statement__list">
+              {(statements.length > 0) ?
+                statements.map((mark, index) => {
+                  return (
+                    <ExamStatement
+                      key={mark.id}
+                      statement_title={mark.statement}
+                      statement_id={mark.id}
+                      index={index}
+                      mark={mark.mark}
+                      comment={mark.comment}
+                      student_entries={mark.student_entries}
+                      open_statement={selectedStatement}
+                      handleMarkChange={handleMarkChange}
+                      modified={isModifiedMark}
+                      setIsModifiedMark={setIsModifiedMark}
+                      handleCommentChange={handleCommentChange}
+                    />
+                  )
+                }) : <p className="exam_statements__empty">No hay respuestas</p>
+              }
+            </div>
+          )}
+          {activeTab === "balance" && (
+            <div className="exam_statement__list">
+              <RealTimeTrialBalance 
+                entries={statements.flatMap(statement => 
+                  statement.student_entries?.map(entry => ({
+                    ...entry,
+                    annotations: entry.student_annotations
+                  })) || []
+                )} 
+              />
+            </div>
+          )}
+          {activeTab === "mayor" && (
+            <div className="exam_statement__list">
+              <p>Diario Mayor (en desarrollo)</p>
+            </div>
+          )}
 
           <div className="exam-statement__information">
+            <div className="tabs-container">
+              <button 
+                className={`btn__tabs ${activeTab === "statements" ? "btn__tabs--active" : ""}`}
+                onClick={() => setActiveTab("statements")}
+              >
+                Enunciados
+              </button>
+              <button 
+                className={`btn__tabs ${activeTab === "mayor" ? "btn__tabs--active" : ""}`}
+                onClick={() => setActiveTab("mayor")}
+              >
+                Mayor
+              </button>
+              <button 
+                className={`btn__tabs ${activeTab === "balance" ? "btn__tabs--active" : ""}`}
+                onClick={() => setActiveTab("balance")}
+              >
+                Balance
+              </button>
+            </div>
             <div className="statement-grid">
               {statements.map((statement, index) => {
                 let buttonClass = "statement-button";
