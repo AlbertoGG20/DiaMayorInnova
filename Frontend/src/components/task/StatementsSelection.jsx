@@ -3,15 +3,8 @@ import SolutionsViewer from "../solution/SolutionsViewer";
 import statementService from "../../services/statementService";
 import "./TaskPage.css";
 import useStatements from "../../hooks/useStatements";
-import DataTable from 'datatables.net-react';
-import dt from 'datatables.net-dt';
-import dtResponsive from 'datatables.net-responsive';
-import dtResponsiveDt from 'datatables.net-responsive-dt';
-import 'datatables.net-responsive-dt/css/responsive.dataTables.css';
+import { SearchBar } from "../search-bar/SearchBar";
 
-DataTable.use(dt);
-DataTable.use(dtResponsive);
-DataTable.use(dtResponsiveDt);
 
 const StatementsSelection = ({
   selectedStatements,
@@ -123,24 +116,13 @@ const StatementsSelection = ({
   return (
     <section className="task-page__selection">
       <div className="task-page__selection--content">
-        {/* <div className="task-page__header-row">
+        <div className="task-page__header-row">
           <h2 className="task-page__header">Enunciados</h2>
-          <div className="statements__pagination">
-            <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage(1)}>
-              <i className='fi fi-rr-angle-double-small-left'/>
-            </button>
-            <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)}>
-              <i className='fi fi-rr-angle-small-left'/>
-            </button>
-            <span>Página {currentPage} de {totalPages}</span>
-            <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage((prev) => prev + 1)}>
-              <i className='fi fi-rr-angle-small-right'/>
-            </button>
-            <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage(totalPages)}>
-              <i className='fi fi-rr-angle-double-small-right'/>
-            </button>
-          </div>
         </div>
+        <SearchBar
+          value={null}
+          handleSearchChange={null}
+        />
         <ul className="task-page__list">
           {statements.map((statement) => (
             <li className="task-page__list-item" key={statement.id}>
@@ -162,11 +144,31 @@ const StatementsSelection = ({
                     </label>
                   )}
                   <button className="task-page__button--edit" type="button" onClick={() => viewSolutions(statement.id)}>
-                    <i className="fi fi-rr-interrogation interrogation"></i>
-                    <span className="task-page__button-text">Ver Soluciones</span>
-                  </button> */}
+                    <i className="fi fi-rr-eye interrogation"></i>
+                  </button>
 
-        <h2 className="task-page__header">Enunciados</h2>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+        <div className="section-table__pagination">
+          <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage(1)}>
+            <i className='fi fi-rr-angle-double-small-left' />
+          </button>
+          <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)}>
+            <i className='fi fi-rr-angle-small-left' />
+          </button>
+          <span>Página {currentPage} de {totalPages}</span>
+          <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage((prev) => prev + 1)}>
+            <i className='fi fi-rr-angle-small-right' />
+          </button>
+          <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage(totalPages)}>
+            <i className='fi fi-rr-angle-double-small-right' />
+          </button>
+        </div>
+
+        {/* <h2 className="task-page__header">Enunciados</h2>
         <div className="task_table__container">
           <div ref={tableRef}>
             <DataTable
@@ -176,7 +178,7 @@ const StatementsSelection = ({
               className="display"
             />
           </div>
-        </div>
+        </div> */}
 
 
         {isModalOpen && (

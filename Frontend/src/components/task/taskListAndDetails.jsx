@@ -7,6 +7,7 @@ import TaskModal from "../modal/TaskModal";
 import TaskDetails from "./TaskDetails";
 import "./TaskPage.css";
 import "./TaskList.css"
+import { SearchBar } from "../search-bar/SearchBar";
 
 const TaskListAndDetails = () => {
   const location = useLocation();
@@ -80,8 +81,7 @@ const TaskListAndDetails = () => {
     }
   };
 
-  const handleSearchChange = (e) => {
-    const value = e.target.value;
+  const handleSearchChange = (value) => {
     setSearchTerm(value);
     setCurrentPage(1);
     setIsSearching(value.trim() !== "");
@@ -191,17 +191,10 @@ const TaskListAndDetails = () => {
                     </button>
                   </div>
                 </div>
-                <div className="task-list__search-container">
-                  <input
-                    type="text"
-                    value={searchTerm}
-                    onChange={handleSearchChange}
-                    placeholder="Buscar por Título"
-                    className="task-list__search-input"
-                    aria-label="Búsqueda por Título"
-                  />
-                  <i className="fi fi-rr-search task-list__search-icon"></i>
-                </div>
+                <SearchBar
+                  value={searchTerm}
+                  handleSearchChange={handleSearchChange}
+                />
               </div>
             </header>
 
@@ -235,7 +228,7 @@ const TaskListAndDetails = () => {
               ))}
             </ul>
 
-            <div className="task-list__pagination">
+            <div className="section-table__pagination">
               <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage(1)}>
                 <i className='fi fi-rr-angle-double-small-left' />
               </button>

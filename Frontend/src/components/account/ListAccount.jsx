@@ -4,6 +4,7 @@ import AccountService from '../../services/AccountService';
 import "./Account.css";
 import Account from "./Account";
 import Modal from '../modal/Modal';
+import { SearchBar } from '../search-bar/SearchBar';
 
 const AccountsList = ({ newAcc }) => {
   const [accounts, setAccounts] = useState([]);
@@ -55,8 +56,8 @@ const AccountsList = ({ newAcc }) => {
       });
   }
 
-  const handleSearchChange = (e) => {
-    const searchTerm = e.target.value.toLowerCase();
+  const handleSearchChange = (value) => {
+    const searchTerm = value;
     setSearchAccount(searchTerm);
 
     if (!searchTerm) {
@@ -114,18 +115,11 @@ const AccountsList = ({ newAcc }) => {
       <section className='account_accList'>
         <div className='account__header'>
           <h2 className='account__header--h2'>Todas las cuentas</h2>
-
           <div className='account__form--row'>
-            <form className='search-bar search-bar--acc'>
-              <input
-                className='search-bar_search'
-                type='text'
-                value={searchAccount}
-                onChange={handleSearchChange}
-                placeholder='Buscar por nombre de cuenta'
-              />
-              <i className='fi fi-rr-search'></i>
-            </form>
+            <SearchBar
+              value={searchAccount}
+              handleSearchChange={handleSearchChange}
+            />
           </div>
 
           <div className='account__table'>

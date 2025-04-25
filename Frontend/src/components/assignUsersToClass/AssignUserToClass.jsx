@@ -30,19 +30,19 @@ const AssignUserToClass = ({
     acc[role].push(user);
     return acc;
   }, {});
-  
+
 
   const rolesOrder = ['teacher', 'student'];
 
-/*   const toggleUser = (userId) => {
-    setSelectedUsers(prev => {
-      if (prev.includes(userId)) {
-        return prev.filter(id => id !== userId);
-      } else {
-        return [...prev, userId];
-      }
-    });
-  }; */
+  /*   const toggleUser = (userId) => {
+      setSelectedUsers(prev => {
+        if (prev.includes(userId)) {
+          return prev.filter(id => id !== userId);
+        } else {
+          return [...prev, userId];
+        }
+      });
+    }; */
   const toggleUser = (userId) => {
     setSelectedUsers(prev => {
       const newSelected = prev.includes(userId)
@@ -117,12 +117,13 @@ const AssignUserToClass = ({
   return (
     <Modal
       ref={modalRef}
-      btnText="Asignar Usuarios"
+      btnText={<i className='fi fi-rr-user-add' />}
       modalTitle="Asignar usuarios al grupo"
       showButton={true}
       needOpen={!disabled}
       onOpen={() => setIsModalOpen(true)}
       onClose={() => setIsModalOpen(false)}
+      btnNoBg={true}
     >
       <div className='task-assigned__container'>
         <div className="list__container">

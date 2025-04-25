@@ -3,6 +3,7 @@ import ClassGroupService from "../../services/ClassGroupService";
 import userService from "../../services/userService";
 import ConfirmDeleteModal from "../modal/ConfirmDeleteModal";
 import AssignUserToClass from "../assignUsersToClass/AssignUserToClass";
+import { SearchBar } from "../search-bar/SearchBar";
 
 const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange, maxStudents }) => {
   const [classGroups, setClassGroups] = useState([]);
@@ -106,24 +107,12 @@ const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange, maxStud
     <div className="class-group-page__list">
       <div className="class-group-row">
         <h2>Lista de Grupos de Clase</h2>
-
-        <div className="class-group-list__pagination">
-          <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage(1)}>
-            <i className='fi fi-rr-angle-double-small-left'/>
-          </button>
-          <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)}>
-            <i className='fi fi-rr-angle-small-left'/>
-          </button>
-          <span>Página {currentPage} de {totalPages}</span>
-          <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage((prev) => prev + 1)}>
-            <i className='fi fi-rr-angle-small-right'/>
-          </button>
-          <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage(totalPages)}>
-            <i className='fi fi-rr-angle-double-small-right'/>
-          </button>
-        </div>  
       </div>
-      
+
+      <SearchBar
+        value={null}
+        handleSearchChange={null}
+      />
 
       {classGroups.length === 0 ? (
         <p>No hay grupos de clase creados.</p>
@@ -172,23 +161,38 @@ const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange, maxStud
                     maxStudents={group.max_students}
                   />
                   <button
-                    className="edit-btn btn"
+                    className=" btn btn__icon"
                     onClick={() => onEdit(group)}
                     disabled={isButtonDisabled(group)}
                   >
-                    Editar
+                    <i className='fi fi-rr-pencil' />
                   </button>
                   <button
-                    className="delete-btn btn"
+                    className="btn btn__icon"
                     onClick={() => handleDeleteClick(group)}
                     disabled={isButtonDisabled(group)}
                   >
-                    Eliminar
+                    <i className='fi fi-rr-trash' />
                   </button>
                 </div>
               </li>
             ))}
           </ul>
+          <div className="section-table__pagination">
+            <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage(1)}>
+              <i className='fi fi-rr-angle-double-small-left' />
+            </button>
+            <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)}>
+              <i className='fi fi-rr-angle-small-left' />
+            </button>
+            <span>Página {currentPage} de {totalPages}</span>
+            <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage((prev) => prev + 1)}>
+              <i className='fi fi-rr-angle-small-right' />
+            </button>
+            <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage(totalPages)}>
+              <i className='fi fi-rr-angle-double-small-right' />
+            </button>
+          </div>
         </div>
       )}
       <ConfirmDeleteModal

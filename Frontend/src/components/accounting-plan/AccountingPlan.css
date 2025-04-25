@@ -6,7 +6,6 @@
   justify-content: start;
   width: 100%;
   height: 100%;
-  background-color: aqua;
 
   & .search-bar--pgc {
     width: 50%;
@@ -153,7 +152,7 @@ th {
 .accountingPlan__form--row {
   display: flex;
   gap: var(--gap-s);
-  align-items: center;
+  align-items: start;
   justify-content: start;
   width: 100%;
 }

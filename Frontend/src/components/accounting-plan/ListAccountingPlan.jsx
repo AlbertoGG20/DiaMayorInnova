@@ -5,6 +5,7 @@ import "./AccountingPlan.css";
 import "../modal/AccountModal.css";
 import AccountingPlan from "./AccountingPlan";
 import Modal from "../modal/Modal";
+import { SearchBar } from "../search-bar/SearchBar";
 
 
 const AccountingPlansList = ({ newPGC }) => {
@@ -63,8 +64,8 @@ const AccountingPlansList = ({ newPGC }) => {
       });
   };
 
-  const handleSearchChange = (e) => {
-    const searchTerm = e.target.value.toLowerCase();
+  const handleSearchChange = (searchValue) => {
+    const searchTerm = searchValue;
     setSearchAccPlan(searchTerm);
 
     if (!searchTerm) {
@@ -141,16 +142,10 @@ const AccountingPlansList = ({ newPGC }) => {
         <div className="accountingPlan__header">
           <h2 className="accountingPlan__header--h2">Todos los planes</h2>
           <div className="accountingPlan__form--row">
-            <form className="search-bar search-bar--pgc">
-              <input
-                className="search-bar_search"
-                type="text"
-                value={searchAccPlan}
-                onChange={handleSearchChange}
-                placeholder="Buscar por nombre"
-              />
-              <i className="fi fi-rr-search"></i> {/* Icône uniquement décorative */}
-            </form>
+            <SearchBar
+              value={searchAccPlan}
+              handleSearchChange={handleSearchChange}
+            />
           </div>
         </div>
 

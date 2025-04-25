@@ -153,12 +153,7 @@
   }
 
   .accountingPlan__table--container {
-    background-color: lightpink;
     justify-content: start;
-  }
-
-  .accountingPlan__table {
-    background-color: coral;
   }
 
 }
