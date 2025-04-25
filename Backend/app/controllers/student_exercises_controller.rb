@@ -61,7 +61,6 @@ class StudentExercisesController < ApplicationController
     end
   end
 
-
   def students_mark_list
     task_id = params[:task_id] # Get ID by param
 
@@ -80,14 +79,51 @@ class StudentExercisesController < ApplicationController
         mark: exercise.total_mark.round(1),
         date: exercise.updated_at.strftime("%d/%m/%Y, %H:%M:%S")
       }
+    end
+
+    render json: result
   end
 
-  render json: result
-end
+  def export_to_xlsx
+    task_id = params[:task_id] # Get ID by param
+
+    @students_marks = Exercise
+      .includes(:marks, :task, :user)     # Get relations
+      .where(task_id: task_id)            # Filter all exercises from a specific task
+      .where(users: { role: "student" })  # Only students
+      .joins(:user)                       # Join all student users
+      .distinct                           # Avoid dupes
+    
+    # Créer un nouveau workbook avec caxlsx
+    package = Axlsx::Package.new
+    workbook = package.workbook
+    sheet = workbook.add_worksheet(name: "Notas Estudiantes")
+
+    # Ajouter les en-têtes
+    headers = ["Fecha", "Nombre", "Tarea", "Nota"]
+    sheet.add_row headers
+
+    # Ajouter les données
+    @students_marks.each do |exercise|
+      row = [
+        exercise.updated_at.strftime("%d/%m/%Y, %H:%M:%S"),
+        exercise.user.name,
+        exercise.task.title,
+        exercise.total_mark.round(1)
+      ]
+      sheet.add_row row
+    end
+
+    # Générer le fichier et l'envoyer
+    file_stream = package.to_stream
+    send_data file_stream.read, 
+              filename: "notas_tarea_#{task_id}_#{Time.current.strftime('%Y%m%d_%H%M%S')}.xlsx",
+              type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+              disposition: "attachment"
+  end
 
 
   def find_mark_exercise_by_user
-
     @exercises = Exercise.includes(:task, marks: { student_entries: :student_annotations }).where(user_id: current_user.id)
   
     render json: @exercises.as_json(
@@ -135,40 +171,38 @@ end
   end
 
   def update_student_exercise
-      
-      @exercise = Exercise.find(params[:id])
+    @exercise = Exercise.find(params[:id])
     
-      if @exercise.update(exercise_params)
-        marks_params = exercise_params[:marks_attributes] || []
-        statement_ids = marks_params.map { |mark| mark[:statement_id] }
-        statements = Statement.includes(solutions: { entries: :annotations }).where(id: statement_ids)
+    if @exercise.update(exercise_params)
+      marks_params = exercise_params[:marks_attributes] || []
+      statement_ids = marks_params.map { |mark| mark[:statement_id] }
+      statements = Statement.includes(solutions: { entries: :annotations }).where(id: statement_ids)
     
-        marks_params.each do |mark_param|
-
-          @exercise.marks.where(statement_id: mark_param[:statement_id]).destroy_all
+      marks_params.each do |mark_param|
+        @exercise.marks.where(statement_id: mark_param[:statement_id]).destroy_all
           
-          mark = @exercise.marks.create!(mark_param.except(:student_entries_attributes).merge(mark: 0))
+        mark = @exercise.marks.create!(mark_param.except(:student_entries_attributes).merge(mark: 0))
           
-          param_entries = mark_param[:student_entries_attributes] || []
-          statement = statements.find { |s| s.id == mark_param[:statement_id].to_i }
-          mark_value = statement ? compute_grade(statement, param_entries) : 0
-          mark.update!(mark: mark_value)
+        param_entries = mark_param[:student_entries_attributes] || []
+        statement = statements.find { |s| s.id == mark_param[:statement_id].to_i }
+        mark_value = statement ? compute_grade(statement, param_entries) : 0
+        mark.update!(mark: mark_value)
           
-          student_entries_params = mark_param[:student_entries_attributes] || []
-          student_entries_params.each do |entry_param|
-            entry = mark.student_entries.create!(entry_param.except(:student_annotations_attributes))
+        student_entries_params = mark_param[:student_entries_attributes] || []
+        student_entries_params.each do |entry_param|
+          entry = mark.student_entries.create!(entry_param.except(:student_annotations_attributes))
     
-            student_annotations_params = entry_param[:student_annotations_attributes] || []
-            student_annotations_params.each do |annotation_param|
-              entry.student_annotations.create!(annotation_param)
-            end
+          student_annotations_params = entry_param[:student_annotations_attributes] || []
+          student_annotations_params.each do |annotation_param|
+            entry.student_annotations.create!(annotation_param)
           end
         end
-      
-        render json: @exercise, status: :ok
-      else
-        render json: { errors: @exercise.errors.full_messages }, status: :unprocessable_entity
       end
+      
+      render json: @exercise, status: :ok
+    else
+      render json: { errors: @exercise.errors.full_messages }, status: :unprocessable_entity
+    end
   end
   
   private
@@ -201,34 +235,30 @@ end
   end
 
   def compute_grade(statement, param_entries)
-      grade = 1
-      statement.solutions.each do |solution|
-        solution.entries.each do |solution_entry|
+    grade = 1
+    statement.solutions.each do |solution|
+      solution.entries.each do |solution_entry|
+        matching_entry = param_entries.find do |entry|
+          entry[:entry_date].to_s == solution_entry.entry_date.to_s
+        end
 
-          matching_entry = param_entries.find do |entry|
-            entry[:entry_date].to_s == solution_entry.entry_date.to_s
-          end
-
-          if matching_entry
-            param_annotations = matching_entry[:student_annotations_attributes] || []
-            solution_entry.annotations.each do |annotation|
-              matching_annotation = param_annotations.find do |param_annotation|
-                param_annotation[:account_id].to_i == annotation.account_id &&
-                param_annotation[:credit].to_f == annotation.credit.to_f &&
-                param_annotation[:debit].to_f == annotation.debit.to_f
-              end
-              if matching_annotation.nil?
-                grade = 0
-
-              end
+        if matching_entry
+          param_annotations = matching_entry[:student_annotations_attributes] || []
+          solution_entry.annotations.each do |annotation|
+            matching_annotation = param_annotations.find do |param_annotation|
+              param_annotation[:account_id].to_i == annotation.account_id &&
+              param_annotation[:credit].to_f == annotation.credit.to_f &&
+              param_annotation[:debit].to_f == annotation.debit.to_f
             end
-          else
-
-            grade = 0
+            if matching_annotation.nil?
+              grade = 0
+            end
           end
+        else
+          grade = 0
         end
       end
-      grade
     end
-
+    grade
+  end
 end
