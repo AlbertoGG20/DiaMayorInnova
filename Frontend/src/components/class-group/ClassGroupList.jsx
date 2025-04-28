@@ -4,6 +4,8 @@ import userService from "../../services/userService";
 import ConfirmDeleteModal from "../modal/ConfirmDeleteModal";
 import AssignUserToClass from "../assignUsersToClass/AssignUserToClass";
 import { SearchBar } from "../search-bar/SearchBar";
+import Table from "../table/Table";
+import PaginationMenu from "../pagination-menu/PaginationMenu";
 
 const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange, maxStudents }) => {
   const [classGroups, setClassGroups] = useState([]);
@@ -15,6 +17,37 @@ const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange, maxStud
   const [assignedUsers, setAssignedUsers] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+  const itemsPerPage = 10;
+  const [localPage, setLocalPage] = useState(1);
+
+  const isSearching = searchTerm.trim().length > 0;
+
+  const filteredGroups = isSearching
+    ? classGroups.filter(group =>
+      String(group.course || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      String(group.course_module || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      String(group.modality || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      String(group.location || "").toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    : classGroups;
+
+  const totalLocalPages = Math.ceil(filteredGroups.length / itemsPerPage);
+
+  useEffect(() => {
+    setLocalPage(1);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    if (localPage > totalLocalPages) {
+      setLocalPage(1);
+    }
+  }, [totalLocalPages]);
+
+  const paginatedGroups = filteredGroups.slice(
+    (isSearching ? (localPage - 1) : (currentPage - 1)) * itemsPerPage,
+    (isSearching ? localPage : currentPage) * itemsPerPage
+  );
 
   const fetchClassGroups = async () => {
     setLoading(true);
@@ -60,7 +93,8 @@ const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange, maxStud
     return true;
   };
 
-  const handleAssignUsers = (group) => {
+  const handleAssignUsers = (groupId) => {
+    const group = classGroups.find(group => group.id === groupId);
     userService.getUserByClassId(group.id)
       .then(({ data }) => {
         setAssignedUsers(prev => ({
@@ -70,7 +104,8 @@ const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange, maxStud
       });
   };
 
-  const handleDeleteClick = (group) => {
+  const handleDeleteClick = (groupId) => {
+    const group = classGroups.find(group => group.id === groupId);
     setGroupToDelete(group);
     setIsDeleteModalOpen(true);
   };
@@ -91,7 +126,6 @@ const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange, maxStud
   const handleDelete = async () => {
     try {
       await ClassGroupService.remove(groupToDelete.id);
-      // Después de eliminar, refrescamos la lista
       fetchClassGroups();
       setIsDeleteModalOpen(false);
     } catch (error) {
@@ -99,9 +133,10 @@ const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange, maxStud
     }
   };
 
-  if (loading) {
-    return <div>Cargando grupos de clase...</div>;
-  }
+  const handleEdit = (groupId) => {
+    const group = classGroups.find(group => group.id === groupId);
+    onEdit(group);
+  };
 
   return (
     <div className="class-group-page__list">
@@ -110,89 +145,58 @@ const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange, maxStud
       </div>
 
       <SearchBar
-        value={null}
-        handleSearchChange={null}
+        value={searchTerm}
+        handleSearchChange={setSearchTerm}
       />
 
-      {classGroups.length === 0 ? (
+      {filteredGroups.length === 0 ? (
         <p>No hay grupos de clase creados.</p>
       ) : (
         <div className="class-group-page__list-content">
-          <ul>
-            <li className="class-group-page-item header">
-              <div className="class-group-page_section">
-                <p><strong>Curso</strong></p>
-                <p><strong>Módulo</strong></p>
-                <p><strong>Modalidad</strong></p>
-                <p><strong>Nº Estudiantes</strong></p>
-                <p><strong>Máx. Estudiantes</strong></p>
-                <p><strong>Aula</strong></p>
-                <p><strong>Horas semanales</strong></p>
-                <p><strong>Centro</strong></p>
-              </div>
-              <div className="class-group-page_section">
-                <p><strong>Acciones</strong></p>
-              </div>
-            </li>
-            {classGroups.map((group) => (
-              <li key={group.id} className="class-group-page-item">
-                <div className="class-group-page_section">
-                  <p> {group.course}</p>
-                  <p> {group.course_module}</p>
-                  <p> {group.modality}</p>
-                  <p> {group.number_students}</p>
-                  <p> {group.max_students}</p>
-                  <p> {group.location}</p>
-                  <p> {group.weekly_hours}</p>
-                  <p> {group.school_center_id}</p>
-                </div>
-                <div className="class-group-page_section">
+          {
+            loading ? (
+              <p>Cargando grupos de clase...</p>
+            ) : (
+              <Table
+                titles={["Curso", "Módulo", "Modalidad", "Nº Estudiantes", "Máx. Estudiantes", "Aula", "Horas semanales", "Centro", "Acciones"]}
+                data={paginatedGroups}
+                actions={true}
+                openModal={handleEdit}
+                deleteItem={handleDeleteClick}
+                columnConfig={[
+                  { field: 'course', sortable: true },
+                  { field: 'course_module', sortable: true },
+                  { field: 'modality', sortable: true },
+                  { field: 'number_students', sortable: true },
+                  { field: 'max_students', sortable: true },
+                  { field: 'location', sortable: true },
+                  { field: 'weekly_hours', sortable: true },
+                  { field: 'school_center_id', sortable: true },
+                ]}
+                customActions={(row) => (
                   <AssignUserToClass
-                    assignedInclude={(id) => (assignedUsers[group.id] || []).includes(id)}
+                    assignedInclude={(id) => (assignedUsers[row.id] || []).includes(id)}
                     setCurrentUsers={(newUsers) => setAssignedUsers(prev => ({
                       ...prev,
-                      [group.id]: newUsers
+                      [row.id]: newUsers
                     }))}
-                    currentUsers={assignedUsers[group.id] || []}
-                    classGroupId={group.id}
+                    currentUsers={assignedUsers[row.id] || []}
+                    classGroupId={row.id}
                     onSave={handleSaveAssignment}
-                    disabled={isButtonDisabled(group)}
+                    disabled={isButtonDisabled(row)}
                     onStudentCountChange={onStudentCountChange}
-                    maxStudents={group.max_students}
+                    maxStudents={row.max_students}
                   />
-                  <button
-                    className=" btn btn__icon"
-                    onClick={() => onEdit(group)}
-                    disabled={isButtonDisabled(group)}
-                  >
-                    <i className='fi fi-rr-pencil' />
-                  </button>
-                  <button
-                    className="btn btn__icon"
-                    onClick={() => handleDeleteClick(group)}
-                    disabled={isButtonDisabled(group)}
-                  >
-                    <i className='fi fi-rr-trash' />
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-          <div className="section-table__pagination">
-            <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage(1)}>
-              <i className='fi fi-rr-angle-double-small-left' />
-            </button>
-            <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)}>
-              <i className='fi fi-rr-angle-small-left' />
-            </button>
-            <span>Página {currentPage} de {totalPages}</span>
-            <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage((prev) => prev + 1)}>
-              <i className='fi fi-rr-angle-small-right' />
-            </button>
-            <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage(totalPages)}>
-              <i className='fi fi-rr-angle-double-small-right' />
-            </button>
-          </div>
+                )}
+              />
+            )
+          }
+
+          <PaginationMenu
+            currentPage={isSearching ? localPage : currentPage}
+            setCurrentPage={isSearching ? setLocalPage : setCurrentPage}
+            totalPages={isSearching ? totalLocalPages : totalPages}
+          />
         </div>
       )}
       <ConfirmDeleteModal

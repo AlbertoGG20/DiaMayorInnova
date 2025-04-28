@@ -8,7 +8,7 @@ import TaskDetails from "./TaskDetails";
 import "./TaskPage.css";
 import "./TaskList.css"
 import { SearchBar } from "../search-bar/SearchBar";
-
+import PaginationMenu from "../pagination-menu/PaginationMenu";
 const TaskListAndDetails = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -107,7 +107,7 @@ const TaskListAndDetails = () => {
       fetchTasks();
     }
     setIsCreatingTask(false);
-    navigate("/Home");
+    navigate("/home");
   };
 
   const handleDeleteStatement = async (taskId, statementId) => {
@@ -158,7 +158,7 @@ const TaskListAndDetails = () => {
   };
 
   if (!user) return <p>Cargando usuario...</p>;
-  if (loading) return <p>Cargando tareas... Por favor espera.</p>;
+
   if (error) return <p>{error}</p>;
 
   return (
@@ -198,51 +198,46 @@ const TaskListAndDetails = () => {
               </div>
             </header>
 
-            <ul className="task-list__items">
-              {filteredTasks.map((task) => (
-                <li key={`${task.id}-${task.created_at}`} className="task-list__item" onClick={() => fetchTaskDetails(task.id)}>
-                  <div className="task-list__info">
-                    <div className="task-list__info-header">
-                      <p className="task-list__item-title">{task.title}</p>
-                      <div className="task-list__square">
-                        <i className="fi fi-rr-book-alt"></i>
-                      </div>
-                      <div className="task-list__square">
-                        <button className="task-list__duplicate" onClick={(event) => handleDuplicatedTask(event, task)}>
-                          <i className="fi fi-rr-copy" />
-                        </button>
-                      </div>
-                    </div>
-                    <div className="task-list__info-body">
-                      <div className="task-list__date">
-                        <i className="fi fi-rr-calendar"></i>
-                        <strong>Apertura: </strong> {new Date(task.opening_date).toLocaleString('es-ES', { hour: '2-digit', minute: '2-digit', year: 'numeric', month: '2-digit', day: '2-digit', })}
-                      </div>
-                      <div className="task-list__date">
-                        <i className="fi fi-rr-calendar"></i>
-                        <strong>Cierre: </strong> {new Date(task.closing_date).toLocaleString('es-ES', { hour: '2-digit', minute: '2-digit', year: 'numeric', month: '2-digit', day: '2-digit', })}
-                      </div>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            {
+              loading ? <p className="task-list__loading">Cargando tareas... Por favor espera.</p> :
+                <>
+                  <ul className="task-list__items">
+                    {filteredTasks.map((task) => (
+                      <li key={`${task.id}-${task.created_at}`} className="task-list__item" onClick={() => fetchTaskDetails(task.id)}>
+                        <div className="task-list__info">
+                          <div className="task-list__info-header">
+                            <p className="task-list__item-title">{task.title}</p>
+                            <div className="task-list__square">
+                              <i className="fi fi-rr-book-alt"></i>
+                            </div>
+                            <div className="task-list__square">
+                              <button className="task-list__duplicate" onClick={(event) => handleDuplicatedTask(event, task)}>
+                                <i className="fi fi-rr-copy" />
+                              </button>
+                            </div>
+                          </div>
+                          <div className="task-list__info-body">
+                            <div className="task-list__date">
+                              <i className="fi fi-rr-calendar"></i>
+                              <strong>Apertura: </strong> {new Date(task.opening_date).toLocaleString('es-ES', { hour: '2-digit', minute: '2-digit', year: 'numeric', month: '2-digit', day: '2-digit', })}
+                            </div>
+                            <div className="task-list__date">
+                              <i className="fi fi-rr-calendar"></i>
+                              <strong>Cierre: </strong> {new Date(task.closing_date).toLocaleString('es-ES', { hour: '2-digit', minute: '2-digit', year: 'numeric', month: '2-digit', day: '2-digit', })}
+                            </div>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+            }
 
-            <div className="section-table__pagination">
-              <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage(1)}>
-                <i className='fi fi-rr-angle-double-small-left' />
-              </button>
-              <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)}>
-                <i className='fi fi-rr-angle-small-left' />
-              </button>
-              <span>Página {currentPage} de {totalPages}</span>
-              <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage((prev) => prev + 1)}>
-                <i className='fi fi-rr-angle-small-right' />
-              </button>
-              <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage(totalPages)}>
-                <i className='fi fi-rr-angle-double-small-right' />
-              </button>
-            </div>
+            <PaginationMenu
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+              totalPages={totalPages}
+            />
           </section>
 
           <TaskModal show={modalVisible} onClose={handleCloseModal} modalTitle={selectedTask?.title}>

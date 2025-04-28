@@ -196,7 +196,7 @@ const AddUsers = ({ setUsers, selectedUser, setSelectedUser }) => {
                 className="user_item"
                 value={input.first_lastName}
                 onChange={handleInput}
-                placeholder="Pica"
+                placeholder="Leon"
 
               />
             </label>
@@ -208,11 +208,34 @@ const AddUsers = ({ setUsers, selectedUser, setSelectedUser }) => {
                 className="user_item"
                 value={input.second_lastName}
                 onChange={handleInput}
-                placeholder="Piedras"
+                placeholder="Castillo"
 
               />
             </label>
           </fieldset>
+
+          {/* <div className="add-users__form--upload">
+            <button
+              className="btn "
+              onClick={onImageChange}
+              disabled={!selectedFile}
+            > Cargar imagen </button>
+            <label htmlFor="fileUpload" className="accountingPlan__file--label btn light">
+              <input
+                type="file"
+                accept=".png, .jpg, .jpeg"
+                id="fileUpload"
+                onChange={onImageChange}
+                className="accountingPlan__file--input"
+              />
+              <i className="fi-rr-upload" />
+              <p>Imágen</p>
+              <span id="file-name" className="accountingPlan__file--name">
+                {fileName}
+              </span>
+            </label>
+          </div> */}
+
           <label htmlFor='featured_image' className='user_label'>Introduzca una imagen de usuario
             {input.featured_image && (
               <div>
@@ -261,24 +284,24 @@ const AddUsers = ({ setUsers, selectedUser, setSelectedUser }) => {
           </label>
 
           {auth?.user?.role !== "center_admin" && (
-          <label htmlFor="school_center_id" className="user_label">Centro Escolar
-            <select id="school_center_id" name="school_center_id" className="user_item" value={input.school_center_id} onChange={handleInput}>
-              <option value="">Seleccione un centro</option>
-              {schoolCenters.map((center) => (
-                <option key={center.id} value={center.id}>
-                  {center.school_name}
-                </option>
-              ))}
-            </select>
-          </label>
+            <label htmlFor="school_center_id" className="user_label--select">Centro Escolar
+              <select id="school_center_id" name="school_center_id" className="user_item" value={input.school_center_id} onChange={handleInput}>
+                <option value="">Seleccione un centro</option>
+                {schoolCenters.map((center) => (
+                  <option key={center.id} value={center.id}>
+                    {center.school_name}
+                  </option>
+                ))}
+              </select>
+            </label>
           )}
-
-          <button type="submit" className="createSchool_submit btn"><i className='fi fi-rr-plus'></i>{selectedUser ? "Actualizar Usuario" : "Registrar Usuario"}</button>
-          {selectedUser && <button type="button" className="btn light" onClick={() => setSelectedUser(null)}>Cancelar</button>}
-          {error && <p role="alert" style={{ color: "red" }}>{error}</p>}
-          {successMessage && <p role="alert" style={{ color: "green" }}>{successMessage}</p>}
-        </form>
-      </section>
+        </div>
+        <button type="submit" className="createSchool_submit btn"><i className='fi fi-rr-plus'></i>{selectedUser ? "Actualizar Usuario" : "Registrar Usuario"}</button>
+        {selectedUser && <button type="button" className="btn light" onClick={() => setSelectedUser(null)}>Cancelar</button>}
+        {error && <p role="alert" style={{ color: "red" }}>{error}</p>}
+        {successMessage && <p role="alert" style={{ color: "green" }}>{successMessage}</p>}
+      </form>
+    </section >
     </>
   );
 };

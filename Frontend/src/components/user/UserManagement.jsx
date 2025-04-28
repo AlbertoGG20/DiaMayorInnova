@@ -33,21 +33,19 @@ const UserManagement = () => {
   );
 
   return (
-    <main className="user_page">
-      <ListUsers
-        users={filteredUsers}
-        setUsers={setUsers}
-        setSelectedUser={setSelectedUser}
-      />
+    <div className="user_page">
 
       <AddUsers
         setUsers={setUsers}
         selectedUser={selectedUser}
         setSelectedUser={setSelectedUser}
       />
-
-      <FindNameUsers searchName={searchName} setSearchName={setSearchName} />
-    </main>
+      <ListUsers
+        users={filteredUsers}
+        setUsers={setUsers}
+        setSelectedUser={setSelectedUser}
+      />
+    </div>
   );
 };
 

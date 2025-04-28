@@ -1,23 +1,22 @@
 .user_page {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: 0.49fr 1fr;
-  grid-template-areas:
-    "form find"
-    "form list"
-  ;
-  overflow: hidden;
+  width: 100%;
   height: 100%;
+  overflow: hidden;
+  display: flex;
+  gap: var(--gap-s);
 
   & h2 {
-    font-size: var(--text-desktop-subtitles-1);
+    font-size: var(--text-desktop-subtitles-2);
   }
 
 }
 
-.user__page {
-  padding-top: 400px;
+.user_page__container {
+  overflow: hidden;
+  height: 100%;
+  display: flex;
 }
+
 
 .users_list {
   font-size: 0.7rem;
@@ -78,4 +77,13 @@ label {
   &>.label-user_item {
     width: 500px;
   }
+}
+
+@media (max-width: 768px) {
+  .user_page {
+    flex-direction: column;
+    overflow-y: visible;
+    height: auto;
+  }
+
 }

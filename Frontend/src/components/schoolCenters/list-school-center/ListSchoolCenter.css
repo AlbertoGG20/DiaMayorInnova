@@ -1,13 +1,13 @@
 .school-center-list__container {
-  grid-area: list;
-  height: 100%;
-  overflow-y: scroll;
-  padding: var(--gap-s);
-  border-left: solid 1px var(--Color-grey-200);
-  height: 100%;
   display: flex;
   flex-direction: column;
-  gap: var(--gap-xxs);
+  height: 100%;
+  width: 100%;
+  background-color: var(--Color-White);
+  border-radius: var(--gap-xs);
+  padding: var(--gap-s);
+  box-shadow: var(--box-shadow-btn);
+
 }
 
 
@@ -41,6 +41,7 @@
 
 .school-list__pagination {
   padding-top: var(--gap-s);
+
   & span {
     padding: var(--gap-s);
     color: var(--Color-Principal);
@@ -49,21 +50,21 @@
 
 @media (max-width: 1024px) {
   .school-center-list__container {
-      border-left: none; 
+    border-left: none;
   }
 
   .schools-centers_list {
-      flex-direction: column; 
+    flex-direction: column;
   }
 }
 
 @media (max-width: 768px) {
   .school-center-list__container {
-      padding: var(--gap-xs); 
+    padding: var(--gap-xs);
   }
 
   .school-list_item {
-      font-size: var(--text-mobile-tiny);
-      padding: var(--gap-xxs);
+    font-size: var(--text-mobile-tiny);
+    padding: var(--gap-xxs);
   }
 }

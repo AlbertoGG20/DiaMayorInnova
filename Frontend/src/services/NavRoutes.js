@@ -8,9 +8,9 @@ routes.push({
 })
 
 routes.push({
-  to: "/modes",
+  to: "/modes/practica",
   icon: "fi fi-rr-bank",
-  name: "modos",
+  name: "modo práctica",
   rol: ["teacher", "admin", "center_admin", "student"],
 })
 

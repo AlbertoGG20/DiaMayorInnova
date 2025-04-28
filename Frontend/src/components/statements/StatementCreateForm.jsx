@@ -151,9 +151,6 @@ const StatementCreateForm = () => {
           onClose={handleCloseModal}
           onSave={handleSaveSolution}
         />
-        {/* {isModalOpen && selectedSolutionIndex !== null && (
-         
-        )} */}
       </aside>
 
       <section className="statement-page__selection">

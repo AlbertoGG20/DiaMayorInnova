@@ -1,16 +1,16 @@
 .class-group-page {
+  padding: var(--gap-s);
   width: 100%;
   height: 100%;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 3% 42% 55%;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: auto auto 1.2fr;
   grid-template-areas:
-    "class-group-header class-group-header"
-    "class-group-form class-group-preview"
-    "class-group-list class-group-list";
-  gap: var(--gap-l);
-  padding: var(--gap-s);
+    "title title "
+    "form preview"
+    "list list";
   overflow: hidden;
+  gap: var(--gap-s);
 }
 
 
@@ -19,9 +19,8 @@
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  gap: var(--gap-xs);
+  gap: var(--gap-s);
   padding: 0;
-  grid-area: class-group-header;
 }
 
 .class-group-page__title h1 {
@@ -29,24 +28,27 @@
 }
 
 
-/* FORMULARIO */
 .class-group-page__form {
-  grid-area: class-group-form;
+  grid-area: form;
   padding: var(--gap-s);
-  border-radius: var(--r-xxs);
+  border-radius: var(--r-xs);
   background-color: var(--Color-White);
   box-shadow: var(--box-shadow-btn);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   transition: width 0.3s ease-in-out;
+
+  & input {
+    margin-bottom: 0;
+  }
 }
 
 .class-group-page__form--form {
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: var(--gap-m);
-  padding: var(--gap-s);
+  gap: var(--gap-s);
 }
 
 .class-group-page__form--row {
@@ -101,6 +103,14 @@
   }
 }
 
+.form-row__sub-group {
+  width: 100%;
+  display: flex;
+  gap: var(--gap-m);
+  align-items: end;
+}
+
+
 .form-group {
   display: flex;
   flex-direction: column;
@@ -120,17 +130,16 @@
 
 /* LISTA */
 .class-group-page__list {
-  grid-area: class-group-list;
-  padding: var(--gap-xl);
-  border-top: 1px solid var(--Color-grey-200);
-  border-radius: var(--r-xxs);
+  grid-area: list;
+  padding: var(--gap-s);
+  border-radius: var(--r-xs);
   height: 100%;
   display: flex;
   flex-direction: column;
   gap: var(--gap-s);
-  overflow: hidden;
   background-color: var(--Color-White);
   box-shadow: var(--box-shadow-btn);
+  overflow: hidden;
 }
 
 .class-group-page__list-content {
@@ -190,6 +199,20 @@
   align-items: center;
 }
 
+.form-row__sub-group--left {
+  width: 100%;
+  display: flex;
+  gap: var(--gap-m);
+}
+
+.form-row__sub-group--right {
+  width: 100%;
+  display: flex;
+  gap: var(--gap-m);
+}
+
+
+
 /*Afecta a los inputs de sign_in */
 input {
   -webkit-box-sizing: border-box;
@@ -203,190 +226,48 @@ input {
 
 @media (max-width: 1024px) {
   .class-group-page {
-    grid-template-rows: auto auto auto;
-    gap: var(--gap-m);
-    padding: var(--gap-s);
-    overflow: auto;
-    height: 100vh;
-  }
-
-  .class-group-page__form--form {
-    padding: var(--gap-xs);
-  }
-
-  .class-group-page_section:first-child {
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--gap-xs);
-  }
-
-  .class-group-page_section:last-child {
-    flex-direction: column;
-    align-items: flex-end;
-  }
-
-  .form-group--small,
-  .form-group--medium {
-    flex: 1 1 45%;
-  }
-
-  .class-group-page-item {
-    align-items: flex-start;
-    padding: var(--gap-xs) 0;
-  }
-
-  .class-group-page_section p {
-    font-size: var(--text-mobile-small);
-    line-height: 1.4;
-  }
-
-  .class-group-page__list {
     height: auto;
-    min-height: 400px;
-    overflow: visible;
-  }
-
-  .class-group-page__list-content {
-    max-height: 60vh;
-    overflow-y: auto;
-  }
-}
-
-@media (max-width: 768px) {
-  .class-group-page {
-    grid-template-rows: auto auto 1fr;
-  }
-
-  .class-group-page__list {
-    height: 100%;
-    min-height: unset;
-  }
-
-  .class-group-page__list-content {
-    max-height: none;
-    height: 100%;
-  }
-  
-  .class-group-page__header {
+    display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: var(--gap-xxs);
-  }
+    overflow: visible;
 
-  .class-group-page__title h1 {
-    font-size: var(--text-mobile-lead);
-  }
-
-  .class-group-page__form--form {
-    gap: var(--gap-s);
-  }
-
-  .form-row {
-    gap: var(--gap-s);
-  }
-}
-
-@media (max-width: 480px) { 
-  .class-group-page {
-    grid-template-areas:
-      "class-group-header"
-      "class-group-form"
-      "class-group-list";
-    grid-template-rows: auto auto 1fr;
-    overflow: auto;
-    padding: var(--gap-xs);
   }
 
   .class-group-page__form {
-    padding: var(--gap-xs);
-    border-radius: var(--r-xs);
+    width: 100%;
+    max-width: none;
   }
 
-  .class-group-page__list {
-    height: 100%;
-    overflow: visible;
+  .form-row__sub-group {
+    gap: var(--gap-s);
+    width: 100%;
+
   }
 
-  .class-group-page__list-content {
-    max-height: none;
-    overflow-y: visible;
+
+}
+
+@media (max-width: 768px) {
+
+  .class-group-page {
     height: auto;
-  }
-
-  .class-group-page-item {
+    display: flex;
     flex-direction: column;
-    gap: var(--gap-xs);
-    padding: var(--gap-s) 0;
     overflow: visible;
+
   }
 
-  .class-group-page_section:first-child {
-    grid-template-columns: repeat(2, 1fr);
+  .form-row__sub-group {
+    gap: var(--gap-s);
     width: 100%;
-    gap: var(--gap-xxs);
+
   }
 
-  .class-group-page_section:last-child {
-    width: 100%;
-    flex-direction: row;
-    justify-content: flex-start;
-    margin-top: var(--gap-xs);
-  }
-
-  .class-group-page_section p {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .form-group--small,
-  .form-group--medium {
-    flex: 1 1 100%;
-  }
-
-  .class-group-page__form--button-container {
-    width: 100%;
+  .form-row__sub-group--left {
     flex-direction: column;
   }
 
-  .class-group-page__form--button-container button {
-    width: 100%;
-  }
-
-  .class-group-page-item.header .class-group-page_section p {
-    display: none;
-  }
-
-  .class-group-page-item.header .class-group-page_section p:first-child,
-  .class-group-page-item.header .class-group-page_section p:nth-child(2) {
-    display: block;
-  }
-}
-
-@media (max-width: 360px) {
-  .class-group-page__list-content {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .class-group-page_section:first-child {
-    grid-template-columns: 1fr;
-  }
-
-  .class-group-page__list {
-    padding: var(--gap-xs);
-  }
-
-  .class-group-page_section:last-child {
-    flex-wrap: wrap;
-  }
-}
-
-@media (max-width: 480px) {
-  .class-group-page__input {
-    padding: var(--gap-xxs);
-    font-size: var(--text-mobile-small);
-  }
-  
-  .class-group-page__form--form label {
-    font-size: var(--text-mobile-caption);
+  .form-row__sub-group--right {
+    flex-direction: column;
   }
 }

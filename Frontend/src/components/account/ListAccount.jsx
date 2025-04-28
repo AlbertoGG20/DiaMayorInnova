@@ -5,6 +5,8 @@ import "./Account.css";
 import Account from "./Account";
 import Modal from '../modal/Modal';
 import { SearchBar } from '../search-bar/SearchBar';
+import Table from '../table/Table';
+import PaginationMenu from '../pagination-menu/PaginationMenu';
 
 const AccountsList = ({ newAcc }) => {
   const [accounts, setAccounts] = useState([]);
@@ -14,8 +16,7 @@ const AccountsList = ({ newAcc }) => {
   const [currentIndex, setCurrentIndex] = useState(-1);
   const [searchAccount, setSearchAccount] = useState("");
   const navigate = useNavigate();
-  const [sortOrder, setSortOrder] = useState("ascending") //Sort control state
-  const [currentPage, setCurrentPage] = useState(1); //Pagination
+  const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -61,11 +62,10 @@ const AccountsList = ({ newAcc }) => {
     setSearchAccount(searchTerm);
 
     if (!searchTerm) {
-      retrieveAccounts(); // Si le champ est vide, récupérer tous les comptes
+      retrieveAccounts();
       return;
     }
 
-    // Filtrage dynamique des comptes
     setAccounts((prevAccounts) =>
       prevAccounts.filter((acc) => {
         acc.name.toLowerCase().includes(searchTerm);
@@ -73,27 +73,6 @@ const AccountsList = ({ newAcc }) => {
       })
     );
   };
-
-
-  //Accounts sorted by Name column
-  const sortAccounts = (order) => {
-    const sortedAcc = [...accounts].sort((a, b) => {
-      if (order === "ascending") {
-        return a.name.localeCompare(b.name);
-      }
-      else {
-        return b.name.localeCompare(a.name);
-      }
-    });
-    setAccounts(sortedAcc);
-  }
-
-  //Change order
-  const handleSortClick = () => {
-    const newOrder = sortOrder === "ascending" ? "descending" : "ascending";
-    setSortOrder(newOrder);
-    sortAccounts(newOrder);
-  }
 
   const openEditModal = (id) => {
     setSelectedAccountId(id);
@@ -126,62 +105,26 @@ const AccountsList = ({ newAcc }) => {
             {accounts.length === 0 ? (
               <p>No hay cuentas disponibles</p>
             ) : (
-              <table className='account_tbody'>
-                <thead>
-                  <tr>
-                    <th>Nº Cuenta</th>
-                    <th onClick={handleSortClick} style={{ cursor: "pointer" }}>
-                      Nombre {sortOrder === "ascending" ? <i className='fi fi-rr-angle-small-down' /> : <i className='fi fi-rr-angle-small-up' />}
-                    </th>
-                    <th>Descripción</th>
-                    <th>PGC</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {accounts && accounts.map((account, index) => (
-                    <tr className='account__accList--item' key={index} onClick={() => setActiveAccount(account, index)}>
-                      <td>{account.account_number}</td>
-                      <td>{account.name}</td>
-                      <td>{account.description}</td>
-                      <td>{account.accounting_plan_id}</td>
-                      <td className='account__table--actions'>
-                        <button className='account__button--link inter' onClick={() => navigate("/help-examples")}>
-                          <i className='fi-rr-interrogation' />
-                        </button>
-                        <button className='account__button--link pencil' onClick={() => openEditModal(account.id)}>
-                          <i className='fi-rr-pencil' />
-                        </button>
-                        <button aria-label="Eliminar cuenta" className='account__button--remove trash'
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            deleteAccount(account.id);
-                          }}>
-                          <i className='fi-rr-trash' />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <Table
+                titles={["Nº Cuenta", "Nombre", "Descripción", "PGC", "Acciones"]}
+                data={accounts}
+                actions={true}
+                openModal={openEditModal}
+                deleteItem={deleteAccount}
+                columnConfig={[
+                  { field: 'account_number', sortable: true },
+                  { field: 'name', sortable: true },
+                  { field: 'description', sortable: true },
+                  { field: 'accounting_plan_id', sortable: true }
+                ]}
+              />
             )}
-
           </div>
-          <div className="section-table__pagination">
-            <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage(1)}>
-              <i className='fi fi-rr-angle-double-small-left' />
-            </button>
-            <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)}>
-              <i className='fi fi-rr-angle-small-left' />
-            </button>
-            <span>Página {currentPage} de {totalPages}</span>
-            <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage((prev) => prev + 1)}>
-              <i className='fi fi-rr-angle-small-right' />
-            </button>
-            <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage(totalPages)}>
-              <i className='fi fi-rr-angle-double-small-right' />
-            </button>
-          </div>
+          <PaginationMenu
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            totalPages={totalPages}
+          />
         </div>
 
       </section>

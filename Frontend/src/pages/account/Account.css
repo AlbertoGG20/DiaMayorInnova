@@ -42,10 +42,9 @@
 /* Add Account Section */
 .account__addAcc {
   grid-area: form;
-  padding-bottom: 24px;
-  height: 340px;
+  height: auto;
   background-color: var(--Color-White);
-  border-radius: var(--gap-xxs);
+  border-radius: var(--r-xs);
   box-shadow: var(--box-shadow-btn);
 }
 
@@ -56,7 +55,7 @@
   overflow-y: hidden;
   height: 100%;
   background-color: var(--Color-White);
-  border-radius: var(--gap-xxs);
+  border-radius: var(--r-xs);
   box-shadow: var(--box-shadow-btn);
 }
 
@@ -83,24 +82,7 @@
   height: 100%;
 }
 
-/* Keep table header sticky */
-.account__table thead {
-  position: sticky;
-  top: 0;
-  background-color: #fff;
-  /* Ensures visibility */
-  z-index: 2;
-}
 
-/* Header Row Styling */
-.account__table th {
-  padding: 12px;
-  color: var(--Color-Principal);
-  font-weight: bold;
-  text-align: left;
-  border-bottom: 1px solid var(--Color-grey-400);
-  background-color: #FAFAFA;
-}
 
 /* Scrollbar Styling */
 .account__listAcc::-webkit-scrollbar {

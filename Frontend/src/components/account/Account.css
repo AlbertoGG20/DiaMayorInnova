@@ -17,7 +17,6 @@
   padding: var(--gap-s);
   margin-bottom: var(--gap-s);
   border-bottom: 1px solid var(--Color-grey-200);
-  border-radius: var(--border-radius);
   justify-content: space-between;
   align-items: center;
   gap: var(--gap-s);
@@ -80,23 +79,12 @@
   }
 }
 
-.account__page th {
-  color: var(--Color-Principal);
-  border-bottom: solid 1px var(--Color-Principal);
-  padding: var(--gap-xs) 0;
-  margin: var(--gap-xs);
-
-  & i {
-    font-size: x-large;
-  }
-}
 
 .account__button {
   padding: var(--gap-s) var(--gap-m);
   background-color: var(--Color-Principal);
   color: white;
   border: none;
-  border-radius: var(--border-radius);
   cursor: pointer;
 }
 
@@ -104,7 +92,6 @@
   padding: var(--gap-s) var(--gap-m);
   background-color: transparent;
   border: none;
-  border-radius: var(--border-radius);
   cursor: pointer;
 }
 
@@ -148,9 +135,7 @@
 }
 
 .account__form {
-  margin-top: var(--gap-s);
   padding: var(--gap-s);
-  border-radius: var(--border-radius);
 }
 
 .account__form--row {

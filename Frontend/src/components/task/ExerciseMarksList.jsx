@@ -5,7 +5,6 @@ import "./MarkList.css";
 import DataTable from 'datatables.net-react';
 import DT from 'datatables.net-dt';
 import Table from "../table/Table";
-import { renderToString } from "react-dom/server";
 import Breadcrumbs from "../breadcrumbs/Breadcrumbs";
 
 const ExerciseMarksList = () => {
@@ -16,8 +15,6 @@ const ExerciseMarksList = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
 
-    DataTable.use(DT);
-
     const taskId = location.state?.task_id;
 
     useEffect(() => {
@@ -27,6 +24,7 @@ const ExerciseMarksList = () => {
             try {
                 const response = await getStudentsMarkList(taskId, currentPage, 10);
                 setExerciseMarksList(response.data.students);
+                setTotalPages(response.data.meta.total_pages);
             } catch (error) {
                 console.error("Error devolviendo la lista", error);
             }
@@ -49,46 +47,12 @@ const ExerciseMarksList = () => {
         }
     };
 
-    const columns = [
-        { title: 'Fecha', data: 'date', className: 'left-align statement__date--header' },
-        { title: 'Nombre', data: 'student', className: 'left-align' },
-        {
-            title: '% Correcto',
-            data: 'mark',
-            className: 'left-align',
-            render: function (data) {
-                return renderToString(
-                    <>
-                        <p>{data * 10}%</p>
-                        <progress value={data * 0.1}></progress>
-                    </>
-                );
-            }
-        },
-        { title: 'Nota', data: 'mark', className: 'right-align' },
-        {
-            title: 'Estado',
-            data: 'mark',
-            className: 'right-align statement__state--header',
-            render: function (data, type, row) {
-                let statusClass = "status__container";
-                let statusIcon = "fi";
-                (data >= 5)
-                    ? (statusClass = "status__container green", statusIcon = "fi fi fi-rr-check")
-                    : (statusClass = "status__container red", statusIcon = "fi fi fi-rr-x");
+    const titles = ['Fecha', 'Nombre', '% Correcto', 'Nota', 'Estado', 'Acciones'];
 
-                return `<div class="statement__state" ><div class="${statusClass}"><i class="${statusIcon}"></i></div ></div >`;
-            }
-        },
-        {
-            title: 'Acciones',
-            data: 'exercise_id',
-            className: 'right-align statement__action--header',
-            render: function (data, type, row) {
-                return `<button class="btn__table view-result" data-id="${row.exercise_id}"><i class="fi fi-rr-eye"></i></button>`;
-            }
-        },
-    ];
+    const handleViewResult = (exerciseId) => {
+        navigate(`/notas-estudiantes/${id}/examen/${exerciseId}`);
+        console.log("Ver resultado del ejercicio:", exerciseId);
+    };
 
     return (
         <div className="mark_list__page">
@@ -109,10 +73,56 @@ const ExerciseMarksList = () => {
             }
             <div className="mask_list_table__container">
                 <Table
+                    titles={titles}
                     data={exerciseMarksList}
-                    columns={columns}
-                    id={id}
-                    isMarkTable={true}
+                    show={handleViewResult}
+                    columnConfig={[
+                        { field: 'date', sortable: true },
+                        { field: 'student', sortable: true },
+                        {
+                            field: 'mark',
+                            sortable: true,
+                            render: (row) => (
+                                <div>
+                                    <p>{row.mark * 10}%</p>
+                                    <progress value={row.mark * 0.1}></progress>
+                                </div>
+                            )
+                        },
+                        {
+                            field: 'mark',
+                            sortable: true,
+                            align: 'right'
+                        },
+                        {
+                            field: 'mark',
+                            sortable: true,
+                            align: 'right',
+                            render: (row) => {
+                                const statusClass = row.mark >= 5 ? "status__container green" : "status__container red";
+                                const statusIcon = row.mark >= 5 ? "fi fi-rr-check" : "fi fi-rr-x";
+                                return (
+                                    <div className="statement__state">
+                                        <div className={statusClass}>
+                                            <i className={statusIcon}></i>
+                                        </div>
+                                    </div>
+                                );
+                            }
+                        },
+                        {
+                            field: 'exercise_id',
+                            render: (row) => (
+                                <button
+                                    className="btn__table view-result"
+                                    onClick={() => handleViewResult(row.exercise_id)}
+                                >
+                                    <i className="fi fi-rr-eye"></i>
+                                </button>
+                            )
+                        }
+                    ]}
+                    actions={false}
                 />
             </div>
             <div className="mark-list__pagination">
@@ -130,8 +140,8 @@ const ExerciseMarksList = () => {
                     <i className='fi fi-rr-angle-double-small-right' />
                 </button>
             </div>
-        </div >
-    )
+        </div>
+    );
 }
 
 export default ExerciseMarksList;

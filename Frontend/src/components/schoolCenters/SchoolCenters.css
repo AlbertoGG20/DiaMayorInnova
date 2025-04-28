@@ -1,16 +1,14 @@
 .school-center_page {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: 0.48fr 1fr;
-    grid-template-areas:
-        "form find"
-        "form list"
-    ;
-    overflow: hidden;
+    display: flex;
+    gap: var(--gap-m);
+    flex-direction: row-reverse;
     height: 100%;
+    width: 100%;
 
     & h2 {
-        font-size: var(--text-desktop-subtitles-1);
+        font-size: var(--text-desktop-subtitles-2);
+        color: var(--Color-Principal);
+        margin-bottom: var(--gap-s);
     }
 
 }
@@ -85,14 +83,14 @@ label {
     .school-center_page {
         grid-template-columns: 1fr;
         grid-template-rows: auto;
-        grid-template-areas: 
+        grid-template-areas:
             "form"
             "find"
             "list";
     }
 
     .center_list {
-        font-size: 0.85rem; 
+        font-size: 0.85rem;
         gap: 0.5rem;
         padding: 0.5rem 1rem;
     }
@@ -100,11 +98,11 @@ label {
 
 @media (max-width: 768px) {
     .school-center_page {
-        padding: 1rem; 
+        flex-direction: column-reverse;
     }
 
     .center_list {
-        flex-direction: column; 
+        flex-direction: column;
         align-items: center;
     }
 

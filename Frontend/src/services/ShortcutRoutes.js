@@ -22,9 +22,9 @@ scRoutes.push({
 })
 
 scRoutes.push({
-  to: "/modes",
+  to: "/modes/practica",
   icon: "fi fi-rr-bank",
-  name: "modos",
+  name: "Práctica",
   rol: ["teacher", "student"],
 })
 

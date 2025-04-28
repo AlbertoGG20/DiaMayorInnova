@@ -4,7 +4,7 @@
   height: 100%;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: 0.1fr 0.8fr 1.2fr;
+  grid-template-rows: auto auto 1.2fr;
   grid-template-areas:
     "title title "
     "form preview"
@@ -42,7 +42,7 @@
   padding: var(--gap-s);
   height: auto;
   background-color: var(--Color-White);
-  border-radius: var(--gap-xxs);
+  border-radius: var(--r-xs);
   box-shadow: var(--box-shadow-btn);
 }
 

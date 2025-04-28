@@ -234,6 +234,10 @@ a {
   color: inherit;
 }
 
+.pointer {
+  cursor: pointer;
+}
+
 .app-main {
   padding: 60px 0 0 0;
   height: 100vh;
@@ -480,7 +484,7 @@ input::placeholder {
 .search-bar {
   background-color: var(--Color-Neutral-White);
   width: 100%;
-  height: 48px;
+  height: 36px;
   border-radius: var(--r-xs);
   display: flex;
   align-items: center;
@@ -493,6 +497,7 @@ input::placeholder {
     border: none;
     outline: none;
     background-color: transparent;
+    height: 36px;
   }
 
   & .fi {
@@ -562,54 +567,6 @@ input::placeholder {
 
   & :hover {
     color: var(--Color-Principal-claro);
-  }
-}
-
-.dt-pagination-button {
-  color: var(--color-Principal);
-}
-
-.dt-paging-button:disabled {
-  background-color: var(--Color-grey-50);
-  color: var(--Color-principal-100);
-}
-
-.dt-paging-button:hover:disabled {
-  background-color: var(--Color-grey-50);
-  color: var(--Color-principal-100);
-  cursor: default;
-}
-
-.section-table__pagination {
-  display: flex;
-  justify-content: start;
-  align-items: center;
-  gap: var(--gap-xxs);
-  margin-top: var(--gap-xxs);
-
-  & .paging-text {
-    padding: 0 var(--gap-xxs);
-  }
-}
-
-
-
-.dt-paging-button {
-  display: flex;
-  width: 40px;
-  height: 30px;
-  padding: 0;
-  margin: 0;
-  justify-content: center;
-  align-items: center;
-  box-shadow: var(--box-shadow-btn);
-  border-radius: var(--r-xs);
-  background-color: var(--Color-White);
-  color: var(--Color-principal-700);
-
-  &:hover {
-    background-color: var(--Color-Neutral-White);
-    color: var(--Color-Principal-oscuro);
   }
 }
 

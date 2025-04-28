@@ -90,10 +90,9 @@ const ClassGroup = () => {
     <main className="class-group-page">
       <header className="class-group-page__header">
         <ButtonBack />
-        <div className="class-group-page__title">
-          <Breadcrumbs />
-        </div>
+        <Breadcrumbs />
       </header>
+      
       <ClassGroupForm
         formData={formData}
         handleInputChange={handleInputChange}

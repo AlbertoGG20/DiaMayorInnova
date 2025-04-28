@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import statementService from "../../services/statementService";
 import ConfirmDeleteModal from "../modal/ConfirmDeleteModal";
+import Table from "../table/Table";
+import PaginationMenu from "../pagination-menu/PaginationMenu";
+import { SearchBar } from "../search-bar/SearchBar";
 
 const StatementsList = ({ onSelectStatement }) => {
   const { user, loading: authLoading } = useAuth();
@@ -16,6 +19,9 @@ const StatementsList = ({ onSelectStatement }) => {
   const [currentPage, setCurrentPage] = useState(1); //Pagination
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const itemsPerPage = 10;
+  const [localPage, setLocalPage] = useState(1);
+  const [allStatements, setAllStatements] = useState([]);
 
   useEffect(() => {
     const fetchStatements = async () => {
@@ -94,7 +100,9 @@ const StatementsList = ({ onSelectStatement }) => {
     }
   };
 
-  const handleStatementSelection = (statement) => {
+  const handleStatementSelection = (statementId) => {
+    const statement = statements.find(s => s.id === statementId);
+    console.log("Enunciado seleccionado:", statement);
     setSelectedStatement(statement);
     onSelectStatement(statement);
   };
@@ -156,52 +164,33 @@ const StatementsList = ({ onSelectStatement }) => {
         </div>
       </div>
       {errorMessage && <div className="error-message">{errorMessage}</div>}
-      <ul className="statement-page__list">
-        {statements.map((statement) => {
-          const isPublicAndNotOwned = statement.is_public && statement.user_id !== user.id;
 
-          return (
-            <li className="statement-page__list-item" key={statement.id}>
-              <div className="statement-page__statement-container">
-                <span className="statement-page__definition">{statement.definition}</span>
-                <div className="statement-page__actions">
+      <SearchBar
+        value={searchTerm}
+        handleSearchChange={setSearchTerm}
+      />
 
-                  <div className="statement-page__toggle-visibility">
-                    <button
-                      onClick={() => toggleVisibility(statement.id, false)}
-                      className={`toggle-option ${!statement.is_public ? "active" : ""}`}
-                      disabled={isPublicAndNotOwned}
-                    >
-                      Privado
-                    </button>
-                    <button
-                      onClick={() => toggleVisibility(statement.id, true)}
-                      className={`toggle-option ${statement.is_public ? "active" : ""}`}
-                      disabled={isPublicAndNotOwned}
-                    >
-                      Público
-                    </button>
-                  </div>
-                  <button
-                    onClick={() => handleStatementSelection(statement)}
-                    className={`statement-page__button--edit btn__icon ${isPublicAndNotOwned ? "disabled" : ""}`}
-                    disabled={isPublicAndNotOwned}
-                  >
-                    <i className="fi-rr-pencil"></i>
-                  </button>
-                  <button
-                    onClick={() => openDeleteModal(statement)}
-                    className={`statement-page__button--delete btn__icon ${isPublicAndNotOwned ? "disabled" : ""}`}
-                    disabled={isPublicAndNotOwned}
-                  >
-                    <i className="fi-rr-trash"></i>
-                  </button>
-                </div>
-              </div>
-            </li>
-          );
-        })}
-      </ul>
+      <Table
+        titles={["Definición", "Acciones"]}
+        data={paginatedStatements.map(statement => ({
+          ...statement,
+          current_user_id: user.id
+        }))}
+        actions={true}
+        openModal={handleStatementSelection}
+        deleteItem={openDeleteModal}
+        onToggleVisibility={toggleVisibility}
+        columnConfig={[
+          { field: 'definition', sortable: true }
+        ]}
+      />
+
+      <PaginationMenu
+        currentPage={localPage}
+        setCurrentPage={setLocalPage}
+        totalPages={totalLocalPages}
+      />
+
       <ConfirmDeleteModal
         isOpen={isDeleteModalOpen}
         title="¿Estás seguro de que deseas eliminar este enunciado?"
@@ -209,21 +198,6 @@ const StatementsList = ({ onSelectStatement }) => {
         onDelete={() => handleDelete(statementToDelete?.id)}
         onClose={() => setIsDeleteModalOpen(false)}
       />
-      <div className="section-table__pagination">
-        <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => changePage(1)}>
-          <i className='fi fi-rr-angle-double-small-left' />
-        </button>
-        <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => changePage(currentPage - 1)}>
-          <i className='fi fi-rr-angle-small-left' />
-        </button>
-        <span className="paging-text" >Página {currentPage} de {totalPages}</span>
-        <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => changePage(currentPage + 1)}>
-          <i className='fi fi-rr-angle-small-right' />
-        </button>
-        <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => changePage(totalPages)}>
-          <i className='fi fi-rr-angle-double-small-right' />
-        </button>
-      </div>
     </div>
   );
 };

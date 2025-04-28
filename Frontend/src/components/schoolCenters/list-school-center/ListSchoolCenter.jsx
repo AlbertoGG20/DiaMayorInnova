@@ -2,15 +2,19 @@ import React, { useEffect, useState } from 'react';
 import SchoolsServices from '../../../services/SchoolsServices';
 import ConfirmDeleteModal from '../../modal/ConfirmDeleteModal';
 import "./ListSchoolCenter.css"
+import Table from '../../table/Table';
+import FindNameSchoolCenter from '../find-name-school-center/FindNameSchoolCenter';
+import { SearchBar } from '../../search-bar/SearchBar';
+import PaginationMenu from '../../pagination-menu/PaginationMenu';
 
-const ListSchoolCenter = ({ schools, setSchools, setSelectedSchool }) => {
+const ListSchoolCenter = ({ schools, setSchools, setSelectedSchool, searchSchoolName, setSeachSchoolName }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [schoolToDelete, setSchoolToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1); //Pagination
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
 
-  const allSchools = async(page, school_name) => {
+  const allSchools = async (page, school_name) => {
     setIsLoading(true);
     try {
       const data = await SchoolsServices.getAll(page, 10, school_name);
@@ -40,49 +44,45 @@ const ListSchoolCenter = ({ schools, setSchools, setSelectedSchool }) => {
       .catch(e => console.log(e));
   };
 
-  const handleDeleteClick = (school) => {
+  const handleDeleteClick = (schoolId) => {
+    const school = schools.find(school => school.id === schoolId);
     setSchoolToDelete(school);
     setIsModalOpen(true);
   };
 
+  const handleEditClick = (schoolId) => {
+    const school = schools.find(school => school.id === schoolId);
+    setSelectedSchool(school);
+  };
+
   return (
     <>
-      <section className='school-center-list__container scroll-style'>
-        {schools.map(school => (
-          <ul className="school-center_list" key={school.id}>
-            <li className='school-list_item'>
-              <div className="school-list_section">
-                <p>{school.school_name}</p>
-                <p>{school.phone}</p>
-                <p>{school.province}</p>
-              </div>
-              <div className="school-list_section">
-                <p>{school.address}</p>
-                <p>{school.website}</p>
-              </div>
-              <div className="user-list_section">
-                <button className="edit-btn btn" onClick={() => setSelectedSchool(school)} >Editar</button>
-                <button className="delete-btn btn" onClick={() => handleDeleteClick(school)}>Eliminar</button>
-              </div>
-            </li>
-          </ul>
-        ))}
+      <section className='school-center-list__container'>
+        <h2>Lista de Centros Escolares</h2>
+        <SearchBar
+          value={searchSchoolName}
+          handleSearchChange={setSeachSchoolName}
+        />
+        <Table
+          titles={["Nombre", "Teléfono", "Provincia", "Dirección", "Web", "Acciones"]}
+          data={schools}
+          actions={true}
+          openModal={handleEditClick}
+          deleteItem={handleDeleteClick}
+          columnConfig={[
+            { field: "school_name", sortable: true },
+            { field: "phone", sortable: false },
+            { field: "province", sortable: true },
+            { field: "address", sortable: true },
+            { field: "website", sortable: true },
+          ]}
+        />
 
-        <div className="school-list__pagination">
-          <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage(1)}>
-            <i className='fi fi-rr-angle-double-small-left'/>
-          </button>
-          <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)}>
-            <i className='fi fi-rr-angle-small-left'/>
-          </button>
-          <span>Página {currentPage} de {totalPages}</span>
-          <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage((prev) => prev + 1)}>
-            <i className='fi fi-rr-angle-small-right'/>
-          </button>
-          <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage(totalPages)}>
-            <i className='fi fi-rr-angle-double-small-right'/>
-          </button>
-         </div>
+        <PaginationMenu
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          totalPages={totalPages}
+        />
       </section>
 
       <ConfirmDeleteModal

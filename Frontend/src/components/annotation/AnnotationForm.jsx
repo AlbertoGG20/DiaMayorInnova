@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Modal from "../modal/Modal";
 import http from "../../http-common";
+import PaginationMenu from "../pagination-menu/PaginationMenu";
 
 const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions, setSolutions }) => {
   const annotation = solutions[solutionIndex].entries[entryIndex].annotations[annotationIndex];
@@ -9,6 +10,37 @@ const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions,
   const [totalPages, setTotalPages] = useState(1);
   const accountNumberInputRef = useRef(null);
   const modalRef = useRef(null);
+
+  useEffect(() => {
+    if (annotation.account_id) {
+      const fetchAccountData = async () => {
+        try {
+          const response = await http.get(`/accounts/${annotation.account_id}`);
+          const accountData = response.data;
+          const updatedSolutions = [...solutions];
+          updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_number = accountData.account_number;
+          updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_name = accountData.name;
+          setSolutions(updatedSolutions);
+        } catch (error) {
+          console.error("Error al cargar los datos de la cuenta:", error);
+        }
+      };
+      fetchAccountData();
+    }
+  }, [annotation.account_id]);
+
+  useEffect(() => {
+    const loadAccounts = async () => {
+      try {
+        const response = await http.get(`/accounts?page=${currentPage}&limit=${5}`);
+        setAccounts(response.data.accounts);
+        setTotalPages(response.data.meta.total_pages || 1);
+      } catch (error) {
+        console.error("Error al cargar las cuentas:", error);
+      }
+    };
+    loadAccounts();
+  }, [currentPage]);
   const debounceTimeout = useRef(null);
 
   const retrieveAccounts = async (page = 1) => {
@@ -57,19 +89,21 @@ const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions,
 
   const handleAccountSelect = (account) => {
     const updatedSolutions = [...solutions];
-    updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex] = {
-      ...updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex],
-      account_number: account.account_number,
-      account_name: account.name
-    };
+    updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_id = account.id;
+    updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_number = account.account_number;
+    updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_name = account.name;
     setSolutions(updatedSolutions);
     modalRef.current?.close();
   };
 
   const handleAnnotationChange = (event) => {
     const updatedSolutions = [...solutions];
-    const { name, value } = event.target;
-    updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex][name] = name === "account_number" ? Number(value) : value;
+    updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex][event.target.name] = event.target.value;
+    if (event.target.name === "account_number") {
+      updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_number = Number(event.target.value);
+      updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_id = null;
+      updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_name = "";
+    }
     setSolutions(updatedSolutions);
 
     if (name === "account_number" && value) {
@@ -126,7 +160,8 @@ const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions,
         name="number"
         value={annotation.number || ""}
         onChange={handleAnnotationChange}
-        className="statement-page__input"
+        id="number"
+        className="statement-page__input--edit-solution"
         placeholder="Apunte"
       />
       <input
@@ -134,7 +169,8 @@ const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions,
         name="account_number"
         value={annotation.account_number || ""}
         onChange={handleAnnotationChange}
-        className="statement-page__input"
+        id="account_number"
+        className="statement-page__input--edit-solution"
         placeholder="Nº Cuenta"
         ref={accountNumberInputRef}
       />
@@ -143,7 +179,8 @@ const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions,
         name="account_name"
         value={annotation.account_name || ""}
         readOnly
-        className="statement-page__input"
+        id="account_name"
+        className="statement-page__input--edit-solution"
         placeholder="Nombre Cuenta"
       />
       <input
@@ -152,7 +189,8 @@ const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions,
         value={annotation.debit || ""}
         disabled={!!annotation.credit}
         onChange={handleAnnotationChange}
-        className="statement-page__input"
+        id="debit"
+        className="statement-page__input--edit-solution"
         placeholder="Debe"
       />
       <input
@@ -161,13 +199,14 @@ const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions,
         value={annotation.credit || ""}
         disabled={!!annotation.debit}
         onChange={handleAnnotationChange}
-        className="statement-page__input"
+        id="credit"
+        className="statement-page__input--edit-solution"
         placeholder="Haber"
       />
       <button
         type="button"
         onClick={removeAnnotation}
-        className="statement-page__button statement-page__button-delete"
+        className="statement-page__button statement-page__button-delete btn__icon"
         aria-label="Eliminar apunte"
       >
         <i className="fi fi-rr-trash"></i>
@@ -175,9 +214,9 @@ const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions,
 
       <Modal ref={modalRef} modalTitle="Seleccionar Cuenta" showButton={false}>
         <div className="account-list">
-          {accounts.map((account) => (
+          {accounts && accounts.map((account) => (
             <div
-              key={account.account_number}
+              key={account.id}
               className="account-item"
               onClick={() => handleAccountSelect(account)}
             >
@@ -186,36 +225,12 @@ const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions,
             </div>
           ))}
         </div>
-        <div className="account__pagination">
-          <button
-            className="dt-paging-button"
-            disabled={currentPage === 1}
-            onClick={() => handlePageChange(1)}
-          >
-            <i className="fi fi-rr-angle-double-small-left" />
-          </button>
-          <button
-            className="dt-paging-button"
-            disabled={currentPage === 1}
-            onClick={() => handlePageChange(currentPage - 1)}
-          >
-            <i className="fi fi-rr-angle-small-left" />
-          </button>
-          <span>Página {currentPage} de {totalPages}</span>
-          <button
-            className="dt-paging-button"
-            disabled={currentPage === totalPages}
-            onClick={() => handlePageChange(currentPage + 1)}
-          >
-            <i className="fi fi-rr-angle-small-right" />
-          </button>
-          <button
-            className="dt-paging-button"
-            disabled={currentPage === totalPages}
-            onClick={() => handlePageChange(totalPages)}
-          >
-            <i className="fi fi-rr-angle-double-small-right" />
-          </button>
+        <div className="account-pagination">
+          <PaginationMenu
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            totalPages={totalPages}
+          />
         </div>
       </Modal>
     </div>

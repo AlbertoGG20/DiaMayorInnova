@@ -155,15 +155,12 @@ const AddAccountingPlan = ({ setNewPGC }) => {
             <div className="accountingPlan__form--actions">
               <div className="accountingPlan__form--row">
                 <div className="accountingPlan__form--add">
-                  <button className="btn accountingPlan__button" onClick={saveAccountingPlan}> <i className="fi-rr-plus" />Añadir plan</button>
+                  <button className="btn " onClick={saveAccountingPlan}> <i className="fi-rr-plus" />Añadir plan</button>
                 </div>
 
-
-
-                {/* Sección de Importación de CSV */}
                 <div className="accountingPlan__form--upload">
                   <button
-                    className="btn accountingPlan__button"
+                    className="btn "
                     onClick={handleUpload}
                     disabled={!selectedFile}
                   > Cargar archivo </button>
@@ -175,7 +172,8 @@ const AddAccountingPlan = ({ setNewPGC }) => {
                       onChange={handleFileChange}
                       className="accountingPlan__file--input"
                     />
-                    <p>Subir CSV</p>
+                    <i className="fi-rr-upload" />
+                    <p>CSV</p>
                     <span id="file-name" className="accountingPlan__file--name">
                       {fileName}
                     </span>

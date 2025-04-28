@@ -4,7 +4,7 @@
   height: 100%;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 0.1fr 1fr 1fr;
+  grid-template-rows: auto auto 1fr;
   grid-template-areas:
     "task-header task-header"
     "task-form task-preview"
@@ -76,8 +76,8 @@
 
 .task-page__selection {
   grid-area: statements-selection;
-  padding: var(--gap-xxs) var(--gap-xxs) var(--gap-xxs) var(--gap-xl);
-  border-radius: var(--r-xxss);
+  padding: var(--gap-s);
+  border-radius: var(--r-xs);
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -96,12 +96,11 @@
 .task-page__selection--content {
   display: flex;
   flex-direction: column;
-  flex: 1;
+  gap: var(--gap-s);
   overflow: hidden;
 }
 
 .task-page__header {
-  top: 0;
   font-size: var(--text-desktop-subtitles-2);
   font-weight: bold;
 }
@@ -234,7 +233,6 @@
   background-color: var(--Color-primary);
   color: var(--Color-Neutral-White);
   border: none;
-  border-radius: var(--border-radius);
   cursor: pointer;
   margin-top: var(--gap-m);
 }
@@ -270,7 +268,6 @@
   background-color: transparent;
   color: var(--Color-grey-400);
   border: none;
-  border-radius: var(--border-radius);
   cursor: pointer;
 }
 
@@ -291,7 +288,7 @@
 .task-page__list-item {
   padding: var(--gap-s) 0;
   border-bottom: 1px solid var(--Color-grey-200);
-  border-radius: var(--border-radius);
+
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -370,7 +367,7 @@
   margin-top: var(--gap-m);
   padding: var(--gap-s);
   border: 1px solid var(--Color-grey-200);
-  border-radius: var(--border-radius);
+
 }
 
 .task-page__dates-container {
@@ -447,7 +444,7 @@
   font-size: var(--text-desktop-small);
   margin-bottom: var(--gap-xxs);
   padding: var(--gap-xxs);
-  border-radius: var(--border-radius);
+
   display: flex;
   justify-content: flex-start;
   background-color: var(--Color-grey-100);
@@ -480,7 +477,7 @@
   background-color: transparent;
   color: var(--Color-grey-400);
   border: 1px solid var(--Color-grey-400);
-  border-radius: var(--border-radius);
+
   cursor: pointer;
 }
 

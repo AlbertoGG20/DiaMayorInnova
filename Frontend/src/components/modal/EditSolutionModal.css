@@ -140,8 +140,7 @@ textarea {
 }
 
 .statement-page__annotation-row {
-  display: grid;
-  grid-template-columns: 1fr 2fr 3fr 2fr 2fr 1fr;
+  display: flex;
   gap: 10px;
 }
 
@@ -149,6 +148,35 @@ textarea {
   padding: 5px;
   border: 1px solid #ccc;
   border-radius: 4px;
+}
+
+.statement-page__entry-columns span:nth-child(2) {
+  width: 30px;
+}
+
+.SolutionForm__entry_header {
+
+  display: flex;
+}
+
+.statement-page__input--edit-solution:nth-child(2) {
+  width: 100px;
+}
+
+.statement-page__input--edit-solution:nth-child(4) {
+  width: 100px;
+}
+
+.statement-page__input--edit-solution:nth-child(5) {
+  width: 100px;
+}
+
+.SolutionForm__entry_container {
+  background-color: var(--Color-White);
+  margin: var(--gap-xxs);
+  padding: var(--gap-xs);
+  border-radius: var(--r-xs);
+  box-shadow: var(--box-shadow-btn);
 }
 
 .statement-page__date-input {
@@ -216,11 +244,11 @@ textarea {
 }
 
 .statement-page__entry-collapse {
+  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: var(--gap-xxxs);
-  background-color: var(--Color-grey-50);
   border-radius: var(--r-xxs);
   cursor: pointer;
 }

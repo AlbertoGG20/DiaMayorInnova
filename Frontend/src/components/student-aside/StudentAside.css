@@ -1,9 +1,12 @@
 .student__aside {
+  background-color: var(--Color-White);
   display: flex;
   flex-direction: column;
   height: 100%;
   padding: var(--gap-s);
   overflow: hidden;
+  box-shadow: var(--box-shadow-btn);
+  border-radius: var(--r-s);
 
   & header {
     border-bottom: 1px solid var(--Color-grey-100);
@@ -42,7 +45,7 @@
   gap: var(--gap-xs);
 }
 
-.student-aside__list-item{
+.student-aside__list-item {
   background-color: var(--Color-White);
   border-radius: var(--r-xs);
   width: 100%;
@@ -52,7 +55,7 @@
   box-shadow: var(--box-shadow-btn);
 }
 
-.student-aside__list-info{
+.student-aside__list-info {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -60,7 +63,7 @@
   gap: var(--gap-xs);
 }
 
-.student-aside__info-header{
+.student-aside__info-header {
   width: 100%;
   display: flex;
   justify-content: space-between;
@@ -83,22 +86,23 @@
 }
 
 .student-aside__square.task {
-  background-color: var(--Color-blue-100);;
+  background-color: var(--Color-blue-100);
+  ;
 }
 
-.student-aside__square .fi{
+.student-aside__square .fi {
   display: flex;
   font-size: medium;
   color: var(--Color-Principal);
 }
 
-.student-aside__list-info--body{
+.student-aside__list-info--body {
   display: flex;
   flex-direction: column;
   gap: var(--gap-xxxs);
 }
 
-.student-aside__date{
+.student-aside__date {
   display: flex;
   gap: var(--gap-xxs);
   align-items: center;

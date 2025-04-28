@@ -1,14 +1,12 @@
 .create-schools_wrapper {
-  grid-area: form;
-  width: 100%;
-  padding: var(--gap-s) var(--gap-xl);
-  margin: 0;
   display: flex;
   flex-direction: column;
-  justify-content: start;
-  align-items: start;
-  gap: var(--gap-xl);
-  color: var(--Color-Principal);
+  height: 100%;
+  width: 100%;
+  background-color: var(--Color-White);
+  border-radius: var(--gap-xs);
+  padding: var(--gap-s);
+  box-shadow: var(--box-shadow-btn);
 
   & h2 {
     font-size: var(--text-desktop-subtitles-1);
@@ -59,35 +57,32 @@
   margin: 0;
 }
 
-.createSchool_submit {
-  margin-top: var(--gap-m);
-}
 
 @media (max-width: 1024px) {
   .create-schools_wrapper {
-      padding: var(--gap-m);
+    padding: var(--gap-m);
   }
 
   .create-schools_fieldset {
-      flex-direction: column; 
-      align-items: start;
+    flex-direction: column;
+    align-items: start;
   }
 
   .create-schools_fieldset .school_label {
-      width: 100%; 
+    width: 100%;
   }
 }
 
 @media (max-width: 768px) {
   .create-schools_wrapper {
-      padding: var(--gap-s);
+    padding: var(--gap-s);
   }
 
   .create-schools_form {
-      gap: var(--gap-xs);
+    gap: var(--gap-xs);
   }
 
   .createSchool_submit {
-      width: 100%; 
+    width: 100%;
   }
 }

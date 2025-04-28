@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { navContext } from '../context/nav-menu/navMenuContext';
 import Shortcuts from "../components/shortcuts/Shortcuts";
 import StudentMark from "../components/student-mark/StudentMark";
@@ -9,17 +9,23 @@ import StatementsSelection from "../components/task/StatementsSelection";
 
 
 function Home() {
+  const location = useLocation();
+  console.log(location.pathname);
   const { currentRole } = useContext(navContext);
 
   if (currentRole === 'admin' || currentRole === 'center_admin') {
     return (
       <>
-        <main className="home_section">
+        <main className="home_section--admin">
+          <Shortcuts />
           <section className="principal">
+            {location.pathname === '/home' && (
+              <div className="home__admin">
+                <div className="principalSection__img"></div>
+              </div>
+            )}
             <Outlet />
           </section>
-          <aside className="aside"></aside>
-          <Shortcuts />
         </main>
       </>
     )

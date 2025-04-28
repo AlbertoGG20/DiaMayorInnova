@@ -6,6 +6,8 @@ import "../modal/AccountModal.css";
 import AccountingPlan from "./AccountingPlan";
 import Modal from "../modal/Modal";
 import { SearchBar } from "../search-bar/SearchBar";
+import Table from "../table/Table";
+import PaginationMenu from "../pagination-menu/PaginationMenu";
 
 
 const AccountingPlansList = ({ newPGC }) => {
@@ -14,8 +16,6 @@ const AccountingPlansList = ({ newPGC }) => {
   const modalRef = useRef(null); // Referencia para la modal
   const accountsModalRef = useRef(null)
   const navigate = useNavigate();
-  const [currentAccountingPlan, setCurrentAccountingPlan] = useState(null);
-  const [currentIndex, setCurrentIndex] = useState(-1);
   const [searchAccPlan, setSearchAccPlan] = useState("");
   const [sortOrder, setSortOrder] = useState("ascending") //Sort control state
   const [accounts, setAccounts] = useState([]); // Stocker les comptes récupérés
@@ -46,17 +46,10 @@ const AccountingPlansList = ({ newPGC }) => {
     }
   };
 
-  const setActiveAccountingPlan = (accountingPlan, index) => {
-    setCurrentAccountingPlan(accountingPlan);
-    setCurrentIndex(index);
-  };
-
   const deleteAccountingPlan = (id) => {
     AccountingPlanDataService.remove(id)
       .then((response) => {
         retrieveAccountingPlans(); //Refresh list after remove
-        setCurrentAccountingPlan(null); //Clear state
-        setCurrentIndex(-1); //Reset index
         navigate("/accounting-plans/");
       })
       .catch((e) => {
@@ -154,63 +147,30 @@ const AccountingPlansList = ({ newPGC }) => {
           {accountingPlans.length === 0 ? (
             <p>No hay PGCs disponibles</p>
           ) : (
-            <table className="accountingPlan__table">
-              <thead>
-                <tr>
-                  <th onClick={handleSortClick} className="accountingPlan__table--name-field" >
-                    Nombre PGC
-                    {sortOrder === "ascending" ? <i className="fi fi-rr-angle-small-down" /> : <i className="fi fi-rr-angle-small-up" />}
-                  </th>
-                  <th>Acrónimo</th>
-                  <th>Descripción</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {accountingPlans.map((accountingPlan, index) => (
-                  <tr key={index}>
-                    <td>{accountingPlan.name}</td>
-                    <td>{accountingPlan.acronym}</td>
-                    <td>{accountingPlan.description}</td>
-                    <td className="accountingPlan__table--actions">
-                      <button className="accountingPlan__button--link eye" onClick={() => fetchAccountsByPGC(accountingPlan.id)}>
-                        <i className="fi-rr-eye" />
-                      </button>
-                      <button className="accountingPlan__button--link pencil" onClick={() => openEditModal(accountingPlan.id)}>
-                        <i className="fi-rr-pencil" />
-                      </button>
-                      <button className="accountingPlan__button--link download" onClick={() => handleExportToCSV(accountingPlan.id)}>
-                        <i className="fi-rr-download" /> CSV
-                      </button>
-                      <button aria-label="Eliminar PGC" className="accountingPlan__button--remove trash"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deleteAccountingPlan(accountingPlan.id);
-                        }}>
-                        <i className="fi-rr-trash" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+
+            <Table
+              titles={["Nombre PGC", "Acrónimo", "Descripción", "Acciones"]}
+              data={accountingPlans}
+              actions={true}
+              show={fetchAccountsByPGC}
+              openModal={openEditModal}
+              exportCSV={handleExportToCSV}
+              deleteItem={deleteAccountingPlan}
+              columnConfig={[
+                { field: 'name', sortable: true },
+                { field: 'acronym', sortable: true },
+                { field: 'description', sortable: true }
+              ]}
+            />
           )}
         </div>
-        <div className="section-table__pagination">
-          <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage(1)}>
-            <i className='fi fi-rr-angle-double-small-left' />
-          </button>
-          <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)}>
-            <i className='fi fi-rr-angle-small-left' />
-          </button>
-          <span>Página {currentPage} de {totalPages}</span>
-          <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage((prev) => prev + 1)}>
-            <i className='fi fi-rr-angle-small-right' />
-          </button>
-          <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage(totalPages)}>
-            <i className='fi fi-rr-angle-double-small-right' />
-          </button>
-        </div>
+
+        <PaginationMenu
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          totalPages={totalPages}
+        />
+
       </section>
 
       <Modal ref={accountsModalRef} modalTitle="Cuentas del PGC" showButton={false}>

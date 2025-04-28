@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import userService from "../../../services/userService";
 import ConfirmDeleteModal from '../../modal/ConfirmDeleteModal';
 import './ListUsers.css';
-
+import Table from "../../table/Table";
+import { SearchBar } from "../../search-bar/SearchBar";
+import PaginationMenu from "../../pagination-menu/PaginationMenu";
 const ListUsers = ({ setSelectedUser }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
@@ -10,6 +12,9 @@ const ListUsers = ({ setSelectedUser }) => {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [search, setSearch] = useState("");
+  const itemsPerPage = 10;
+  const [localPage, setLocalPage] = useState(1);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -17,7 +22,7 @@ const ListUsers = ({ setSelectedUser }) => {
       try {
         const response = await userService.getAllUsers(currentPage, 10);
 
-        if (response) { 
+        if (response) {
           setUsers(response.data.data.users);
           setTotalPages(response.data.data.meta?.total_pages || 1);
         }
@@ -45,53 +50,55 @@ const ListUsers = ({ setSelectedUser }) => {
     setIsModalOpen(true);
   };
 
+  const isSearching = search.trim().length > 0;
+
+  const filteredUsers = isSearching
+    ? users.filter(user =>
+      String(user.name || "").toLowerCase().includes(search.toLowerCase()) ||
+      String(user.email || "").toLowerCase().includes(search.toLowerCase()) ||
+      String(user.role || "").toLowerCase().includes(search.toLowerCase())
+    )
+    : users;
+
+  const totalLocalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+
+  useEffect(() => {
+    setLocalPage(1);
+  }, [search]);
+
+  const paginatedUsers = filteredUsers.slice(
+    (isSearching ? (localPage - 1) : (currentPage - 1)) * itemsPerPage,
+    (isSearching ? localPage : currentPage) * itemsPerPage
+  );
+
   return (
     <>
-      <section className='user-list__container scroll-style'>
+      <section className='user-list__container'>
+        <h2>Listada de Usuarios</h2>
+        <SearchBar
+          value={search}
+          handleSearchChange={setSearch}
+        />
 
-      <div className="user-list_pagination">
-        <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage(1)}>
-          <i className='fi fi-rr-angle-double-small-left'/>
-        </button>
-        <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)}>
-          <i className='fi fi-rr-angle-small-left'/>
-        </button>
-        <span>Página {currentPage} de {totalPages}</span>
-        <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage((prev) => prev + 1)}>
-          <i className='fi fi-rr-angle-small-right'/>
-        </button>
-        <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage(totalPages)}>
-          <i className='fi fi-rr-angle-double-small-right'/>
-        </button>
-      </div>
+        <Table
+          titles={["Nombre", "Correo", "Role", "Acciones"]}
+          data={paginatedUsers}
+          actions={true}
+          openModal={true}
+          deleteItem={deleteUser}
+          columnConfig={[
+            { field: "name", sortable: true },
+            { field: "email", sortable: true },
+            { field: "role", sortable: true }
+          ]}
+        />
 
-        <ul className="user_list">
-          <li className='user-list_item--header'>
-            <div className="user-list_section">
-              <p><strong>Nombre</strong></p>
-              <p><strong>Correo</strong></p>
-              <p><strong>Role</strong></p>
-            </div>
-          </li>
-          {loading ? (
-            <p>Cargando usuarios...</p>
-          ) : (
-            users.map(user => (
-              <li className='user-list_item' key={user.id}>
-                <div className="user-list_section">
-                  <p>{user.name}</p>
-                  <p>({user.email})</p>
-                  <p>{user.role}</p>
-                </div>
-                <div className="user-list_section">
-                  <button className="edit-btn btn" onClick={() => setSelectedUser(user)} >Editar</button>
-                  <button className="delete-btn btn" onClick={() => handleDeleteClick(user)}>Eliminar</button>
-                </div>
-              </li>
-            ))
-          )}
-        </ul>
-      </section>
+        <PaginationMenu
+          currentPage={isSearching ? localPage : currentPage}
+          setCurrentPage={isSearching ? setLocalPage : setCurrentPage}
+          totalPages={isSearching ? totalLocalPages : totalPages}
+        />
+      </section >
 
       <ConfirmDeleteModal
         isOpen={isModalOpen}

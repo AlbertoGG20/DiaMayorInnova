@@ -1,5 +1,6 @@
 .buttons_container {
   display: flex;
+  height: auto;
   flex-direction: column;
   justify-content: start;
   align-items: center;
@@ -8,34 +9,59 @@
 }
 
 .home_section {
-  padding: 0;
   width: 100%;
   height: 100%;
   display: grid;
   grid-template-columns: 2fr 2fr 1fr;
-  grid-template-rows: 1.5fr 2fr 2fr;
+  grid-template-rows: 1fr 2fr 2fr;
   grid-template-areas:
     "head head aside"
     "main main aside"
     "main main aside";
   overflow: hidden;
+  row-gap: var(--gap-s);
 }
+
+.home_section--admin {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 2fr;
+  grid-template-areas:
+    "head head"
+    "main main";
+  overflow: hidden;
+  gap: var(--gap-s);
+}
+
+.home__admin {
+  height: 100%;
+  background-color: var(--Color-White);
+  border-radius: var(--r-xs);
+  box-shadow: var(--box-shadow-btn);
+
+}
+
 
 .top {
   grid-area: head;
-  padding: var(--gap-xxl);
-  border-bottom: solid 1px var(--Color-grey-100);
+  padding: var(--gap-s);
+  border-radius: var(--r-xs);
+  box-shadow: var(--box-shadow-btn);
+  background-color: var(--Color-White);
+  margin: var(--gap-s) var(--gap-s) 0 var(--gap-s);
 }
 
 .shortcut__wrapper {
-  margin-top: var(--gap-l);
+  margin-top: var(--gap-s);
   display: flex;
   gap: var(--gap-xxl);
 }
 
 .shortcut__title {
   font-size: var(--text-desktop-h4);
-  padding-bottom: 1em;
+  margin-bottom: var(--gap-s);
 }
 
 .shortcut__subtitle {
@@ -44,11 +70,13 @@
 
 .principal {
   grid-area: main;
+  overflow: hidden;
+  padding: 0 var(--gap-s) var(--gap-s) var(--gap-s);
 }
 
 .aside {
   grid-area: aside;
-  border-left: solid 1px var(--Color-grey-100);
+  margin: var(--gap-s) var(--gap-s) var(--gap-s) 0;
 }
 
 /* Estilos para tablet */
@@ -86,6 +114,15 @@
     gap: var(--gap-l);
     padding: var(--gap-xxs);
     overflow: auto;
+  }
+
+  .home_section--admin {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-l);
+    padding: var(--gap-xxs);
+    overflow: auto;
+    height: auto;
   }
 
   .top,

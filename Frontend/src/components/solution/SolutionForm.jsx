@@ -32,15 +32,14 @@ const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
     setSolutions(updatedSolutions);
   };
 
-  /* En caso de querer un botón "Eliminar Asiento", por asiento  
-   const removeEntry = (entryIndex) => {
-      const updatedSolutions = [...solutions];
-      updatedSolutions[solutionIndex].entries = updatedSolutions[solutionIndex].entries.filter(
-        (_, i) => i !== entryIndex
-      );
-      setSolutions(updatedSolutions);
-      console.log("Soluciones actualizadas después de eliminar asiento:", updatedSolutions);
-    }; */
+  const removeEntry = (entryIndex) => {
+    const updatedSolutions = [...solutions];
+    updatedSolutions[solutionIndex].entries = updatedSolutions[solutionIndex].entries.filter(
+      (_, i) => i !== entryIndex
+    );
+    setSolutions(updatedSolutions);
+    console.log("Soluciones actualizadas después de eliminar asiento:", updatedSolutions);
+  };
 
   const removeLastEntry = () => {
     const updatedSolutions = [...solutions];
@@ -82,44 +81,46 @@ const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
         {/* <button type="button" onClick={removeSolution}>Eliminar Solución</button> */}
       </div>
 
-      {solution.entries.map((entry, entryIndex) => (
-        <div key={entryIndex}>
-          <div
-            className="statement-page__entry-collapse"
-            onClick={() => toggleCollapse(entryIndex)}
-          >
-            <span className="statement-page__entry-title">{`Asiento ${entry.entry_number}`}</span>
-            <span className="statement-page__entry-icon">
-              <i className={
-                collapsedEntries[entryIndex]
-                  ? "fi fi-rr-angle-small-down"
-                  : "fi fi-rr-angle-small-up"
-              }
-              ></i>
-            </span>
-            <span className="statement-page__entry-date">Fecha: {entry.entry_date || "Sin fecha"}</span>
+      {
+        solution.entries.map((entry, entryIndex) => (
+          <div key={entryIndex} className="SolutionForm__entry_container">
+            <div className="SolutionForm__entry_header">
+              <div
+                className="statement-page__entry-collapse"
+                onClick={() => toggleCollapse(entryIndex)}
+              >
+                <span className="statement-page__entry-title">{`Asiento ${entry.entry_number}`}</span>
+                <span className="statement-page__entry-icon">
+                  <i className={
+                    collapsedEntries[entryIndex]
+                      ? "fi fi-rr-angle-small-down"
+                      : "fi fi-rr-angle-small-up"
+                  }
+                  ></i>
+                </span>
+                <span className="statement-page__entry-date">Fecha: {entry.entry_date || "Sin fecha"}</span>
+              </div>
+              <button
+                type="button"
+                className="statement-page__button--remove-entry btn__icon"
+                onClick={() => removeEntry(entryIndex)}
+              >
+                <i className="fi fi-rr-trash"></i>
+              </button>
+            </div>
+
+            {!collapsedEntries[entryIndex] && (
+              <EntryForm
+                solutionIndex={solutionIndex}
+                entry={entry}
+                entryIndex={entryIndex}
+                solutions={solutions}
+                setSolutions={setSolutions}
+              />
+            )}
+
           </div>
-
-          {!collapsedEntries[entryIndex] && (
-            <EntryForm
-              solutionIndex={solutionIndex}
-              entry={entry}
-              entryIndex={entryIndex}
-              solutions={solutions}
-              setSolutions={setSolutions}
-            />
-          )}
-
-          <button
-            type="button"
-            className="statement-page__button--remove-entry"
-            onClick={() => removeEntry(entryIndex)}
-          >
-            <i className="fi fi-rr-trash"></i>
-            <span className="statement-page__span--remove-entry">Asiento</span>
-          </button>
-        </div>
-      ))}
+        ))}
 
 
       <div className="statement-page-modal__actions" >
@@ -127,13 +128,13 @@ const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
           <button type="button" onClick={addEntry} className="btn">
             + Asiento
           </button>
-          <button
+          {/* <button
             type="button"
             className="statement-page__button--remove-entry"
             onClick={removeLastEntry}
           >
             <i className="fi fi-rr-trash"></i>
-          </button>
+          </button> */}
         </div>
         <div className="statement-page__totals">
           <span>Total Debe: {totals.debit.toFixed(2)}</span>

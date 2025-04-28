@@ -1,48 +1,38 @@
 .search-school_container {
-  grid-area: find;
-  overflow: hidden;
   width: 100%;
-  height: 100%;
+  height: auto;
   padding: var(--gap-s) var(--gap-xl);
   border-bottom: solid 1px var(--Color-grey-200);
   border-left: solid 1px var(--Color-grey-200);
 }
 
-.search-school_form {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;  
-  width: 100%;
-  height: 80%;
-}
-
-.search-school_label #searchSchoolName{
+.search-school_label #searchSchoolName {
   margin-bottom: 0;
 }
 
 @media (max-width: 1024px) {
   .search-school_container {
-      padding: var(--gap-m);
+    padding: var(--gap-m);
   }
 
   .search-school_form {
-      height: auto;
+    height: auto;
   }
 }
 
 @media (max-width: 768px) {
   .search-school_container {
-      border-left: none;
-      border-bottom: none;
+    border-left: none;
+    border-bottom: none;
   }
 
   .search-school_form {
-      flex-direction: column;
-      align-items: center;
-      gap: var(--gap-xs);
+    flex-direction: column;
+    align-items: center;
+    gap: var(--gap-xs);
   }
 
   .search-school_label #searchSchoolName {
-      width: 100%;
+    width: 100%;
   }
 }

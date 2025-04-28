@@ -81,7 +81,7 @@ const useAuthLogic = (navigate) => {
         setUserAvatarUrl(
           user.featured_image ? `${API_BASE_URL}${user.featured_image}` : null
         );
-        navigate("/Home");
+        navigate("/home");
       } else {
         throw new Error(response.data.message || "Error al autenticar.");
       }
