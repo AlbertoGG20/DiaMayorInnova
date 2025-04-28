@@ -75,8 +75,15 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: var(--Color-red-100);
   border-radius: var(--r-xs);
+}
+
+.student-aside__square.exam {
+  background-color: var(--Color-red-100);
+}
+
+.student-aside__square.task {
+  background-color: var(--Color-blue-100);;
 }
 
 .student-aside__square .fi{

@@ -24,4 +24,9 @@ FactoryBot.define do
     sequence(:name) { |n| "Admin #{n}" }
     role { 'admin' }
   end
+
+  factory :center_admin_user, parent: :user do
+    sequence(:name) { |n| "Center_admin #{n}" }
+    role { 'center_admin' }
+  end
 end

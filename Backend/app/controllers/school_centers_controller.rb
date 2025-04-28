@@ -3,17 +3,26 @@ class SchoolCentersController < ApplicationController
   load_and_authorize_resource
 
   def index
-    if params[:school_name].present?
-      @schools = SchoolCenter.where("school_name LIKE ?", "%#{params[:school_name]}%")
-    else
-      @schools = SchoolCenter.all
-    end
-    render json: @schools
+    schools = SchoolCenter.all
+    schools = schools.where("school_name LIKE ?", "%#{params[:school_name]}%")
+
+    paginated_schools = schools.page(params[:page]).per(params[:per_page] || 10)
+
+    render json: {
+      schools: paginated_schools,
+      meta: {
+        current_page: paginated_schools.current_page,
+        total_pages: paginated_schools.total_pages,
+        total_count:paginated_schools.total_count
+      }
+    }
   end
 
   def show
     @school = SchoolCenter.find(params[:id])
-    render @school
+    render json: @school, status: :ok
+  rescue ActiveRecord::RecordNotFound
+    render json: { error: "Centro escolar no encontrado" }, status: :not_found
   end
 
   def create

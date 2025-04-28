@@ -8,11 +8,11 @@ const ConfirmDeleteModal = ({ isOpen, title, message, onDelete, onClose }) => {
     <div className="modalConfirmDelete-overlay">
       <div className="modalConfirmDelete-content">
         <h2>{title}</h2>
-        <p><strong>{message}</strong></p>
+        <p>{message}</p>
         <p>Esta acción no se puede deshacer.</p>
         <div className="modalConfirmDelete-buttons">
-          <button className="btn-cancel" aria-label="cancelar borrado" onClick={onClose}>Cancelar</button>
           <button className="btn-confirm" aria-label="confirmar borrado" data-testid="confirm-delete-button" onClick={onDelete}>Eliminar</button>
+          <button className="btn light" aria-label="cancelar borrado" onClick={onClose}>Cancelar</button>
         </div>
       </div>
     </div>

@@ -1,10 +1,12 @@
 import http from "../http-common";
 
 
-const getAll = async () => {
+const getAll = async (page=1, perPage = 10, school_name = "") => {
   try {
-    const response = http.get("/school_centers");
-    return response;
+    const response = await http.get("/school_centers", {
+      params: {page, per_page: perPage, school_name}
+    });
+    return response.data;
   } catch (error) {
     console.error("Error en la petición getAll: ", error);
     return null;
@@ -21,15 +23,7 @@ const get = async (id) => {
   }
 };
 
-const create = async (data) => {
-  try {
-    const response = await http.post("/school_centers", data);
-    return response;
-  } catch (error) {
-    console.error("Error en la creación:", error);
-    return null;
-  }
-};
+const create = (data) =>  http.post("/school_centers",{ school_center: data });
 
 const update = async (id, data) => {
   try {
@@ -41,15 +35,7 @@ const update = async (id, data) => {
   }
 };
 
-const remove = async (id) => {
-  try {
-    const response = await http.delete(`/school_centers/${id}`);
-    return response;
-  } catch (error) {
-    console.error("Error en la eliminación:", error);
-    return null;
-  }
-};
+const remove = (schoolId) => http.delete(`/school_centers/${schoolId}`);
 
 const removeAll = async () => {
   try {

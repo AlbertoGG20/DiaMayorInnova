@@ -80,3 +80,36 @@ label {
         width: 500px;
     }
 }
+
+@media (max-width: 1024px) {
+    .school-center_page {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+        grid-template-areas: 
+            "form"
+            "find"
+            "list";
+    }
+
+    .center_list {
+        font-size: 0.85rem; 
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .school-center_page {
+        padding: 1rem; 
+    }
+
+    .center_list {
+        flex-direction: column; 
+        align-items: center;
+    }
+
+    .schoolCenter_item {
+        margin-left: 0;
+        width: 100%;
+    }
+}

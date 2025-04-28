@@ -5,7 +5,6 @@
   justify-content: space-between;
   padding: var(--gap-s);
   border-radius: var(--r-xxs);
-  margin: 0 var(--gap-l) 0 var(--gap-s);
 
   & h2 {
     font-size: var(--text-desktop-subtitles-2);

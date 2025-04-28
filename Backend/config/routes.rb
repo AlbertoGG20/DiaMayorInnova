@@ -1,6 +1,21 @@
 Rails.application.routes.draw do
 
-  resources :class_groups
+  resources :accounting_plans do
+    member do
+      get 'export_csv'
+    end
+    collection do
+      post 'import_csv'
+    end
+  end
+  
+  resources :class_groups do
+    member do
+      get 'users' # AÑADIDO
+      put 'update_users'
+    end
+  end
+  
   resources :school_centers
   
 
@@ -23,12 +38,16 @@ Rails.application.routes.draw do
   resources :solutions
   resources :student_entries
   resources :student_annotations
-  resources :marks
+  resources :marks do
+    put 'update_multiple', on: :collection
+  end
 
   resources :student_exercises, only: [:index, :show, :create, :update] do
     member do
       post 'start'
-      post 'finish'
+      put 'finish'
+      put 'update_student_exercise'
+      put 'update_student_task'
     end
     collection do
       get 'students_mark_list'
@@ -39,6 +58,7 @@ Rails.application.routes.draw do
   resources :exercises do
     delete 'destroy_on_group', on: :collection
     get 'find_by_task_id', on: :collection
+    get 'find_by_exercise_id', on: :collection
   end
 
   resources :tasks, param: :id do
@@ -61,8 +81,15 @@ Rails.application.routes.draw do
     resources :registrations
   end
 
-  resources :users, only: [:index, :show, :create, :update, :destroy]
-
+  resources :users, only: [:index, :show, :create, :update, :destroy] do
+    collection do
+      get 'current_user', to: 'users#current'
+      get '/users/by_class/:id', to: 'users#by_class'
+    end
+  end
+  
+  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
+  # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
 
   root to: 'sessions#create'

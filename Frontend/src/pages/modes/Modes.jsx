@@ -1,10 +1,11 @@
 import React from 'react'
-import { Outlet, useLocation } from 'react-router-dom'
+import { Outlet, useLocation, useParams } from 'react-router-dom'
 import Shortcut from '../../components/shortcuts/shortcut/Shortcut'
 import "./Modes.css"
 
 const Modes = () => {
   const location = useLocation();
+  const { exerciseId } = useParams();
 
 
   if (location.pathname === "/modes") {

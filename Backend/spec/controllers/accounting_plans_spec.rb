@@ -13,25 +13,35 @@ describe AccountingPlansController do
 
     #Tests
     describe "GET /index" do
-        describe "devolver todos los PGC" do
-            before do
-                accounting_plans = create_list(:accounting_plan, 3)
-                get :index
-            end
-
-            it { expect(response).to have_http_status(:ok) }
-
+        context "cuando hay múltiples PGCs" do
+          let!(:accounting_plans) { create_list(:accounting_plan, 3) }
+      
+          before { get :index }
+      
+          it "devuelve estado 200 OK" do
+            expect(response).to have_http_status(:ok)
+          end
+      
+          it "devuelve la cantidad correcta de PGCs" do
+            expect(JSON.parse(response.body).size).to eq(3)
+          end
         end
-
-        describe "filtrar por nombre" do
-            before do
-                plan_a = create(:accounting_plan, name: "Plan A")
-                get :index, params: { name: "Plan A" }
-            end
-
-            it { expect(response).to have_http_status(:ok) }
+      
+        context "cuando se filtra por nombre" do
+          let!(:plan) { create(:accounting_plan, name: "Plan A") }
+      
+          before { get :index, params: { name: "Plan A" } }
+      
+          it { expect(response).to have_http_status(:ok) }
+      
+          it "devuelve solo los resultados filtrados" do
+            body = JSON.parse(response.body)
+            expect(body.size).to eq(1)
+            expect(body.first["name"]).to eq("Plan A")
+          end
         end
-    end
+      end
+      
 
 
     describe "GET show" do
@@ -97,4 +107,31 @@ describe AccountingPlansController do
             it { expect(response).to have_http_status(:success) }
         end
     end
+
+    describe "GET /export_csv" do
+        before { get :export_csv, params: { id: accounting_plan.id } }
+      
+        it { expect(response).to have_http_status(:ok) }
+      
+        it "devuelve un archivo CSV" do
+          expect(response.header["Content-Type"]).to include("text/csv")
+        end
+    end
+
+    describe "POST /import_csv" do
+        let(:csv_file) { fixture_file_upload(Rails.root.join("spec/fixtures/files/valid_accounting_plan.csv"), "text/csv") }
+
+      
+        context "cuando el archivo CSV es válido" do
+          before { post :import_csv, params: { file: csv_file } }
+      
+          it { expect(response).to have_http_status(:ok) }
+      
+          it "crea registros en la base de datos" do
+            expect(AccountingPlan.count).to be > 0
+          end
+        end
+    end
+      
+      
 end

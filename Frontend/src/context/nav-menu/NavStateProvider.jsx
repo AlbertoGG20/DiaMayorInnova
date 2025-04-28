@@ -19,10 +19,15 @@ const NavStateProvider = ({ children }) => {
   }
 
   const isAdmin = role === "admin";
+  const isCenterAdmin = role === "center_admin";
   const isTeacher = role === "teacher";
 
   const setAdminRol = () => {
     setCurrentRole("admin")
+  }
+
+  const setCenterAdminRol = () => {
+    setCurrentRole("center_admin")
   }
 
   const setTeacherRol = () => {
@@ -45,12 +50,14 @@ const NavStateProvider = ({ children }) => {
         userAvatarUrl,
         dropdownState,
         isAdmin,
+        isCenterAdmin,
         isTeacher,
         currentRole,
         changeMenu,
         setdropdownState,
         changeDropmenu,
         setAdminRol,
+        setCenterAdminRol,
         setStudentRol,
         setTeacherRol,
       }

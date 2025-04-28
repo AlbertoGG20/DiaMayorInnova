@@ -1,13 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
 import AccountingPlanDataService from "../../services/AccountingPlanService";
-import { Link } from "react-router-dom";
-import "./AccountingPlan.css";
+import "./EditFormModal.css";
 
-const AccountingPlan = (props) => {
-  const { id } = useParams();
-  let navigate = useNavigate();
-
+const AccountingPlan = ({ id, onSaveSuccess, onCloseModal}) => {
   const initialAccountingPlanState = {
     id: null,
     name: "",
@@ -20,116 +15,95 @@ const AccountingPlan = (props) => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (id) getAccountingPlan(id);
-  }, [id]);
-
-  const getAccountingPlan = (id) => {
-    AccountingPlanDataService.get(id)
-      .then((response) => {
-        setCurrentAccountingPlan(response.data);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  };
-
+    setMessage(""); 
+    setError("");
+  
+    if (id) {
+      AccountingPlanDataService.get(id)
+        .then(response => {
+          setCurrentAccountingPlan(response.data);
+          setError(""); 
+        })
+        .catch(e => {
+          console.log(e);
+          setError("Error al cargar el plan contable.");
+        });
+    }
+  
+    return () => {
+      setMessage("");
+      setError("");
+    };
+  }, [id, onCloseModal]); 
+  
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setCurrentAccountingPlan({ ...currentAccountingPlan, [name]: value });
   };
 
-  const validateForm = () => {
-    if (!currentAccountingPlan.name || !currentAccountingPlan.description || !currentAccountingPlan.acronym) {
-      setError("Todos los campos son obligatorios y deben tener valores válidos.");
-      return false;
-    }
+  const updateAccountingPlan = async (e) => {
+    e.preventDefault();
+  
     setError("");
-    return true;
-  };
-
-  const updateAccountingPlan = () => {
-    if (validateForm()) {
-      AccountingPlanDataService.update(currentAccountingPlan.id, currentAccountingPlan)
-        .then(response => {
-          setMessage("El plan de cuentas fue actualizado correctamente.");
-        })
-        .catch(e => {
-          console.log(e);
-          setError("Hubo un problema al actualizar el plan de cuentas.");
-        });
+  
+    if (!currentAccountingPlan.name || !currentAccountingPlan.description || !currentAccountingPlan.acronym) {
+      setMessage("");
+      setError("Todos los campos son obligatorios.");
+      return;
+    }
+  
+    try {
+      await AccountingPlanDataService.update(currentAccountingPlan.id, currentAccountingPlan);
+      setMessage("Actualizado correctamente.");
+      setError("");
+      onSaveSuccess();
+    } catch (error) {
+      setError("Error al actualizar.");
+      setMessage("");
     }
   };
-
-  // const deleteAccountingPlan = () => {
-  //   AccountingPlanDataService.remove(currentAccountingPlan.id)
-  //     .then((response) => {
-  //       console.log(response.data);
-  //       navigate("/accounting-plans/");
-  //     })
-  //     .catch((e) => {
-  //       console.log(e);
-  //     });
-  // };
+  
 
   return (
-    <>
-
-      {currentAccountingPlan ? (
-        <div>
-          <h4 className="accountingPlan__header--h4 details">Detalles del PGC </h4>
-          <form className="accountingPlan__form">
-            <div className="accountingPlan__form--group">
-              <label className="accountingPlan__label" htmlFor="name">Nombre</label>
-              <input
-                className="accountingPlan__input"
-                id="name"
-                name="name"
-                type="text"
-                value={currentAccountingPlan.name}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-            <div className="accountingPlan__form--group">
-              <label className="accountingPlan__label" htmlFor="description">Descripción</label>
-              <textarea
-                className="accountingPlan__input descrip"
-                id="description"
-                name="description"
-                type="text"
-                value={currentAccountingPlan.description}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-            <div className="accountingPlan__form--group">
-              <label className="accountingPlan__label" htmlFor="acronym">Acrónimo</label>
-              <input
-                className="accountingPlan__input"
-                id="acronym"
-                name="acronym"
-                type="text"
-                value={currentAccountingPlan.acronym}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-          </form>
-          <div className="accountingPlan__form--actions details">
-            {error && <div style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
-            <button className="btn accountingPlan__button--edit" onClick={updateAccountingPlan}>Editar</button>
-            <button className="btn accountingPlan__button--back"><Link to={"/accounting-plans/"}>Atrás</Link></button>
-            <p>{message}</p>
+    <div className="editForm__container">
+      <form onSubmit={updateAccountingPlan}>
+        <div className="editForm__form--row">
+          <div className="editForm__form--group">
+            <label>Nombre
+            <input
+              className="editForm__input" 
+              name="name" value={currentAccountingPlan.name} 
+              onChange={handleInputChange} /></label>
           </div>
 
+          <div className="editForm__form--group">
+            <label>Acrónimo
+            <input 
+              className="editForm__input" 
+              name="acronym" 
+              value={currentAccountingPlan.acronym} 
+              onChange={handleInputChange} /></label>
+          </div>
         </div>
-      ) : (
-        <div>
-          <p>No hay información</p>
+
+        <div className="editForm__form--row">
+          <div className="editForm__form--group full-width">
+            <label>Descripción
+            <input name="description"
+              className="editForm__input"
+              value={currentAccountingPlan.description} 
+              onChange={handleInputChange} /></label>
+          </div>
         </div>
-      )}
-    </>
+
+
+        {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
+        {message && <p style={{ color: 'green', textAlign: 'center'}}>{message}</p>}
+
+        <button className="editForm__form--save" type="submit">Guardar</button>
+      </form>
+    </div>
   );
 };
 

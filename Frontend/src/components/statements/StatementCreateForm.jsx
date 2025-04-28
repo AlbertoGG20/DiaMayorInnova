@@ -100,7 +100,6 @@ const StatementCreateForm = () => {
       <header className="statement-page__header--header">
         <button className="btn light" onClick={() => navigate("/home")}>
           <i className="fi fi-rr-arrow-small-left"></i>
-          Volver
         </button>
         <h1 className="statement-title">Creación de Enunciado</h1>
       </header>

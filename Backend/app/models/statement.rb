@@ -1,7 +1,7 @@
 class Statement < ApplicationRecord
   belongs_to :user
   has_and_belongs_to_many :tasks, join_table: :task_statements
-  has_many :solutions
+  has_many :solutions, dependent: :destroy
   has_many :marks
 
   accepts_nested_attributes_for :solutions, allow_destroy: true

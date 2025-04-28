@@ -1,7 +1,6 @@
 import userExerciseDataService from "./userExerciseDataService";
 
 const taskSubmitService = async (data, navigate) => {
-  console.log("🟢 Datos recibidos en taskSubmitService:", data);
   const { statementsData, taskId, exerciseId } = data;
 
   if (!exerciseId) {
@@ -19,7 +18,8 @@ const taskSubmitService = async (data, navigate) => {
       entry_date: entry.entry_date,
       student_annotations_attributes: (data.annotations || [])
         .filter((annotation) => annotation.student_entry_id === entry.entry_number)
-        .map(({ account_id, account_number, credit, debit }) => ({
+        .map(({ number, account_id, account_number, credit, debit }) => ({
+          number,
           account_id: account_id || 9999,
           account_number,
           credit: credit || 0,
@@ -35,11 +35,9 @@ const taskSubmitService = async (data, navigate) => {
     },
   };
 
-  console.log("✅ Datos preparados:", JSON.stringify(exerciseData, null, 2));
-
   try {
-    console.log("🔍 Intentando actualizar con exerciseId:", exerciseId);
-    await userExerciseDataService.update(exerciseId, exerciseData);
+    await userExerciseDataService.update_student_exercise(exerciseId, exerciseData);
+    await userExerciseDataService.finish(exerciseId);
     navigate("/home");
   } catch (err) {
     console.error("Error al enviar los datos:", err);

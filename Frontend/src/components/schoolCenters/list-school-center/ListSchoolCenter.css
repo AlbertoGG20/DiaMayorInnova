@@ -8,7 +8,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--gap-xxs);
-
 }
 
 
@@ -38,4 +37,33 @@
 .school-list_section {
   display: flex;
   justify-content: space-between;
+}
+
+.school-list__pagination {
+  padding-top: var(--gap-s);
+  & span {
+    padding: var(--gap-s);
+    color: var(--Color-Principal);
+  }
+}
+
+@media (max-width: 1024px) {
+  .school-center-list__container {
+      border-left: none; 
+  }
+
+  .schools-centers_list {
+      flex-direction: column; 
+  }
+}
+
+@media (max-width: 768px) {
+  .school-center-list__container {
+      padding: var(--gap-xs); 
+  }
+
+  .school-list_item {
+      font-size: var(--text-mobile-tiny);
+      padding: var(--gap-xxs);
+  }
 }

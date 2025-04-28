@@ -74,6 +74,40 @@ class ExercisesController < ApplicationController
     end
   end
 
+  def find_by_exercise_id
+    if current_user.student?
+      render json: { error: "No autorizado" }, status: :forbidden
+    else
+      exercise = Exercise.includes(:task, :user, marks: [
+        { student_entries: :student_annotations },
+        :statement
+      ])
+      .where(id: params[:exercise_id])
+      
+      if exercise.any?
+        render json: exercise.as_json(
+          include: {
+            task: {only: [:title]},  
+            user: {only: [:name]},
+            marks: {
+              include: {
+                student_entries: {
+                  include: {
+                    student_annotations: { include: {account: {only: [:name]}}}
+                  }
+                },
+                statement: { only: [:definition] }
+              }
+              }
+          },
+          methods: [:total_mark]
+        )
+      else
+        render json: []
+      end
+    end
+  end
+
   
 
   private

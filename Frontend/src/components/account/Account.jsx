@@ -1,12 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom';
 import AccountDataService from '../../services/AccountService';
-import "./Account.css";
-import { Link } from 'react-router-dom';
 
-const Account = (props) => {
-  const { id } = useParams();
-  let navigate = useNavigate();
+const Account = ({id, onSaveSuccess, onCloseModal}) => {
 
   const initialAccountState = {
     id: null,
@@ -21,117 +16,109 @@ const Account = (props) => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (id) getAccount(id);
-  }, [id]);
+    setMessage("");
+    setError("");
 
-  const getAccount = (id) => {
-    AccountDataService.get(id)
-      .then((response) => {
-        setCurrentAccount(response.data);
-      })
-      .catch((e) => {
-        console.error(e);
-      });
-  };
-
-  const handleInputChange = (event) => {
-    const { name, value } = event.target;
-    setCurrentAccount({ ...currentAccount, [name]: value });
-  };
-
-  const validateForm = () => {
-    if (!currentAccount.name || !currentAccount.account_number || !currentAccount.description || !currentAccount.accounting_plan_id) {
-      setError("Todos los campos son obligatorios y deben tener valores válidos.");
-      return false;
-    };
-    setError("")
-    return true;
-  }
-
-  const updateAccount = () => {
-    if (validateForm()) {
-      AccountDataService.update(currentAccount.id, currentAccount)
+    if (id) {
+      AccountDataService.get(id)
         .then(response => {
-          setMessage("Account updated succesfully");
+          console.log("DAME LA CUENTAAAAAAAAA", response)
+          setCurrentAccount(response.data);
+          setError("");
         })
         .catch(e => {
-          console.error(e);
-          setError("Hubo un problema al actualizar la cuenta.");
+          console.log(e)
+          setError("Error al cargar cuenta");
         });
     }
+
+    return () => {
+      setMessage("");
+      setError("");
+    };
+  }, [id, onCloseModal]);
+
+  const handleInputChange = (event) => {
+    const {name, value} = event.target;
+    setCurrentAccount({...currentAccount, [name]: value});
   };
 
-  // const deleteAccount = () => {
-  //   AccountDataService.remove(currentAccount.id)
-  //   .then((response) => {
-  //     console.log(response.data);
-  //     navigate("/accounts/");
-  //   })
-  //   .catch((e) => {
-  //     console.log(e)
-  //   });
-  // };
+  const updateAccount = async (e) => {
+    e.preventDefault();
+
+    setError("");
+
+    if (!currentAccount.name || !currentAccount.account_number || !currentAccount.description || !currentAccount.accounting_plan_id) {
+      setMessage("");
+      setError("Todos los campos son oblgatorios");
+      return;
+    }
+
+    try {
+      await AccountDataService.update(currentAccount.id, currentAccount);
+      setMessage("Actualizado correctamente");
+      setError("");
+      onSaveSuccess();
+    } catch (error) {
+      setError("Error al actualizar");
+      setMessage("");
+    }
+  };
   
   return (
     <>
-
-      {currentAccount ? (
-        <div>
-          <h4 className='account__header--h4 details'>Detalles de la cuenta</h4>
-          <form className='account__form'>
-            <div className='account__form--group'>
-              <label htmlFor="account_number">Número de cuenta</label>
-              <input
-                className='account__input'
-                id="account_number"
-                name="account_number"
-                type="text"
-                value={currentAccount.account_number}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-
-            <div className='account__form--group'>
-              <label htmlFor="name">Nombre de cuenta</label>
-              <input
-                className='account__input'
-                id="name"
-                name="name"
-                type="text"
-                value={currentAccount.name}
-                onChange={handleInputChange}
-                required>
-              </input>
-            </div>
-
-            <div className='account__form--group'>
-              <label htmlFor="description">Descripción</label>
-              <textarea
-                className='account__input descrip'
-                id="description"
-                name="description"
-                type="text"
-                value={currentAccount.description}
-                onChange={handleInputChange}
-                required />
+      <div className='editForm__container'>
+        <form onSubmit={updateAccount}>
+          <div className='editForm__form--row'>
+            <div className='editForm__form--group'>
+              <label> Nº Cuenta
+                <input
+                  className='editForm__input'
+                  name='account_number' value={currentAccount.account_number}
+                  onChange={handleInputChange}/>
+              </label>
             </div>
             
-          </form>
+            <div className='editForm__form--group'>
+              <label> Nombre
+                <input
+                  className='editForm__input'
+                  name='name' value={currentAccount.name}
+                  onChange={handleInputChange}/>
+              </label>
+            </div>
 
-          <div className='account__form--actions details'>
-            {error && <div style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
-            <button className="btn accountingPlan__button--form" onClick={updateAccount}>Editar</button>
-            <button className="btn accountingPlan__button--back"> <Link to={"/accounts/"}>Atrás</Link></button>
-            <p>{message}</p>
+            <div className='editForm__form--group'>
+              <label> PGC
+                <input
+                  className='editForm__input'
+                  name='accounting_plan_id' value={currentAccount.accounting_plan_id}
+                  onChange={handleInputChange}
+                  />
+              </label>
+            </div>
           </div>
 
-        </div>
-      ) : (
-        <div>
-          <p>No hay información</p>
-        </div>
-      )}
+          <div className='editForm__form--row'>
+            <div className='editForm__form--group'>
+              <label> Descripción
+                <input
+                  className='editForm__input'
+                  name='description' value={currentAccount.description}
+                  onChange={handleInputChange}/>
+              </label>
+            </div>
+          </div>
+
+          {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
+          {message && <p style={{ color: 'green', textAlign: 'center'}}>{message}</p>}
+
+          <button className="editForm__form--save" type="submit">Guardar</button>
+      
+        </form>
+      </div>
+
+      
     </>
   )
 }

@@ -6,13 +6,12 @@ const getAuthHeaders = () => {
     return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
-// ✅ Récupérer tous les PGCs
-const getAll = async () => {
+const getAll = async (page = 1, perPage = 10, name = "") => {
     try {
-        const response = await http.get("/accounting_plans", {
-            headers: getAuthHeaders()
+        const response = await http.get("/accounting_plans", {// "Backend/config/routes.rb"
+            params: {page, per_page: perPage, name}
         });
-        return response;
+        return response.data;
     } catch (error) {
         console.error("Error en la petición getAll: ", error);
         return null;
@@ -135,6 +134,61 @@ const importXLSX = async (formData) => {
 };
 
 // ✅ Service exporté avec les nouvelles méthodes sécurisées
+
+
+  
+const exportToCSV = async (id) => {
+    try {
+        const response = await http.get(`/accounting_plans/${id}/export_csv`, {
+            headers: {
+                "Accept": "text/csv" // csv response
+            },
+            responseType: "blob", // as file
+        });
+
+        // Verify csv
+        const contentType = response.headers["content-type"];
+        if (!contentType || !contentType.includes("text/csv")) {
+            console.error("El archivo no es un csv");
+            return;
+        }
+
+        // Create url and download file
+        const blob = new Blob([response.data], { type: "text/csv" });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", `pgc_${id}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (error) {
+        console.error("Error exportando CSV:", error);
+    }
+};
+
+const importCSV = async (file) => {
+    try {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const response = await http.post("/accounting_plans/import_csv", formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+        });
+
+        if (response.data.success) {
+            console.log("PGC importado correctamente:", response.data);
+            return response.data;
+        }
+
+    } catch (error) {
+        console.error("Error importando CSV:", error.response?.data || error.message);
+        return null;
+    }
+};
+
+
+
 const AccountingPlanService = {
     getAll,
     get,
@@ -146,6 +200,8 @@ const AccountingPlanService = {
     getAccountsByPGC,
     importXLSX, 
     exportXLSXByPGC // ✅ Ajout de la fonction d'exportation
+    exportToCSV,
+    importCSV
 };
 
 export default AccountingPlanService;

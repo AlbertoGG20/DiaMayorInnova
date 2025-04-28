@@ -13,12 +13,20 @@ const AccountingPlans = () => {
   return (
     <>
       <main className="accountingPlan__page">
+        <div className="accountingPlan__page--header">
+          <button className="btn light accountingPlan__btnHome" onClick={() => navigate("/home")}>
+            <i className="fi-rr-arrow-small-left" />
+          </button>
+          <h1 className="accountingPlan__page--title">Creación PGC</h1>
+        </div>
+
+
         <button className="accountingPlan__btnHome" onClick={() => navigate("/home")}>
           <i className="fi-rr-arrow-small-left" /> Volver
         </button>
         <h1 className="accountingPlan__page--title">Creación PGC</h1>
 
-        <section className="accountingPlan__addPGC">
+        <section className="accountingPlan__addPGC" >
           <AddAccountingPlan setNewPGC={setNewPGC} />
         </section>
         <section className="accountingPlan__listPGC">

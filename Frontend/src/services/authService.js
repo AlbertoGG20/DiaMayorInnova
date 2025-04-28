@@ -18,8 +18,6 @@ const authService = {
     if (!credentials && !token) {
       throw new Error("Se requiere credentials o token para autenticarse.");
     }
-    // Aquí dejé axios porque si añado http se intentará añadir un token que si no has iniciado sesión aun no existe.
-    console.log("Las credenciales en AuthService.js", credentials);
     return axios.post(`${API_BASE_URL}/sign_in`, {}, {
       headers: {
         "Authorization": credentials ? `Basic ${credentials}` : token,

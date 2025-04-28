@@ -12,19 +12,27 @@ import exerciseServices from "../../services/exerciseServices.js";
 const TaskCreateForm = ({ onTaskCreated }) => {
   const { state } = useLocation();
   const navigate = useNavigate();
-  const { task } = state || {};
+  const task = state?.task || state?.newTask || null;
   const { user } = useAuth();
   const [title, setTitle] = useState(task?.title || "");
   const [openingDate, setOpeningDate] = useState(task?.opening_date || "");
   const [closingDate, setClosingDate] = useState(task?.closing_date || "");
   const [statements, setStatements] = useState([]);
-  const [selectedStatements, setSelectedStatements] = useState(task?.statements?.map(s => s.id) || []);
+  const [selectedStatements, setSelectedStatements] = useState(task?.statements ? task.statements.map(s => s.id ?? s) : []);
   const [solutions, setSolutions] = useState({});
-  const [editMode, setEditMode] = useState(task ? true : false);
+  const [editMode, setEditMode] = useState(false);
+
+  useEffect(() => {
+    if (task?.id && !state?.newTask) {
+      setEditMode(true);
+    }
+  }, [task, state]);
+
   const [currentUsers, setCurrentUsers] = useState([]);
   const [assignedUsers, setAssignedUsers] = useState([]);
   const [additionalInformation, setAdditionalInformation] = useState(task?.additional_information || "");
   const [isExam, setIsExam] = useState(task?.is_exam || false);
+  const [isHelpAvailable, setIsHelpAvailable] = useState(task?.help_available || false);
   const [errors, setErrors] = useState({
     title: "",
     openingDate: "",
@@ -34,7 +42,6 @@ const TaskCreateForm = ({ onTaskCreated }) => {
   const usersByTaskId = (id) => {
     exerciseServices.getByTaskId(id)
       .then(({ data }) => {
-        console.log(data)
         setCurrentUsers(data)
         setAssignedUsers(data)
       });
@@ -160,6 +167,7 @@ const TaskCreateForm = ({ onTaskCreated }) => {
       closing_date: closingDate,
       additional_information: additionalInformation,
       is_exam: isExam,
+      help_available: isHelpAvailable,
       statement_ids: selectedStatements,
       created_by: user.id,
     };
@@ -186,7 +194,6 @@ const TaskCreateForm = ({ onTaskCreated }) => {
       <header className="task-page__header--header">
         <button className="btn light" onClick={() => navigate("/home")}>
           <i className="fi fi-rr-arrow-small-left"></i>
-          Volver
         </button>
         <div className="task-title">
           <h1>{editMode ? "Edición de Tarea" : "Creación de Tarea"}</h1>
@@ -203,6 +210,8 @@ const TaskCreateForm = ({ onTaskCreated }) => {
         setAdditionalInformation={setAdditionalInformation}
         isExam={isExam}
         setIsExam={setIsExam}
+        isHelpAvailable={isHelpAvailable}
+        setIsHelpAvailable={setIsHelpAvailable}
         handleSubmit={handleSubmit}
         errors={errors}
         id={task && task.id}

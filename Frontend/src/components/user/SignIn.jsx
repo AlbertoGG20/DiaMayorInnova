@@ -55,7 +55,7 @@ const SignIn = () => {
   };
 
   return (
-    <>
+    <main className="log__main">
       <div className="log__section">
         <img className="log__img" src="/images/log.jpg" alt="Imagen de inicio de sesión" />
         <div className="log__container">
@@ -94,7 +94,7 @@ const SignIn = () => {
           </form>
         </div>
       </div>
-    </>
+    </main>
   );
 };
 

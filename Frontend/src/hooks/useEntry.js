@@ -1,22 +1,26 @@
 import { useState } from "react";
 
 const useEntry = () => {
-
-  const [entries, setEntries] = useState([]);
+  const generateUid = () => `id-${Math.random().toString(32).substr(2, 9)}`;
+  const [entries, setEntries] = useState([{
+    entry_number: 1,
+    entry_date: "2024-10-10",
+    entry_uid: generateUid(),
+  }]);
 
 
   const addEntry = () => {
     const defaultEntry = {
       entry_number: entries.length + 1,
       entry_date: "2024-10-10",
+      entry_uid: generateUid(),
     }
     setEntries([...entries, defaultEntry])
   }
 
-  const removeEntry = (entryNumber) => {
-    const updatedEntries = entries.filter(entry => entry.entry_number !== entryNumber);
+  const removeEntry = (entryUid) => {
+    const updatedEntries = entries.filter(entry => entry.entry_uid !== entryUid);
     setEntries(updatedEntries);
-    setAnnotations(annotations.filter(annotation => annotation.student_entry_id !== entryNumber));
   };
 
   return {

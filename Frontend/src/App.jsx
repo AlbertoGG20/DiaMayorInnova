@@ -4,7 +4,7 @@ import AccountingPlan from './components/accounting-plan/AccountingPlan';
 import AccountingPlanList from './components/accounting-plan/ListAccountingPlan';
 import AddAccountingPlan from './components/accounting-plan/AddAccountingPlan';
 import ClassGroup from "./components/class-group/ClassGroup";
-import ClassGroupsList from "./pages/class-group/ClassGroupList";
+import ClassGroups from "./pages/class-group/ClassGroup";
 import AddClassGroup from "./components/class-group/AddClassGroup";
 import SchoolsCenters from './components/schoolCenters/SchoolCenters'
 import { AuthProvider } from "./context/AuthContext";
@@ -33,6 +33,7 @@ import 'react-tooltip/dist/react-tooltip.css'
 import './App.css';
 import './assets/Styles/Global.css';
 import UserManagement from './components/user/UserManagement';
+import ExamInformation from './components/task/ExamInformation/ExamInformation';
 
 function App() {
 
@@ -46,34 +47,33 @@ function App() {
               <Routes>
                 <Route path="/sign_in" element={<SignIn />} />
                 <Route path="*" element={<Home />} />
-                <Route element={<PrivateRoute allowedRoles={['admin', 'teacher', 'student']} />}>
+                <Route element={<PrivateRoute allowedRoles={['admin', 'center_admin', 'teacher', 'student']} />}>
                   <Route path="/home" element={<Home />} />
-                  <Route path="/accounting-plans-test" element={<AccountingPlanList />} />
-                  <Route path="/accounting-plans-test/:id" element={<AccountingPlan />} />
                   <Route path="/modes" element={<Modes />} >
-                    <Route path='tarea/' element={<TaskPage />} />
+                    <Route path="tarea/:exerciseId" element={<TaskPage />} />
                     <Route path='practica/' element={<PracticePage />} />
                     <Route path='examen/:exerciseId' element={<ExamPage />} />
                   </Route>
                   <Route path="/help-examples" element={<HelpExampleList />} />
                   <Route path="/help-examples/:id" element={<HelpExample />} />
                   <Route path="/add-help-example" element={<AddHelpExample />} />
-                  <Route element={<PrivateRoute allowedRoles={['admin', 'teacher']} />}>
+                  <Route element={<PrivateRoute allowedRoles={['admin', 'center_admin', 'teacher']} />}>
                     <Route path="/accounting-plans" element={<AccountingPlans />} />
                     <Route path="/accounting-plans/:id" element={<AccountingPlan />} />
                     <Route path="/accounts" element={<Accounts />} />
                     <Route path="/accounts/:id" element={<Account />} />
                     <Route path="/tasks" element={<TaskListAndDetails />} />
                     <Route path="/task-edit" element={<TaskCreateForm />} />
-                    <Route path="/student-marks" element={<ExerciseMarksList/>}/>
+                    <Route path="/notas-estudiantes/:id" element={<ExerciseMarksList />} />
+                    <Route path="/notas-estudiantes/:id/examen/:exerciseId" element={<ExamInformation />} />
                     <Route path="/statements" element={<StatementsList />} />
                     <Route path="/add-statements" element={<StatementCreateForm />} />
                     <Route path="/add-accounting-plan" element={<AddAccountingPlan />} />
                     <Route path="/schools" element={<SchoolsCenters />} />
-                    <Route path="/class-list" element={<ClassGroupsList />} />
+                    <Route path="/class-list" element={<ClassGroups />} />
                     <Route path="/add-class-list" element={<AddClassGroup />} />
                     <Route path="/class-list/:id" element={<ClassGroup />} />
-                    <Route element={<PrivateRoute allowedRoles={['admin']} />}>
+                    <Route element={<PrivateRoute allowedRoles={['admin', 'center_admin']} />}>
                       <Route path="/users" element={<UserManagement/>} />
                       <Route path="/home" element={<Home />} >
                         <Route path='escuelas/' element={<SchoolsCenters />} />

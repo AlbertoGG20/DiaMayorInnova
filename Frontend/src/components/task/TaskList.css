@@ -103,6 +103,15 @@
   border-radius: var(--r-xs);
 }
 
+.task-list__duplicate {
+  width: 28px;
+  height: 28px;
+  padding: var(--gap-xxs);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .task-list__info-header {
   width: 100%;
   display: flex;
@@ -156,6 +165,14 @@
 
   & strong {
     font-weight: 600;
+    color: var(--Color-Principal);
+  }
+}
+
+.task-list__pagination {
+  text-align: center;
+  & span {
+    padding: var(--gap-s);
     color: var(--Color-Principal);
   }
 }

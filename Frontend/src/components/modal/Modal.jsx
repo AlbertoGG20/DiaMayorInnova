@@ -1,7 +1,7 @@
 import { useRef, forwardRef, useImperativeHandle } from "react";
 import "./Modal.css";
 
-const Modal = forwardRef(({ children, btnText = "Abrir Modal", modalTitle = "Modal", showButton = true , needOpen = true}, ref) => {
+const Modal = forwardRef(({ children, btnText = "Abrir Modal", modalTitle = "Modal", showButton = true, needOpen = true }, ref) => {
   const modalRef = useRef(null);
 
   useImperativeHandle(ref, () => ({
@@ -10,6 +10,7 @@ const Modal = forwardRef(({ children, btnText = "Abrir Modal", modalTitle = "Mod
   }));
 
   const openModal = (e) => {
+    if (!needOpen) return;
     e.preventDefault();
     modalRef.current.showModal();
   };
@@ -22,7 +23,11 @@ const Modal = forwardRef(({ children, btnText = "Abrir Modal", modalTitle = "Mod
   return (
     <>
       {showButton && (
-        <button className="btn light" onClick={needOpen ? openModal : (e) => e.preventDefault()}>
+        <button
+          className="btn light"
+          onClick={needOpen ? openModal : (e) => e.preventDefault()}
+          disabled={!needOpen}
+        >
           {btnText}
         </button>
       )}

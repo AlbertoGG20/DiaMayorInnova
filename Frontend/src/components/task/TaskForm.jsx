@@ -15,22 +15,17 @@ const TaskForm = ({
   id,
   assignedInclude,
   setCurrentUsers,
-  currentUsers
+  currentUsers,
+  isHelpAvailable,
+  setIsHelpAvailable
 }) => {
   const navigate = useNavigate();
-
 
   return (
     <section className="task-page__form">
       <form className="task-page__form--form">
         <header className="task-page__form--header">
           <h2 className="task-page__header">Crear Tarea</h2>
-          <AssignTaskUser
-            id={id}
-            assignedInclude={assignedInclude}
-            setCurrentUsers={setCurrentUsers}
-            currentUsers={currentUsers}
-          />
         </header>
         <div>
           <label className="task-page__label--title" htmlFor="title">Tarea:</label>
@@ -76,15 +71,27 @@ const TaskForm = ({
               onChange={(e) => setAdditionalInformation(e.target.value)}
             />
           </div>
-          <div className="task-page__container--exam">
-            <label className="task-page__label--exam" htmlFor="isExam">¿Es un examen?</label>
-            <input
-              id="isExam"
-              type="checkbox"
-              checked={isExam}
-              className="task-page__checkbox--exam"
-              onChange={(e) => setIsExam(e.target.checked)}
-            />
+          <div className="task-page__checkbox_container">
+            <div className="task-page__container--exam">
+              <label className="task-page__label--exam" htmlFor="isExam">¿Es un examen?</label>
+              <input
+                id="isExam"
+                type="checkbox"
+                checked={isExam}
+                className="task-page__checkbox--exam"
+                onChange={(e) => setIsExam(e.target.checked)}
+              />
+            </div>
+            <div className="task-page__container--exam">
+              <label className="task-page__label--exam" htmlFor="isExam">Ayuda disponible</label>
+              <input
+                id="setIsHelpAvailable"
+                type="checkbox"
+                checked={isHelpAvailable}
+                className="task-page__checkbox--exam"
+                onChange={(e) => setIsHelpAvailable(e.target.checked)}
+              />
+            </div>
           </div>
         </div>
         <div className="task-page__dates--errors">
@@ -103,13 +110,19 @@ const TaskForm = ({
             {id && (
               <button
                 type="button"
-                className="task-page__button--form task-page__button--cancel"
+                className="task-page__button--form task-page__button--cancel btn light"
                 onClick={() => navigate("/home")}
               >
                 Cancelar
               </button>
             )}
           </div>
+          <AssignTaskUser
+            id={id}
+            assignedInclude={assignedInclude}
+            setCurrentUsers={setCurrentUsers}
+            currentUsers={currentUsers}
+          />
           <button
             type="button"
             // className="task-page__button--form"
