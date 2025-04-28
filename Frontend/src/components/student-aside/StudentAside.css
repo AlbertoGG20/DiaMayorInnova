@@ -6,7 +6,7 @@
   padding: var(--gap-s);
   overflow: hidden;
   box-shadow: var(--box-shadow-btn);
-  border-radius: var(--r-s);
+  border-radius: var(--r-xs);
 
   & header {
     border-bottom: 1px solid var(--Color-grey-100);
@@ -28,9 +28,7 @@
 }
 
 .aside__tittle {
-  /* font-weight: 700; */
-  font-size: var(--text-desktop-subtitles-1);
-  margin: var(--gap-xl) 0 var(--gap-m);
+  margin: 0 0 var(--gap-m);
 }
 
 .student-aside__list-items {

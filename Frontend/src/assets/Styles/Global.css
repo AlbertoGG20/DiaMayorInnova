@@ -205,8 +205,9 @@ h1 {
 }
 
 h2 {
-  font-size: var(--text-desktop-subtitles-1);
+  font-size: var(--text-desktop-subtitles-2);
   line-height: 120%;
+  color: var(--Color-Principal);
 }
 
 h3 {

@@ -17,7 +17,7 @@ const SolutionList = ({ solutions, onEditSolution, onDeleteSolution, solutionToD
   };
   return (
     <>
-      <h3 className="statement-page__solutions-header">Soluciones del Enunciado</h3>
+      <h2 className="statement-page__solutions-header">Soluciones del Enunciado</h2>
       <ul className="statement-page__list">
         {solutions.map((solution, index) => (
           <li key={index} className={`statement-page__list-item ${solutionToDeleteIndex === index ? 'statement-page__list-item--deleting' : ''}`}>

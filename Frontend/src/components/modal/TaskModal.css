@@ -85,7 +85,7 @@
 }
 
 .task-details__statement-item--delete-btn {
-  color: var(--Color-red-500);
+  color: var(--Color-Principal);
   padding: var(--gap-xs);
   cursor: pointer;
   border-radius: var(--r-xxs);

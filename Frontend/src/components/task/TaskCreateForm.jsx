@@ -62,7 +62,6 @@ const TaskCreateForm = ({ onTaskCreated }) => {
       }
       exerciseServices.deleteOnGroup(data)
         .then((response) => {
-          console.log(response);
         })
     }
   }
@@ -79,7 +78,6 @@ const TaskCreateForm = ({ onTaskCreated }) => {
       }
       exerciseServices.create(data)
         .then((response) => {
-          console.log(response);
         })
     }
   }

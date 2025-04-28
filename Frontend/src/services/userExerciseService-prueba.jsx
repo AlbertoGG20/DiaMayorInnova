@@ -2,7 +2,6 @@ import http from "../http-common";
 
 const getAll = (id) => {
 
-  console.log("servicio", id)
   const exercises = http.get(`/exercises?user_id=${id}`)
   return exercises;
 

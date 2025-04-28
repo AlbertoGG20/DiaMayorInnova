@@ -69,7 +69,8 @@ const StatementsList = ({ onSelectStatement }) => {
     }
   };
 
-  const openDeleteModal = (statement) => {
+  const openDeleteModal = (statementId) => {
+    const statement = statements.find(s => s.id === statementId);
     setStatementToDelete(statement);
     setIsDeleteModalOpen(true);
   };
@@ -134,34 +135,7 @@ const StatementsList = ({ onSelectStatement }) => {
   return (
     <div className="statement-page__selection--content">
       <div className="statement-page__row" style={{ display: "flex", gap: "var(--gap-m)", alignItems: "center", width: "100%" }}>
-        <h3 className="statement-page__list--header">Enunciados</h3>
-
-        <form className='search-bar search-bar--statement'>
-          <input
-            className='search-bar_search'
-            type='text'
-            value={searchTerm}
-            onChange={handleSearchChange}
-            placeholder='Buscar enunciado'
-          />
-          <i className='fi fi-rr-search'></i>
-        </form>
-
-        <div className="statement-list__pagination">
-          <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => changePage(1)}>
-            <i className='fi fi-rr-angle-double-small-left' />
-          </button>
-          <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => changePage(currentPage - 1)}>
-            <i className='fi fi-rr-angle-small-left' />
-          </button>
-          <span style={{ padding: "var(--gap-s)", color: "var(--Color-Principal)" }}>Página {currentPage} de {totalPages}</span>
-          <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => changePage(currentPage + 1)}>
-            <i className='fi fi-rr-angle-small-right' />
-          </button>
-          <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => changePage(totalPages)}>
-            <i className='fi fi-rr-angle-double-small-right' />
-          </button>
-        </div>
+        <h2 className="statement-page__list--header">Enunciados</h2>
       </div>
       {errorMessage && <div className="error-message">{errorMessage}</div>}
 

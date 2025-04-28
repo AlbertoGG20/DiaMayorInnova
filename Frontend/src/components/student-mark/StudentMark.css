@@ -4,7 +4,7 @@
   background-color: var(--Color-White);
   padding: var(--gap-s);
   box-shadow: var(--box-shadow-btn);
-  border-radius: var(--r-s);
+  border-radius: var(--r-xs);
 
   & .defaultModal {
     min-width: 800px;
@@ -36,6 +36,16 @@
   font-size: var(--text-desktop-subtitles-2);
   color: var(--Color-green-700);
   font-weight: 600;
+}
+
+.mark_mark--fail {
+  border-color: var(--Color-red-200);
+  color: var(--Color-red-600);
+}
+
+.mark_mark--warning {
+  border-color: var(--Color-orange-300);
+  color: var(--Color-orange-700);
 }
 
 .marks__wrapper {

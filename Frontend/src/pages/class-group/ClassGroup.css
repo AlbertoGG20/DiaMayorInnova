@@ -44,6 +44,10 @@
   }
 }
 
+.class-group-page__h2 {
+  margin-bottom: var(--gap-xs);
+}
+
 .class-group-page__form--form {
   width: 100%;
   display: flex;

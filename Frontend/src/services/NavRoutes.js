@@ -21,14 +21,6 @@ routes.push({
   rol: ["teacher", "center_admin", "admin"],
 })
 
-
-routes.push({
-  to: "/schools",
-  icon: "fi fi-rr-school",
-  name: "gestión escuelas",
-  rol: ["center_admin", "admin"],
-})
-
 routes.push({
   to: "/accounting-plans",
   icon: "fi fi-rr-book",

@@ -6,6 +6,8 @@ import DataTable from 'datatables.net-react';
 import DT from 'datatables.net-dt';
 import Table from "../table/Table";
 import Breadcrumbs from "../breadcrumbs/Breadcrumbs";
+import ButtonBack from "../button-back/ButtonBack";
+import PaginationMenu from "../pagination-menu/PaginationMenu";
 
 const ExerciseMarksList = () => {
     const { id } = useParams();
@@ -57,89 +59,81 @@ const ExerciseMarksList = () => {
     return (
         <div className="mark_list__page">
             <div className="mark_list__header">
-                <button className="btn light" onClick={() => navigate(-1)}>
-                    <i className="fi fi-rr-arrow-small-left" />
-                </button>
-                <h1 className="mark_list__page--title"><Breadcrumbs /></h1>
+                <ButtonBack />
+                <Breadcrumbs />
                 <button className="btn light" onClick={handleExportToXlsx}>
                     <i className="fi fi-rr-download" /> Exportar en XLSX
                 </button>
             </div>
+            <div className="mark_list__table-container">
 
-            {
-                exerciseMarksList.length > 0 && (
-                    <h2 className="mark_list__page--task">{exerciseMarksList[0].task_tittle}</h2>
-                )
-            }
-            <div className="mask_list_table__container">
-                <Table
-                    titles={titles}
-                    data={exerciseMarksList}
-                    show={handleViewResult}
-                    columnConfig={[
-                        { field: 'date', sortable: true },
-                        { field: 'student', sortable: true },
-                        {
-                            field: 'mark',
-                            sortable: true,
-                            render: (row) => (
-                                <div>
-                                    <p>{row.mark * 10}%</p>
-                                    <progress value={row.mark * 0.1}></progress>
-                                </div>
-                            )
-                        },
-                        {
-                            field: 'mark',
-                            sortable: true,
-                            align: 'right'
-                        },
-                        {
-                            field: 'mark',
-                            sortable: true,
-                            align: 'right',
-                            render: (row) => {
-                                const statusClass = row.mark >= 5 ? "status__container green" : "status__container red";
-                                const statusIcon = row.mark >= 5 ? "fi fi-rr-check" : "fi fi-rr-x";
-                                return (
-                                    <div className="statement__state">
-                                        <div className={statusClass}>
-                                            <i className={statusIcon}></i>
-                                        </div>
+                {
+                    exerciseMarksList.length > 0 && (
+                        <h2 className="mark_list__page--task">{exerciseMarksList[0].task_tittle}</h2>
+                    )
+                }
+                <div className="mask_list_table__container">
+                    <Table
+                        titles={titles}
+                        data={exerciseMarksList}
+                        show={handleViewResult}
+                        columnConfig={[
+                            { field: 'date', sortable: true },
+                            { field: 'student', sortable: true },
+                            {
+                                field: 'mark',
+                                sortable: true,
+                                render: (row) => (
+                                    <div>
+                                        <p>{row.mark * 10}%</p>
+                                        <progress value={row.mark * 0.1}></progress>
                                     </div>
-                                );
+                                )
+                            },
+                            {
+                                field: 'mark',
+                                sortable: true,
+                                align: 'right'
+                            },
+                            {
+                                field: 'mark',
+                                sortable: true,
+                                align: 'right',
+                                render: (row) => {
+                                    const statusClass = row.mark >= 5 ? "status__container green" : "status__container red";
+                                    const statusIcon = row.mark >= 5 ? "fi fi-rr-check" : "fi fi-rr-x";
+                                    return (
+                                        <div className="statement__state">
+                                            <div className={statusClass}>
+                                                <i className={statusIcon}></i>
+                                            </div>
+                                        </div>
+                                    );
+                                }
+                            },
+                            {
+                                field: 'exercise_id',
+                                render: (row) => (
+                                    <button
+                                        className="btn__table view-result"
+                                        onClick={() => handleViewResult(row.exercise_id)}
+                                    >
+                                        <i className="fi fi-rr-eye"></i>
+                                    </button>
+                                )
                             }
-                        },
-                        {
-                            field: 'exercise_id',
-                            render: (row) => (
-                                <button
-                                    className="btn__table view-result"
-                                    onClick={() => handleViewResult(row.exercise_id)}
-                                >
-                                    <i className="fi fi-rr-eye"></i>
-                                </button>
-                            )
-                        }
-                    ]}
-                    actions={false}
+                        ]}
+                        actions={false}
+                    />
+                </div>
+
+                <PaginationMenu
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
                 />
             </div>
-            <div className="mark-list__pagination">
-                <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => handlePageChange(1)}>
-                    <i className='fi fi-rr-angle-double-small-left' />
-                </button>
-                <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => handlePageChange(currentPage - 1)}>
-                    <i className='fi fi-rr-angle-small-left' />
-                </button>
-                <span>Página {currentPage} de {totalPages}</span>
-                <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => handlePageChange(currentPage + 1)}>
-                    <i className='fi fi-rr-angle-small-right' />
-                </button>
-                <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => handlePageChange(totalPages)}>
-                    <i className='fi fi-rr-angle-double-small-right' />
-                </button>
-            </div>
+
         </div>
     );
 }

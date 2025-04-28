@@ -42,7 +42,13 @@ const StudentMark = () => {
               key={"modal" + task.id}
               btnText={
                 <div className="mark_container" data-testid={`mark-${task.id}`}>
-                  <p className='mark_mark'>{task.total_mark ? (task.total_mark).toFixed(1) : " - "}</p>
+                  <p className={`mark_mark ${task.total_mark < 5.0 ? 'mark_mark--fail' :
+                    (task.total_mark >= 5.0 && task.total_mark <= 6.0) ? 'mark_mark--warning' : ''
+                    }`}>
+                    {task.total_mark !== null && task.total_mark !== undefined ?
+                      (task.total_mark).toFixed(1) :
+                      (task.marks && task.marks.length > 0 && task.marks.some(mark => mark.student_entries && mark.student_entries.length > 0) ? "0.0" : " - ")}
+                  </p>
                   <p className='mark-text_title'>{task.task.title}</p>
                 </div>
               }

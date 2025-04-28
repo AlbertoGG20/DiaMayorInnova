@@ -114,6 +114,7 @@
     gap: var(--gap-l);
     padding: var(--gap-xxs);
     overflow: auto;
+    height: auto;
   }
 
   .home_section--admin {
