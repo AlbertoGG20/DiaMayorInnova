@@ -3,12 +3,13 @@ import Modal from "../modal/Modal";
 import http from "../../http-common";
 
 const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions, setSolutions }) => {
-  const annotation = solutions[0].entries[entryIndex].annotations[annotationIndex];
+  const annotation = solutions[solutionIndex].entries[entryIndex].annotations[annotationIndex];
   const [accounts, setAccounts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const accountNumberInputRef = useRef(null);
   const modalRef = useRef(null);
+  const debounceTimeout = useRef(null);
 
   const retrieveAccounts = async (page = 1) => {
     try {
@@ -26,6 +27,23 @@ const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions,
     }
   };
 
+  const searchAccount = async (accountNumber) => {
+    try {
+      const response = await http.get(`/accounts/find_by_account_number?account_number=${accountNumber}`);
+      if (response.data) {
+        const updatedSolutions = [...solutions];
+        updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex] = {
+          ...updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex],
+          account_number: response.data.account_number,
+          account_name: response.data.name
+        };
+        setSolutions(updatedSolutions);
+      }
+    } catch (error) {
+      console.error("Error al buscar la cuenta:", error);
+    }
+  };
+
   const openAccountModal = async () => {
     await retrieveAccounts(1);
     modalRef.current?.showModal();
@@ -39,8 +57,11 @@ const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions,
 
   const handleAccountSelect = (account) => {
     const updatedSolutions = [...solutions];
-    updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_number = account.account_number;
-    updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_name = account.name;
+    updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex] = {
+      ...updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex],
+      account_number: account.account_number,
+      account_name: account.name
+    };
     setSolutions(updatedSolutions);
     modalRef.current?.close();
   };
@@ -50,6 +71,33 @@ const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions,
     const { name, value } = event.target;
     updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex][name] = name === "account_number" ? Number(value) : value;
     setSolutions(updatedSolutions);
+
+    if (name === "account_number" && value) {
+      // Limpiar el timeout anterior si existe
+      if (debounceTimeout.current) {
+        clearTimeout(debounceTimeout.current);
+      }
+
+      // Si el valor está vacío, limpiar los campos
+      if (!value) {
+        updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_name = "";
+        setSolutions(updatedSolutions);
+        return;
+      }
+
+      // Buscar primero en las cuentas cargadas
+      const foundAccount = accounts.find(acc => acc.account_number === value);
+      if (foundAccount) {
+        updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_name = foundAccount.name;
+        setSolutions(updatedSolutions);
+        return;
+      }
+
+      // Si no se encuentra, usar debounce para buscar en la API
+      debounceTimeout.current = setTimeout(() => {
+        searchAccount(value);
+      }, 500); // 500ms de debounce
+    }
   };
 
   const removeAnnotation = () => {

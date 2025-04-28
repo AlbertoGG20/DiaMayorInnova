@@ -328,16 +328,11 @@ const ExamPage = () => {
         ref={modalTestSentRef}
         modalTitle="Examen enviado"
         showButton={false}
+        showCloseButton={false}
       >
-        <p>Este examen ya fue enviado anteriormente.</p>
-        <button 
-          className="btn light" 
-          onClick={() => {
-            modalTestSentRef.current?.close();
-            navigate("/home");
-          }}
-        >
-          Aceptar
+        <p>Este examen ya ha sido enviado.</p>
+        <button className="btn-light" onClick={() => navigate("/home")}>
+          Volver al inicio
         </button>
       </Modal>
 

@@ -13,6 +13,12 @@
   min-width: 600px;
   max-height: 80vh;
   overflow: hidden;
+  position: fixed;
+  z-index: 1000;
+}
+
+.defaultModal::backdrop {
+  background-color: rgba(0, 0, 0, 1);
 }
 
 .modal__content {

@@ -66,11 +66,11 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
             uid: anno.uid || `anno-${anno.id || Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             number: anno.number,
             student_entry_id: entry.entry_number,
-            account_number: anno.account_number,
-            account_name: anno.account.name,
-            account_id: anno.account_id,
-            debit: anno.debit,
-            credit: anno.credit
+            account_number: anno.account_number || "",
+            account_name: anno.account_name || anno.account?.name || "",
+            account_id: anno.account_id || "",
+            debit: anno.debit || "",
+            credit: anno.credit || ""
           })) || []
         );
   
@@ -266,27 +266,29 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
 
   return (
     <div className='entry__container'>
-      <EntryHeader addEntry={() => addEntry(selectedStatement.id)} selectedStatement={selectedStatement} examStarted={examStarted} exercise={exercise}/>
-      <section className='modes-entries-containner scroll-style'>
-        {entries.sort((a, b) => a.entry_number - b.entry_number).map((entry) => (
-          <Entry
-            key={entry.entry_number}
-            entryIndex={entry.entry_number}
-            number={entry.entry_number}
-            date={entry.entry_date}
-            annotations={annotations.filter(
-              (annotation) => annotation.student_entry_id === entry.entry_number
-            )}
-            updateAnnotation={updateAnnotation}
-            deleteAnnotation={handleDeleteAnnotation}
-            addAnnotation={(entryId) => addAnnotation(selectedStatement.id, entryId)}
-            deleteEntry={removeEntry}
-            selectedStatement={selectedStatement}
-            updateEntryDate={updateEntryDate}
-            exercise={exercise}
-          />
-        ))}
-      </section>
+      <div className='entry_content_container'>
+        <EntryHeader addEntry={() => addEntry(selectedStatement.id)} selectedStatement={selectedStatement} examStarted={examStarted} exercise={exercise}/>
+        <section className='modes-entries-containner scroll-style'>
+          {entries.sort((a, b) => a.entry_number - b.entry_number).map((entry) => (
+            <Entry
+              key={entry.entry_number}
+              entryIndex={entry.entry_number}
+              number={entry.entry_number}
+              date={entry.entry_date}
+              annotations={annotations.filter(
+                (annotation) => annotation.student_entry_id === entry.entry_number
+              )}
+              updateAnnotation={updateAnnotation}
+              deleteAnnotation={handleDeleteAnnotation}
+              addAnnotation={(entryId) => addAnnotation(selectedStatement.id, entryId)}
+              deleteEntry={removeEntry}
+              selectedStatement={selectedStatement}
+              updateEntryDate={updateEntryDate}
+              exercise={exercise}
+            />
+          ))}
+        </section>
+      </div>
       <div className='modes-entries-container--buttons'>
         <button onClick={handleSubmitStatement} className='btn light' disabled={!examStarted || exercise.finished}>
           {exercise?.task?.is_exam ? "Guardar y Continuar" : "Guardar Progreso"}

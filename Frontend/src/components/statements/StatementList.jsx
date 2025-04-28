@@ -23,8 +23,6 @@ const StatementsList = ({ onSelectStatement }) => {
         setLoading(true);
         const response = await statementService.getAllStatements(currentPage, 10, searchTerm);
 
-
-        console.log("Datos de enunciados obtenidos:", response.data.statements);
         if (Array.isArray(response.data.statements)) {
           const filteredStatements = response.data.statements.filter(
             (statement) => statement.is_public || statement.user_id === user?.id
@@ -110,7 +108,6 @@ const StatementsList = ({ onSelectStatement }) => {
   }
 
   const handleStatementCreated = (newStatement) => {
-    console.log("Nuevo enunciado creado:", newStatement);
     setStatements((prevStatements) => [...prevStatements, newStatement]);
     setFormVisible(false);
   };

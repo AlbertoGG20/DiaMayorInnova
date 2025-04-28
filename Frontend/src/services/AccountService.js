@@ -17,7 +17,6 @@ const get = async (id) => {
     const response = await http.get(`/accounts/${id}`);
     return response;
   } catch (error) {
-    console.log("Error en la petición get: ", error);
     return null;
   }
 };
@@ -74,7 +73,6 @@ const  findByName =  async (name) => {
     return response;
   }
   catch (error) {
-    console.log("Error en la búsqueda por módulo", error);
     return null;
   }
 };

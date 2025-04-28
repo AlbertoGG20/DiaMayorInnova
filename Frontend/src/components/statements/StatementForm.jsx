@@ -61,7 +61,6 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
     const updatedSolutions = [...solutions];
     updatedSolutions[index] = updatedSolution;
     setSolutions(updatedSolutions);
-    console.log("Solución actualizada:", updatedSolutions);
     if (onSaveSolution) {
       onSaveSolution(updatedSolution);
     }
@@ -123,8 +122,7 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
         if (totalDebit !== totalCredit) {
           errors += `El asiento ${entryIndex + 1} de la solución ${solutionIndex + 1} no está balanceado. La suma de débitos (${totalDebit}) no es igual a la suma de créditos (${totalCredit}).\n`;
         }
-        console.log("Total Credit", totalCredit);
-        console.log("Total Debit", totalDebit);
+
       });
     });
 
@@ -168,13 +166,10 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
       })),
     };
 
-    console.log("Datos COMPLETOS antes de enviar al backend:", statementData);
     try {
       const response = statement?.id
         ? await statementService.updateStatement(statement.id, statementData)
         : await statementService.createStatement(statementData);
-
-      console.log("Respuesta del servidor:", response);
 
       if (onStatementCreated) {
         onStatementCreated(response.data);

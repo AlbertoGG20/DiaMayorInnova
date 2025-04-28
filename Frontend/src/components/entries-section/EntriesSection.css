@@ -15,6 +15,14 @@
   display: none;
 }
 
+.entry_content_container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-s);
+  flex: 1;
+  overflow-y: auto;
+}
+
 .modes-entries-container {
   height: 100%;
   width: 100%;

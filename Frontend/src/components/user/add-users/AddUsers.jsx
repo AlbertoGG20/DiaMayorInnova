@@ -28,7 +28,6 @@ const AddUsers = ({ setUsers, selectedUser, setSelectedUser }) => {
     const fetchSchoolCenters = async () => {
       try {
         const response = await SchoolsServices.getAll();
-        console.log("AQui los datos de los centros:", response.schools)
         setSchoolCenters(response.schools);
       } catch (error) {
         console.error("Error al obtener centros educativos:", error);

@@ -15,7 +15,6 @@ const DEFAULT_EMPTY_RESOURCE = {
 };
 
 function resourceReducer(state, action) {
-  console.log(action.type, action);
 
   switch (action.type) {
     case "USING_RESOURCE":
@@ -99,7 +98,6 @@ const useResource = (resource) => {
     action = "get",
     updateStateWithFetchedData = true
   ) => {
-    console.log("ROUTES", routes);
     const url = `${API_BASE_URL}/school_centers`
     /*       const url = new UrlPattern(
               routes[resource]?.[action]?.url || routes[resource].url
@@ -132,7 +130,6 @@ const useResource = (resource) => {
       );
 
     dispatch({ type: "FETCH_STARTED", resource, updateStateWithFetchedData });
-    console.log(url);
     return promise;
   };
 

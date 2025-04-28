@@ -4,6 +4,7 @@ import StatementForm from "./StatementForm";
 import StatementList from "./StatementList";
 import SolutionList from "../solution/SolutionList";
 import EditSolutionModal from "../modal/EditSolutionModal";
+import http from "../../http-common";
 import "./StatementPage.css";
 
 const StatementCreateForm = () => {
@@ -16,19 +17,40 @@ const StatementCreateForm = () => {
   const [statements, setStatements] = useState([]);
   const [solutionToDeleteIndex, setSolutionToDeleteIndex] = useState(null);
 
-  const handleSelectStatement = (statement) => {
+  const getAccountName = async (accountId) => {
+    try {
+      const response = await http.get(`/accounts/${accountId}`);
+      return response.data.name;
+    } catch (error) {
+      console.error("Error al obtener el nombre de la cuenta:", error);
+      return "";
+    }
+  };
+
+  const handleSelectStatement = async (statement) => {
     setSelectedStatement(statement);
-    console.log("Enunciado seleccionado:", statement);
     if (statement && statement.solutions) {
-      setPrevSolutions(statement.solutions);
-      console.log("Soluciones establecidas:", statement.solutions);
+      // Creamos una copia de las soluciones para no modificar el objeto original
+      const solutionsWithAccounts = [...statement.solutions];
+      
+      // Para cada solución, actualizamos los nombres de las cuentas
+      for (let solution of solutionsWithAccounts) {
+        for (let entry of solution.entries) {
+          for (let annotation of entry.annotations) {
+            if (annotation.account_id) {
+              annotation.account_name = await getAccountName(annotation.account_id);
+            }
+          }
+        }
+      }
+      
+      setPrevSolutions(solutionsWithAccounts);
     } else {
       setPrevSolutions([]);
     }
   };
 
   const handleStatementCreated = (updatedStatement) => {
-    console.log("Enunciado actualizado/creado:", updatedStatement);
     if (updatedStatement.id === selectedStatement?.id) {
       setSelectedStatement(updatedStatement);
       navigate("/add-statements");
@@ -51,7 +73,6 @@ const StatementCreateForm = () => {
     };
     setPrevSolutions((prevSolutions) => {
       const updatedSolutions = [...prevSolutions, newSolution];
-      console.log("Soluciones actualizadas:", updatedSolutions);
       return updatedSolutions;
     });
   };
@@ -63,7 +84,6 @@ const StatementCreateForm = () => {
 
   const handleEditStatement = (statement) => {
     setSelectedStatement(statement);
-    console.log("Enunciado seleccionado:", statement);
   };
 
   const handleDeleteSolution = (index) => {
@@ -88,6 +108,8 @@ const StatementCreateForm = () => {
         ...entry,
         annotations: entry.annotations.map(annotation => ({
           ...annotation,
+          account_name: annotation.account_name || "",
+          account_number: annotation.account_number || 0
         })),
       })),
     };

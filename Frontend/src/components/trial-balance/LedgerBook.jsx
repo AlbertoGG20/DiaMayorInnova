@@ -11,16 +11,21 @@ const LedgerBook = ({ entries, title = "Libro Mayor" }) => {
     const accountsMap = new Map();
     
     entries.forEach(entry => {
-      entry.annotations?.forEach(annotation => {
-        const accountNumber = annotation.account_number;
+      const validAnnotations = entry.annotations?.filter(anno => !anno._destroy) || [];
+      validAnnotations.forEach((annotation, index) => {
+        const accountNumber = String(annotation.account_number).trim();
+        if (!accountNumber) return; // Saltar si no hay número de cuenta
+
         if (!accountsMap.has(accountNumber)) {
           accountsMap.set(accountNumber, {
             accountNumber,
             entries: []
           });
         }
+        // Añadir un índice único para cada anotación dentro del mismo asiento
         accountsMap.get(accountNumber).entries.push({
           entryNumber: entry.entry_number,
+          entryIndex: index, // Índice único para cada anotación en el mismo asiento
           debit: parseFloat(annotation.debit) || 0,
           credit: parseFloat(annotation.credit) || 0
         });
@@ -117,8 +122,8 @@ const LedgerBook = ({ entries, title = "Libro Mayor" }) => {
           </tr>
         </thead>
         <tbody>
-          {processedData.accounts.map(account => (
-            <React.Fragment key={account.accountNumber}>
+          {processedData.accounts.map((account, index) => (
+            <React.Fragment key={`${account.accountNumber}-${index}`}>
               <tr className="ledger-book-account-totals">
                 <td>{account.accountNumber}</td>
                 <td></td>
@@ -128,8 +133,11 @@ const LedgerBook = ({ entries, title = "Libro Mayor" }) => {
                   {formatCurrency(account.balance)}
                 </td>
               </tr>
-              {account.entries.map((entry, index) => (
-                <tr key={`${account.accountNumber}-${entry.entryNumber}-${index}`} className="ledger-book-entry-row">
+              {account.entries.map((entry) => (
+                <tr 
+                  key={`${account.accountNumber}-${entry.entryNumber}-${entry.entryIndex}`} 
+                  className="ledger-book-entry-row"
+                >
                   <td></td>
                   <td>{entry.entryNumber}</td>
                   <td>{formatCurrency(entry.debit)}</td>
@@ -157,4 +165,4 @@ const LedgerBook = ({ entries, title = "Libro Mayor" }) => {
   );
 };
 
-export default LedgerBook; 
+export default LedgerBook;

@@ -7,7 +7,6 @@ const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
     setSolutions((solution) => {
       const updatedSolutions = [...solutions];
       updatedSolutions[solutionIndex].description = event.target.value;
-      console.log('AAAAAa', updatedSolutions);
       return updatedSolutions;
     });
 
@@ -31,7 +30,6 @@ const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
       annotations: [{ number: 1, account_number: 0, credit: "", debit: "" }],
     });
     setSolutions(updatedSolutions);
-    console.log("Soluciones actualizadas después de agregar asiento:", updatedSolutions);
   };
 
   /* En caso de querer un botón "Eliminar Asiento", por asiento  
@@ -48,13 +46,11 @@ const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
     const updatedSolutions = [...solutions];
     updatedSolutions[solutionIndex].entries.pop();
     setSolutions(updatedSolutions);
-    console.log("Soluciones actualizadas después de eliminar el último asiento:", updatedSolutions);
   };
 
   const removeSolution = () => {
     const updatedSolutions = solutions.filter((_, index) => index !== solutionIndex);
     setSolutions(updatedSolutions);
-    console.log("Soluciones actualizadas después de eliminar asiento:", updatedSolutions);
   };
 
   const calculateTotals = () => {
