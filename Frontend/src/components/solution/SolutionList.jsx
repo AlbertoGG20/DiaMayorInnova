@@ -12,7 +12,7 @@ const SolutionList = ({ solutions, onEditSolution, onDeleteSolution, solutionToD
     try {
       if (isCurrentlyExample) {
         await solutionService.unmarkAsExample(solutionId);
-        alert("Ejemplo desmarcado correctamente");
+        
       } else {
         // Vérifier si account_id est valide (par exemple, via une requête au backend)
         const accountId = 1; // Remplacer par une logique dynamique si possible
@@ -24,7 +24,6 @@ const SolutionList = ({ solutions, onEditSolution, onDeleteSolution, solutionToD
           debitMoves: "Ejemplo débito",
           account_id: accountId
         });
-        alert("Solución marcada como ejemplo correctamente");
       }
       refreshSolutions();
     } catch (error) {
@@ -45,7 +44,7 @@ const SolutionList = ({ solutions, onEditSolution, onDeleteSolution, solutionToD
                 {`Solución ${index + 1}`}
                 {solution.is_example && (
                   <span className="help-example-indicator" title="Ejemplo de ayuda">
-                    ●
+    
                   </span>
                 )}
               </h4>
