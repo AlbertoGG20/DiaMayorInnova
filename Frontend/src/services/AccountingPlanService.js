@@ -198,7 +198,7 @@ const AccountingPlanService = {
     findByName,
     getAccountsByPGC,
     importXLSX, 
-    exportXLSXByPGC // ✅ Ajout de la fonction d'exportation
+    exportXLSXByPGC, 
     exportToCSV,
     importCSV
 };
