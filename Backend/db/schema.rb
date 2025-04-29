@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_03_20_102356) do
+ActiveRecord::Schema[7.2].define(version: 2025_04_29_091517) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -115,8 +115,10 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_20_102356) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "description"
-    t.integer "solution_id"
+    t.integer "solution"
+    t.bigint "solution_id"
     t.index ["account_id"], name: "index_help_examples_on_account_id"
+    t.index ["solution_id"], name: "index_help_examples_on_solution_id"
   end
 
   create_table "marks", force: :cascade do |t|
@@ -145,7 +147,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_20_102356) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "statement_id", null: false
-    t.boolean "is_example", default: false
+    t.boolean "is_example", default: false, null: false
     t.index ["statement_id"], name: "index_solutions_on_statement_id"
   end
 
