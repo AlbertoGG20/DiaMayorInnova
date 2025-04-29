@@ -40,6 +40,9 @@ gem 'active_model_serializers'
 # An authorization library for Ruby which restricts what resources a given user is allowed to access.
 gem 'cancancan'
 
+# Kaminari for an efficient pagination of data records 
+gem 'kaminari'
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
@@ -68,8 +71,5 @@ group :development, :test do
 
   # SimpleCov is a code coverage analysis tool for Ruby.
   gem 'simplecov', require: false
-
-  # Kaminari for an efficient pagination of data records 
-  gem 'kaminari'
 
 end
