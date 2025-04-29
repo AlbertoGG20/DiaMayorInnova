@@ -29,20 +29,17 @@ const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
       annotations: [{ number: 1, account_number: 0, credit: "", debit: "" }],
     });
     setSolutions(updatedSolutions);
-    console.log("Soluciones actualizadas después de agregar asiento:", updatedSolutions);
   };
 
   const removeLastEntry = () => {
     const updatedSolutions = [...solutions];
     updatedSolutions[solutionIndex].entries.pop();
     setSolutions(updatedSolutions);
-    console.log("Soluciones actualizadas después de eliminar el último asiento:", updatedSolutions);
   };
 
   const removeSolution = () => {
     const updatedSolutions = solutions.filter((_, index) => index !== solutionIndex);
     setSolutions(updatedSolutions);
-    console.log("Soluciones actualizadas después de eliminar asiento:", updatedSolutions);
   };
 
   const calculateTotals = () => {

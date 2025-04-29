@@ -5,11 +5,13 @@ import StatementList from "./StatementList";
 import SolutionList from "../solution/SolutionList";
 import EditSolutionModal from "../modal/EditSolutionModal";
 import statementService from "../../services/statementService";
+import http from "../../http-common";
 import "./StatementPage.css";
 
 const StatementCreateForm = () => {
   const navigate = useNavigate();
   const [solutions, setSolutions] = useState([]);
+  const [prevSolutions, setPrevSolutions] = useState([]); // Ajout de prevSolutions
   const [isModalOpen, setModalOpen] = useState(false);
   const [selectedSolutionIndex, setSelectedSolutionIndex] = useState(null);
   const [selectedStatement, setSelectedStatement] = useState(null);
@@ -34,9 +36,18 @@ const StatementCreateForm = () => {
     }
   };
 
-  const handleSelectStatement = (statement) => {
+  const getAccountName = async (accountId) => {
+    try {
+      const response = await http.get(`/accounts/${accountId}`);
+      return response.data.name;
+    } catch (error) {
+      console.error("Error al obtener el nombre de la cuenta:", error);
+      return "";
+    }
+  };
+
+  const handleSelectStatement = async (statement) => {
     setSelectedStatement(statement);
-    console.log("Enunciado seleccionado:", statement);
     if (statement && statement.solutions) {
       const initializedSolutions = statement.solutions.map(solution => ({
         ...solution,
@@ -44,6 +55,17 @@ const StatementCreateForm = () => {
       }));
       setSolutions(initializedSolutions);
       console.log("Soluciones establecidas:", initializedSolutions);
+      const solutionsWithAccounts = [...statement.solutions];
+      for (let solution of solutionsWithAccounts) {
+        for (let entry of solution.entries) {
+          for (let annotation of entry.annotations) {
+            if (annotation.account_id) {
+              annotation.account_name = await getAccountName(annotation.account_id);
+            }
+          }
+        }
+      }
+      setPrevSolutions(solutionsWithAccounts);
     } else {
       setSolutions([]);
     }
@@ -111,10 +133,19 @@ const StatementCreateForm = () => {
       }
     } else {
       setSolutions((prevSolutions) => prevSolutions.filter((_, i) => i !== index));
+      setPrevSolutions((prevSolutions) =>
+        prevSolutions.map((solution, i) =>
+          i === index ? { ...solution, _destroy: true } : solution
+        )
+      );
       setMessage("Solución eliminada localmente. Debes guardar el enunciado para confirmar.");
       setTimeout(() => setMessage(""), 5000);
     }
     setSolutionToDeleteIndex(null);
+  };
+
+  const handleEditStatement = (statement) => {
+    setSelectedStatement(statement);
   };
 
   const handleCloseModal = () => {
@@ -126,7 +157,14 @@ const StatementCreateForm = () => {
     const updatedSolutions = [...solutions];
     updatedSolutions[selectedSolutionIndex] = {
       ...updatedSolution,
-      entries: updatedSolution.entries || [],
+      entries: updatedSolution.entries?.map(entry => ({
+        ...entry,
+        annotations: entry.annotations.map(annotation => ({
+          ...annotation,
+          account_name: annotation.account_name || "",
+          account_number: annotation.account_number || 0
+        })),
+      })) || [],
     };
 
     if (updatedSolution.id) {
@@ -181,7 +219,7 @@ const StatementCreateForm = () => {
           onEditSolution={handleEditSolution}
           onDeleteSolution={handleDeleteSolution}
           solutionToDeleteIndex={solutionToDeleteIndex}
-          refreshSolutions={refreshSolutions} // Passe la fonction comme prop
+          refreshSolutions={refreshSolutions}
         />
         {isModalOpen && selectedSolutionIndex !== null && (
           <EditSolutionModal

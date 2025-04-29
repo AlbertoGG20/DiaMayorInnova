@@ -66,19 +66,7 @@ const AccountingPlansList = ({ newPGC }) => {
   const handleSearchChange = (e) => {
     const searchTerm = e.target.value.toLowerCase();
     setSearchAccPlan(searchTerm);
-  
-    if (!searchTerm) {
-      retrieveAccountingPlans(); // Si le champ est vide, récupérer tous les PGC
-      return;
-    }
-  
-    // Filtrage dynamique des plans comptables
-    setAccountingPlans((prevPlans) =>
-      prevPlans.filter((plan) => {
-        plan.name.toLowerCase().includes(searchTerm);
-        setCurrentPage(1);
-      })
-    );
+    setCurrentPage(1);
   };
   
 

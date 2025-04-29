@@ -15,14 +15,14 @@ const StatementsList = ({ onSelectStatement }) => {
   const [statementToDelete, setStatementToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1); //Pagination
   const [totalPages, setTotalPages] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchStatements = async () => {
       try {
         setLoading(true);
-        const response = await statementService.getAllStatements(currentPage, 10);
+        const response = await statementService.getAllStatements(currentPage, 10, searchTerm);
 
-        console.log("Datos de enunciados obtenidos:", response.data.statements);
         if (Array.isArray(response.data.statements)) {
           const filteredStatements = response.data.statements.filter(
             (statement) => statement.is_public || statement.user_id === user?.id
@@ -39,7 +39,7 @@ const StatementsList = ({ onSelectStatement }) => {
       }
     };
     fetchStatements();
-  }, [user, currentPage, totalPages]);
+  }, [user, currentPage, searchTerm]);
 
   const handleDelete = async (id) => {
     try {
@@ -108,7 +108,6 @@ const StatementsList = ({ onSelectStatement }) => {
   }
 
   const handleStatementCreated = (newStatement) => {
-    console.log("Nuevo enunciado creado:", newStatement);
     setStatements((prevStatements) => [...prevStatements, newStatement]);
     setFormVisible(false);
   };
@@ -118,10 +117,28 @@ const StatementsList = ({ onSelectStatement }) => {
     setCurrentPage(newPage);
   };
 
+  const handleSearchChange = (e) => {
+    const searchTerm = e.target.value.toLowerCase();
+    setSearchTerm(searchTerm);
+    setCurrentPage(1);
+  };  
+
   return (
     <div className="statement-page__selection--content">
       <div className="statement-page__row" style={{display: "flex", gap: "var(--gap-m)", alignItems: "center", width: "100%"}}>
         <h3 className="statement-page__list--header">Enunciados</h3>
+
+        <form className='search-bar search-bar--statement'>
+          <input
+            className='search-bar_search'
+            type='text'
+            value={searchTerm}
+            onChange={handleSearchChange}
+            placeholder='Buscar enunciado'
+          />
+          <i className='fi fi-rr-search'></i>
+        </form>
+
         <div className="statement-list__pagination">
           <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => changePage(1)}>
             <i className='fi fi-rr-angle-double-small-left' />

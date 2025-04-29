@@ -13,6 +13,11 @@ class StatementsController < ApplicationController
         statements = statements.where("is_public = ? OR user_id = ?", true, current_user.id)
       end
   
+      if params[:search].present?
+        search_term = "%#{params[:search]}%"
+        statements = statements.where("definition ILIKE ? OR explanation ILIKE ?", search_term, search_term)
+      end     
+
       paginated_statements = statements.page(params[:page]).per(params[:per_page] || 10)
   
       render json: {

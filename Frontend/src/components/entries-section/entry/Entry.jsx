@@ -1,12 +1,23 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import "./Entry.css"
 import EntryForm from './entry-form/EntryForm'
 
 const Entry = ({ number, updateEntryDate, annotations, updateAnnotation, deleteAnnotation, addAnnotation, deleteEntry, entryIndex, selectedStatement, date, exercise }) => {
-  const [entryStatus, setEntryStatus] = useState(false);
+  const [entryStatus, setEntryStatus] = useState(exercise?.finished || false);
   const [entryDate, setDate] = useState(date || "2024-10-10");
   const formattedDate = new Date(`${entryDate}T00:00:00`).toLocaleDateString("es-ES");
-  const [total, setTotal] = useState(0);
+
+  const total = useMemo(() => {
+    return annotations.reduce((acc, annotation) => {
+      const debit = parseFloat(annotation.debit) || 0;
+      const credit = parseFloat(annotation.credit) || 0;
+      return acc + debit - credit;
+    }, 0);
+  }, [annotations]);
+
+  const formattedTotal = useMemo(() => {
+    return total.toFixed(2);
+  }, [total]);
 
   const changeStatus = () => {
     setEntryStatus(!entryStatus)
@@ -20,22 +31,9 @@ const Entry = ({ number, updateEntryDate, annotations, updateAnnotation, deleteA
     }
   }
 
-  const calculateTotal = () => {
-    let total = 0;
-    annotations.map((annotation) => {
-      total += annotation.debit;
-      total -= annotation.credit;
-    })
-    return total;
-  }
-
-  useEffect(() => {
-    setTotal(calculateTotal())
-  }, [annotations])
-
   return (
     <div className='entry_wrapper'>
-      <div className="entry_head" tabIndex={0} onKeyDown={changeStatus}>
+      <div className="entry_head">
         <div className="head_tittle" onClick={() => setEntryStatus(!entryStatus)} >
           <p>Asiento {number}</p>
           <i className={entryStatus ? 'fi fi-rr-angle-small-up' : 'fi fi-rr-angle-small-down'}></i>
@@ -48,14 +46,18 @@ const Entry = ({ number, updateEntryDate, annotations, updateAnnotation, deleteA
             value={entryDate} 
             onChange={handleChangeDate}
             disabled={exercise?.finished || false}
+            onClick={(e) => e.stopPropagation()}
           />
-          <p className='entry_total'>Total: <span>{total}</span></p>
+          <p className='entry_total'>Total: <span>{formattedTotal}</span></p>
         </div>
         
         <button 
           className='btn-trash' 
           aria-label='Eliminar asiento' 
-          onClick={() => deleteEntry(entryIndex)}
+          onClick={(e) => {
+            e.stopPropagation();
+            deleteEntry(entryIndex);
+          }}
           disabled={exercise?.finished || false}
         >
           <i className='fi fi-rr-trash'></i>

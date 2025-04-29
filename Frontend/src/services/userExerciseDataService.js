@@ -2,14 +2,12 @@ import http from "../http-common";
 
 const getAll = async () => {
   const response = await http.get(`/student_exercises`);
-  // console.log("all exercise info of user - getAll", response) // Depuración
   return response;
 };
 
 const getById = async (exerciseId) => {
   try {
     const response = await http.get(`/student_exercises/${exerciseId}`);
-    // console.log("Response data:", response.data); // Depuración
     return response.data;
   } catch (error) {
     console.error("Error obteniendo el ejercicio:", error);
@@ -18,7 +16,6 @@ const getById = async (exerciseId) => {
 };
 
 const create = async (exerciseData) => {
-  // console.log(exerciseData) // Depuración
   try {
     const response = await http.post("/student_exercises", exerciseData);
     return response;
@@ -34,7 +31,7 @@ const start = async (exerciseId) => {
     return response;
   } catch (error) {
     console.error("Error al iniciar el examen:", error);
-    return null; // podemos lanzar un throw error y manejarlo en el componente...
+    return null; 
   }
 };
 
@@ -112,7 +109,6 @@ const remove = async (id) => {
 
 const getAllCalification = async () => {
   const response = await http.get(`/student_exercises/find_mark_exercise_by_user`);
-  // console.log("all exercise info of user - gelAllCalification ", response) // Depuración
   return response;
 };
 

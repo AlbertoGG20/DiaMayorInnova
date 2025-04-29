@@ -98,7 +98,7 @@ const AssignUserToClass = ({
           usersResponse = await userService.getAllUsers();
         }
 
-        setAllUsers(usersResponse.data.data.users);
+        setAllUsers(usersResponse.data.data.data.users);
 
         if (user.role === "teacher") {
           const groupsResponse = await ClassGroupService.findByTeacherId(user.id);

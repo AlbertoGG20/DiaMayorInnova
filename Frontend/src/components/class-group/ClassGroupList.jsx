@@ -35,7 +35,6 @@ const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange, maxStud
   const fetchCurrentUser = async () => {
     try {
       const user = await userService.getCurrentUser();
-      console.log("PROBANDOOOO", user);
       setCurrentUser(user);
       if (user.role === "teacher") {
         const teacherGroups = await userService.getTeacherClassGroups(user.id);

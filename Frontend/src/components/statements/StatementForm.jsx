@@ -27,6 +27,48 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
     }, 5000);
   };
 
+  const handleAddSolution = () => {
+    const newSolution = {
+      description: "",
+      entries: [
+        {
+          entry_number: 1,
+          entry_date: "",
+          annotations: [
+            {
+              number: 1,
+              account_number: 0,
+              credit: "",
+              debit: "",
+            },
+            {
+              number: 2,
+              account_number: 0,
+              credit: "",
+              debit: "",
+            },
+          ]
+        }
+      ]
+    };
+    setSolutions((prevSolutions) => [...prevSolutions, newSolution]);
+  };
+
+  const handleSaveSolution = (updatedSolution, index) => {
+    const updatedSolutions = [...solutions];
+    updatedSolutions[index] = updatedSolution;
+    setSolutions(updatedSolutions);
+    if (onSaveSolution) {
+      onSaveSolution(updatedSolution);
+    }
+  };
+
+  const handleDeleteSolution = (index) => {
+    if (onDeleteSolution) {
+      onDeleteSolution(index);
+    }
+  };
+
   const validateForm = () => {
     let errors = "";
 
@@ -76,8 +118,7 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
         if (totalDebit !== totalCredit) {
           errors += `El asiento ${entryIndex + 1} de la solución ${solutionIndex + 1} no está balanceado. La suma de débitos (${totalDebit}) no es igual a la suma de créditos (${totalCredit}).\n`;
         }
-        console.log("Total Credit", totalCredit);
-        console.log("Total Debit", totalDebit);
+
       });
     });
 
@@ -121,13 +162,10 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
       })),
     };
 
-    console.log("Datos COMPLETOS antes de enviar al backend:", statementData);
     try {
       const response = statement?.id
         ? await statementService.updateStatement(statement.id, statementData)
         : await statementService.createStatement(statementData);
-
-      console.log("Respuesta del servidor:", response);
 
       if (onStatementCreated) {
         onStatementCreated(response.data);

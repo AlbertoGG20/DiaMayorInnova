@@ -98,15 +98,43 @@
 .exam-statement__information {
   padding: var(--gap-s) var(--gap-xxl) 0 0;
 
+  & .tabs-container {
+    display: flex;
+    gap: var(--gap-xs);
+    margin-bottom: var(--gap-m);
+    border-bottom: 1px solid var(--Color-grey-200);
+    padding-bottom: var(--gap-xs);
+  }
+
+  & .btn__tabs {
+    padding: var(--gap-xs) var(--gap-s);
+    border: none;
+    background-color: transparent;
+    color: var(--Color-Principal);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: var(--r-xs) var(--r-xs) 0 0;
+    position: relative;
+
+    &:hover {
+      background-color: var(--Color-grey-100);
+    }
+
+    &.btn__tabs--active {
+      background-color: var(--Color-Principal);
+      color: var(--Color-White);
+    }
+  }
+
   & .statement-grid {
     background-color: var(--Color-White);
     padding: var(--gap-s);
     border-radius: var(--r-s);
     box-shadow: var(--box-shadow-btn);
-
+    display: flex;
+    gap: var(--gap-s);
   }
-
-
 }
 
 .selected_mark {

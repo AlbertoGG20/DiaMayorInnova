@@ -26,7 +26,7 @@ const TaskListAndDetails = () => {
 
 
   useEffect(() => {
-    if (location.state?.createTask) {
+    if (location.state?.createTask || location.state?.newTask) {
       setIsCreatingTask(true);
     }
   
@@ -114,6 +114,7 @@ const TaskListAndDetails = () => {
   const handleSearchChange = (e) => {
     const value = e.target.value;
     setSearchTerm(value);
+    setCurrentPage(1);
     setIsSearching(value.trim() !== "");
   };
 
@@ -163,6 +164,27 @@ const TaskListAndDetails = () => {
     navigate("/task-edit", { state: { task: selectedTask } });
   };
 
+  const handleDuplicatedTask = async (event, originalTask) => {
+    event.stopPropagation();
+  
+    try {
+      const response = await taskService.getTaskWithStatements(originalTask.id);
+      const fullTask = response.data;
+  
+      const duplicatedTaskData = {
+        ...fullTask,
+        title: `${fullTask.title} - copia`,
+        id: undefined, // remove id
+      };
+  
+      navigate("/tasks", { state: { newTask: duplicatedTaskData } });
+    } catch (error) {
+      console.error("Error al duplicar la tarea:", error);
+    }
+  };
+  
+  
+
   if (!user) return <p>Cargando usuario...</p>;
   if (loading) return <p>Cargando tareas... Por favor espera.</p>;
   if (error) return <p>{error}</p>;
@@ -199,6 +221,11 @@ const TaskListAndDetails = () => {
                       <p className="task-list__item-title">{task.title}</p>
                       <div className="task-list__square">
                         <i className="fi fi-rr-book-alt"></i>
+                      </div>
+                      <div className="task-list__square">
+                        <button className="task-list__duplicate" onClick={(event) => handleDuplicatedTask(event, task)}>
+                          <i className="fi fi-rr-copy"/>
+                        </button>
                       </div>
                     </div>
                     <div className="task-list__info-body">
@@ -240,6 +267,7 @@ const TaskListAndDetails = () => {
               onEditTask={() => setIsEditingTask(true)}
               onDeleteTask={handleDeleteTask}
               onCloseModal={handleCloseModal}
+              onDuplicateTask={handleDuplicatedTask}
             />
           </TaskModal>
         </>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import taskSubmitService from '../../services/taskSubmitService'
 import EntryHeader from './entry-header/EntryHeader'
 import Entry from './entry/Entry'
@@ -6,7 +6,7 @@ import Modal from '../modal/Modal';
 import { useNavigate } from 'react-router-dom'
 import "./EntriesSection.css"
 
-const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComplete, exercise, examStarted, handleSave }) => {
+const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComplete, exercise, examStarted, handleSave, onEntriesChange }) => {
   const [statementData, setStatementData] = useState({});
   const [allStatementsData, setAllStatementsData] = useState({});
   const accounts = exercise?.chartOfAccounts || [];
@@ -15,8 +15,8 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
   const [entriesData, setEntriesData] = useState([]);
 
   const currentStatementData = selectedStatement ? statementData[selectedStatement.id] : null;
-  const entries = currentStatementData?.entries || [];
-  const annotations = currentStatementData?.annotations || [];
+  const entries = useMemo(() => currentStatementData?.entries || [], [currentStatementData]);
+  const annotations = useMemo(() => currentStatementData?.annotations || [], [currentStatementData]);
 
   useEffect(() => {
     if (savedMarks && savedMarks.length > 0) {
@@ -66,11 +66,11 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
             uid: anno.uid || `anno-${anno.id || Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             number: anno.number,
             student_entry_id: entry.entry_number,
-            account_number: anno.account_number,
-            account_name: anno.account.name,
-            account_id: anno.account_id,
-            debit: anno.debit,
-            credit: anno.credit
+            account_number: anno.account_number || "",
+            account_name: anno.account_name || anno.account?.name || "",
+            account_id: anno.account_id || "",
+            debit: anno.debit || "",
+            credit: anno.credit || ""
           })) || []
         );
   
@@ -82,13 +82,19 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
   
       setStatementData(newStatementData);
     }
-  }, [exercise]);
+  }, [exercise?.marks]);
 
-  const addEntry = (statementId) => {
-    const currentEntries = statementData[statementId]?.entries || [];
-    const newEntryNumber = currentEntries.length > 0 
-      ? Math.max(...currentEntries.map(e => e.entry_number)) + 1 
-      : 1;
+  const addEntry = useCallback((statementId) => {
+    // Obtener todas las entradas de todos los statements
+    const allEntries = Object.values(statementData).flatMap(data => data.entries || []);
+    
+    // Encontrar el número máximo de entrada
+    const maxEntryNumber = allEntries.length > 0 
+      ? Math.max(...allEntries.map(e => e.entry_number)) 
+      : 0;
+    
+    // El nuevo número de entrada será el máximo + 1
+    const newEntryNumber = maxEntryNumber + 1;
   
     const newEntry = {
       entry_number: newEntryNumber,
@@ -102,73 +108,81 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
         entries: [...(prev[statementId]?.entries || []), newEntry],
       },
     }));
-  };
+  }, [statementData]);
 
-  const removeEntry = (entryNumber) => {
+  const removeEntry = useCallback((entryNumber) => {
     if (!selectedStatement) return;
   
-    // Marcar entrada para eliminación en lugar de borrar directamente
+    setStatementData((prevData) => {
+      const updatedEntries = prevData[selectedStatement.id].entries.filter(
+        (entry) => entry.entry_number !== entryNumber
+      );
+  
+      return {
+        ...prevData,
+        [selectedStatement.id]: {
+          entries: updatedEntries,
+          annotations: prevData[selectedStatement.id].annotations.filter(
+            (annotation) => annotation.student_entry_id !== entryNumber
+          ),
+        },
+      };
+    });
+  }, [selectedStatement]);
+
+  const updateEntryDate = useCallback((statementId, entryNumber, newDate) => {
     setStatementData((prevData) => ({
       ...prevData,
-      [selectedStatement.id]: {
-        entries: prevData[selectedStatement.id].entries.map(entry => 
-          entry.entry_number === entryNumber 
-            ? { ...entry, _destroy: true } 
+      [statementId]: {
+        ...prevData[statementId],
+        entries: prevData[statementId].entries.map((entry) =>
+          entry.entry_number === entryNumber
+            ? { ...entry, entry_date: newDate }
             : entry
         ),
-        annotations: prevData[selectedStatement.id].annotations.map(anno => 
-          anno.student_entry_id === entryNumber
-            ? { ...anno, _destroy: true } // Marcar anotaciones relacionadas
-            : anno
-        )
       },
     }));
-  };
+  }, []);
 
-  const addAnnotation = (statementId, entryId) => {
+  const addAnnotation = useCallback((statementId, entryId) => {
+    if (!selectedStatement) return;
+  
     const newAnnotation = {
-      uid: `annotation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      uid: `anno-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       student_entry_id: entryId,
-      account_id: "",
       account_number: "",
-      debit: 0,
-      credit: 0,
+      account_name: "",
+      debit: "",
+      credit: "",
     };
   
     setStatementData((prevData) => ({
       ...prevData,
       [statementId]: {
         ...prevData[statementId],
-        annotations: [
-          ...(prevData[statementId]?.annotations || []),
-          newAnnotation,
-        ],
+        entries: prevData[statementId]?.entries || [],
+        annotations: [...(prevData[statementId]?.annotations || []), newAnnotation],
       },
     }));
-  };
+  }, [selectedStatement]);
 
-  const updateAnnotation = (statementId, annotationUid, updatedAnnotation) => {
-    if (!statementId || !statementData[statementId]) return;
-
-    if (updatedAnnotation.account_number !== undefined) {
-      const foundAccount = updatedAnnotation.account_id
-
-      updatedAnnotation.account_id = foundAccount
-
-    }
-
+  const updateAnnotation = useCallback((statementId, annotationUid, updatedAnnotation) => {
+    if (!selectedStatement) return;
+  
     setStatementData((prevData) => ({
       ...prevData,
       [statementId]: {
         ...prevData[statementId],
         annotations: prevData[statementId].annotations.map((annotation) =>
-          annotation.uid === annotationUid ? { ...annotation, ...updatedAnnotation } : annotation
+          annotation.uid === annotationUid
+            ? { ...annotation, ...updatedAnnotation }
+            : annotation
         ),
       },
     }));
-  };
+  }, [selectedStatement]);
 
-  const handleDeleteAnnotation = (annotationUid) => {
+  const handleDeleteAnnotation = useCallback((annotationUid) => {
     if (!selectedStatement) return;
   
     setStatementData((prevData) => ({
@@ -177,14 +191,14 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
         entries: entries,
         annotations: prevData[selectedStatement.id].annotations.map(annotation => 
           annotation.uid === annotationUid 
-            ? { ...annotation, _destroy: true } // Marcar para eliminación
+            ? { ...annotation, _destroy: true }
             : annotation
         )
       },
     }));
-  };
+  }, [selectedStatement, entries]);
 
-  const handleSubmitStatement = () => {
+  const handleSubmitStatement = useCallback(() => {
     if (!selectedStatement) return;
     if(exercise?.task?.is_exam === false){
       handleSave(true);
@@ -201,9 +215,9 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
     if (onStatementComplete) {
       onStatementComplete(selectedStatement.id, { entries, annotations });
     }
-  };
+  }, [selectedStatement, exercise?.task?.is_exam, handleSave, entries, annotations, onStatementComplete]);
 
-  const handleFinalSubmit = () => {
+  const handleFinalSubmit = useCallback(() => {
     if (!exercise || !exercise.id) {
       console.error("El objeto exercise no está definido correctamente:", exercise);
       return;
@@ -211,56 +225,70 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
 
     const updatedStatementsData = { ...allStatementsData, ...statementData };
 
-    if (Object.keys(updatedStatementsData).length === 0) {
-      console.error("❌ Error: No hay datos en updatedStatementsData", updatedStatementsData);
+    const filteredStatementsData = Object.entries(updatedStatementsData).reduce((acc, [statementId, data]) => {
+      acc[statementId] = {
+        entries: data.entries,
+        annotations: data.annotations.filter(anno => !anno._destroy)
+      };
+      return acc;
+    }, {});
+
+    if (Object.keys(filteredStatementsData).length === 0) {
+      console.error("❌ Error: No hay datos en updatedStatementsData", filteredStatementsData);
       return;
     }
 
     const dataToSubmit = {
-      statementsData: updatedStatementsData,
+      statementsData: filteredStatementsData,
       taskId: exercise.task.id,
       exerciseId: exercise.id,
     };
 
     taskSubmitService(dataToSubmit, navigate);
-  };
+  }, [allStatementsData, statementData, exercise, navigate]);
 
-  const updateEntryDate = (statementId, entryNumber, newDate) => {
-    setStatementData((prevData) => ({
-      ...prevData,
-      [statementId]: {
-        ...prevData[statementId],
-        entries: prevData[statementId].entries.map((entry) =>
-          entry.entry_number === entryNumber ? { ...entry, entry_date: newDate } : entry
-        ),
-      },
-    }));
-  };
-
+  useEffect(() => {
+    if (onEntriesChange && selectedStatement) {
+      const formattedEntries = entries
+        .filter(entry => !entry._destroy)
+        .map(entry => ({
+          ...entry,
+          annotations: annotations
+            .filter(anno => anno.student_entry_id === entry.entry_number && !anno._destroy)
+            .map(anno => ({
+              ...anno,
+              _destroy: anno._destroy || false
+            }))
+        }));
+      onEntriesChange(formattedEntries);
+    }
+  }, [entries, annotations, onEntriesChange, selectedStatement?.id]);
 
   return (
     <div className='entry__container'>
-      <EntryHeader addEntry={() => addEntry(selectedStatement.id)} selectedStatement={selectedStatement} examStarted={examStarted} exercise={exercise}/>
-      <section className='modes-entries-containner scroll-style'>
-        {entries.sort((a, b) => a.entry_number - b.entry_number).map((entry) => (
-          <Entry
-            key={entry.entry_number}
-            entryIndex={entry.entry_number}
-            number={entry.entry_number}
-            date={entry.entry_date}
-            annotations={annotations.filter(
-              (annotation) => annotation.student_entry_id === entry.entry_number
-            )}
-            updateAnnotation={updateAnnotation}
-            deleteAnnotation={handleDeleteAnnotation}
-            addAnnotation={(entryId) => addAnnotation(selectedStatement.id, entryId)}
-            deleteEntry={removeEntry}
-            selectedStatement={selectedStatement}
-            updateEntryDate={updateEntryDate}
-            exercise={exercise}
-          />
-        ))}
-      </section>
+      <div className='entry_content_container'>
+        <EntryHeader addEntry={() => addEntry(selectedStatement.id)} selectedStatement={selectedStatement} examStarted={examStarted} exercise={exercise}/>
+        <section className='modes-entries-containner scroll-style'>
+          {entries.sort((a, b) => a.entry_number - b.entry_number).map((entry) => (
+            <Entry
+              key={entry.entry_number}
+              entryIndex={entry.entry_number}
+              number={entry.entry_number}
+              date={entry.entry_date}
+              annotations={annotations.filter(
+                (annotation) => annotation.student_entry_id === entry.entry_number
+              )}
+              updateAnnotation={updateAnnotation}
+              deleteAnnotation={handleDeleteAnnotation}
+              addAnnotation={(entryId) => addAnnotation(selectedStatement.id, entryId)}
+              deleteEntry={removeEntry}
+              selectedStatement={selectedStatement}
+              updateEntryDate={updateEntryDate}
+              exercise={exercise}
+            />
+          ))}
+        </section>
+      </div>
       <div className='modes-entries-container--buttons'>
         <button onClick={handleSubmitStatement} className='btn light' disabled={!examStarted || exercise.finished}>
           {exercise?.task?.is_exam ? "Guardar y Continuar" : "Guardar Progreso"}
@@ -270,29 +298,23 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
         </button>
       </div>
 
-      <Modal ref={confirmModalRef} modalTitle="Confirmar envío" showButton={false}>
-        <p>{exercise?.task?.is_exam ? "¿Está seguro de enviar el examen?" : "¿Está seguro de enviar la tarea?"}</p>
-        <div className="modal__buttons">
-          <button
-            className="btn"
-            onClick={() => {
-              confirmModalRef.current?.close();
-              handleFinalSubmit();
-            }}
-          >
-            Sí
+      <Modal
+        ref={confirmModalRef}
+        modalTitle="Confirmar envío"
+        showButton={false}
+      >
+        <p>¿Estás seguro de que quieres enviar la tarea? No podrás hacer más cambios después.</p>
+        <div className="modal-buttons">
+          <button className="btn light" onClick={() => confirmModalRef.current?.close()}>
+            Cancelar
           </button>
-          <button
-            className="btn light"
-            onClick={() => confirmModalRef.current?.close()}
-          >
-            No
+          <button className="btn" onClick={handleFinalSubmit}>
+            Confirmar
           </button>
         </div>
       </Modal>
+    </div>
+  );
+};
 
-    </div >
-  )
-}
-
-export default EntriesSection
+export default EntriesSection;

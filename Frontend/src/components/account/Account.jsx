@@ -22,12 +22,10 @@ const Account = ({id, onSaveSuccess, onCloseModal}) => {
     if (id) {
       AccountDataService.get(id)
         .then(response => {
-          console.log("DAME LA CUENTAAAAAAAAA", response)
           setCurrentAccount(response.data);
           setError("");
         })
         .catch(e => {
-          console.log(e)
           setError("Error al cargar cuenta");
         });
     }

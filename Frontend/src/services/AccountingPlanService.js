@@ -119,7 +119,6 @@ const importCSV = async (file) => {
         });
 
         if (response.data.success) {
-            console.log("PGC importado correctamente:", response.data);
             return response.data;
         }
 

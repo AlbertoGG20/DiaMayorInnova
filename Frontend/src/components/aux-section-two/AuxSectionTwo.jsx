@@ -24,8 +24,6 @@ const AuxSectionTwo = ({ statements, examStarted, onSelectStatement, isTaskActiv
     setSelectedStatement(statement);
     onSelectStatement(statement);
   };
-console.log("EXAM_STARTED", examStarted)
-console.log("STATEMENTES", statements)
   return (
     <div className='aux-section_two__container'>
       <h2 className='help_secction_tittle'>Enunciados</h2>

@@ -17,18 +17,14 @@ const StatementsSelection = ({
   const { statements, solutions, editMode, handleEditSolutions, currentPage, totalPages, setCurrentPage  } = useStatements();
 
   const viewSolutions = (statementId) => {
-    console.log("ID del enunciado:", statementId);
     if (solutions[statementId]) {
-      console.log("Soluciones ya cargadas:", solutions[statementId]);
       setCurrentSolutions(solutions[statementId]);
       setSelectedStatementId(statementId);
       setIsModalOpen(true);
     } else {
-      console.log("Soluciones no cargadas. Realizando solicitud...");
       setLoading(true);
       statementService.getSolutions(statementId)
         .then(response => {
-          console.log("Soluciones cargadas:", response.data);
           setCurrentSolutions(response.data);
           setSelectedStatementId(statementId);
           setIsModalOpen(true);
