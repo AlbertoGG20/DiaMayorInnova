@@ -119,15 +119,24 @@ class AccountingPlansController < ApplicationController
     end
   end
 
+  
   def import_xlsx
-    authorize! :import_xlsx, AccountingPlan # Manually authorize
+    authorize! :import_xlsx, AccountingPlan
     if params[:file].blank?
       return render json: { error: "No se proporcionó ningún archivo" }, status: :bad_request
     end
-
+  
     file = params[:file]
     xlsx = Roo::Spreadsheet.open(file.path)
-
+  
+    # Validate headers in the first sheet
+    expected_headers = ['Nombre', 'Acronimo', 'Descripcion']
+    actual_headers = xlsx.sheet(0).row(1).map(&:to_s).map(&:strip)
+    missing_headers = expected_headers - actual_headers
+    unless missing_headers.empty?
+      return render json: { error: "Faltan columnas requeridas en la primera hoja: #{missing_headers.join(', ')}" }, status: :unprocessable_entity
+    end
+  
     ActiveRecord::Base.transaction do
       pgc_data = nil
       xlsx.sheet(0).each(name: 'Nombre', acronym: 'Acronimo', description: 'Descripcion') do |row|
@@ -139,14 +148,22 @@ class AccountingPlansController < ApplicationController
         }
         break
       end
-
+  
       unless pgc_data
         raise "No se encontraron datos válidos para el PGC en la primera hoja"
       end
-
+  
       accounting_plan = AccountingPlan.create!(pgc_data)
-
+  
       if xlsx.sheets.length > 1
+        # Validate headers in the second sheet
+        expected_account_headers = ['NombreC', 'NumeroC', 'DescripcionC']
+        actual_account_headers = xlsx.sheet(1).row(1).map(&:to_s).map(&:strip)
+        missing_account_headers = expected_account_headers - actual_account_headers
+        unless missing_account_headers.empty?
+          raise "Faltan columnas requeridas en la segunda hoja: #{missing_account_headers.join(', ')}"
+        end
+  
         xlsx.sheet(1).each(name: 'NombreC', account_number: 'NumeroC', description: 'DescripcionC') do |row|
           next if row[:name] == 'NombreC'
           Account.create!(
@@ -158,12 +175,11 @@ class AccountingPlansController < ApplicationController
         end
       end
     end
-
+  
     render json: { message: "Importación exitosa" }, status: :ok
   rescue StandardError => e
     render json: { error: "Error durante la importación: #{e.message}" }, status: :unprocessable_entity
   end
-
   def import_csv
     authorize! :import_csv, AccountingPlan # Manually authorize
     if params[:file].present?
