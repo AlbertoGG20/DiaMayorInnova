@@ -8,8 +8,9 @@ const getAuthHeaders = () => {
 
 const getAll = async (page = 1, perPage = 10, name = "") => {
     try {
-        const response = await http.get("/accounting_plans", {// "Backend/config/routes.rb"
-            params: {page, per_page: perPage, name}
+        const response = await http.get("/accounting_plans", {
+            params: { page, per_page: perPage, name },
+            headers: getAuthHeaders()
         });
         return response.data;
     } catch (error) {
@@ -18,7 +19,6 @@ const getAll = async (page = 1, perPage = 10, name = "") => {
     }
 };
 
-// ✅ Récupérer un seul PGC
 const get = async (id) => {
     try {
         const response = await http.get(`/accounting_plans/${id}`, {
@@ -31,7 +31,6 @@ const get = async (id) => {
     }
 };
 
-// ✅ Créer un PGC
 const create = async (data) => {
     try {
         const response = await http.post("/accounting_plans", data, {
@@ -44,7 +43,6 @@ const create = async (data) => {
     }
 };
 
-// ✅ Mettre à jour un PGC
 const update = async (id, data) => {
     try {
         const response = await http.put(`/accounting_plans/${id}`, data, {
@@ -57,7 +55,6 @@ const update = async (id, data) => {
     }
 };
 
-// ✅ Supprimer un PGC
 const remove = async (id) => {
     try {
         const response = await http.delete(`/accounting_plans/${id}`, {
@@ -70,7 +67,6 @@ const remove = async (id) => {
     }
 };
 
-// ✅ Supprimer tous les PGCs
 const removeAll = async () => {
     try {
         const response = await http.delete("/accounting_plans", {
@@ -83,39 +79,59 @@ const removeAll = async () => {
     }
 };
 
-// ✅ Chercher un PGC par son nom
 const findByName = async (name) => {
     try {
-        const response = await http.get(`/accounting_plans?name=${name}`, {
+        const response = await http.get(`/accounting_plans`, {
+            params: { name },
             headers: getAuthHeaders()
         });
-        return response;
+        return response.data;
     } catch (error) {
-        console.error("Error en la búsqueda por módulo:", error);
+        console.error("Error en la búsqueda por nombre:", error);
         return null;
     }
 };
 
-// ✅ Récupérer les comptes d'un PGC (avec Auth)
 const getAccountsByPGC = (id) => {
     return http.get(`/accounting_plans/${id}/accounts_by_PGC`, {
         headers: getAuthHeaders()
     });
 };
 
-// ✅ Télécharger le fichier XLSX des comptes d’un PGC (avec Auth)
-const exportXLSXByPGC = (id) => {
-    return http.get(`/accounting_plans/${id}/export_xlsx_by_pgc`, {
-        headers: getAuthHeaders(),
-        responseType: "blob" // 🔥 Indique qu'on attend un fichier
-    });
+const exportXLSXByPGC = async (id) => {
+    try {
+        const response = await http.get(`/accounting_plans/${id}/export_xlsx_by_pgc`, {
+            headers: {
+                ...getAuthHeaders(),
+                "Accept": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            },
+            responseType: "blob"
+        });
+
+        const contentType = response.headers["content-type"];
+        if (!contentType || !contentType.includes("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")) {
+            console.error("El archivo no es un XLSX");
+            return;
+        }
+
+        const blob = new Blob([response.data], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", `pgc_${id}.xlsx`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (error) {
+        console.error("Error exportando XLSX:", error);
+    }
 };
 
 const importXLSX = async (formData) => {
     try {
         const response = await http.post("/accounting_plans/import_xlsx", formData, {
             headers: {
-                "Content-Type": "multipart/form-data", // En-tête correct pour les fichiers
+                "Content-Type": "multipart/form-data",
                 Authorization: `Bearer ${localStorage.getItem("jwt_token")}`,
             },
         });
@@ -133,27 +149,22 @@ const importXLSX = async (formData) => {
     }
 };
 
-// ✅ Service exporté avec les nouvelles méthodes sécurisées
-
-
-  
 const exportToCSV = async (id) => {
     try {
         const response = await http.get(`/accounting_plans/${id}/export_csv`, {
             headers: {
-                "Accept": "text/csv" // csv response
+                ...getAuthHeaders(),
+                "Accept": "text/csv"
             },
-            responseType: "blob", // as file
+            responseType: "blob",
         });
 
-        // Verify csv
         const contentType = response.headers["content-type"];
         if (!contentType || !contentType.includes("text/csv")) {
             console.error("El archivo no es un csv");
             return;
         }
 
-        // Create url and download file
         const blob = new Blob([response.data], { type: "text/csv" });
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement("a");
@@ -173,20 +184,20 @@ const importCSV = async (file) => {
         formData.append("file", file);
 
         const response = await http.post("/accounting_plans/import_csv", formData, {
-            headers: { "Content-Type": "multipart/form-data" },
+            headers: {
+                "Content-Type": "multipart/form-data",
+                ...getAuthHeaders()
+            },
         });
 
         if (response.data.success) {
             return response.data;
         }
-
     } catch (error) {
         console.error("Error importando CSV:", error.response?.data || error.message);
         return null;
     }
 };
-
-
 
 const AccountingPlanService = {
     getAll,
@@ -197,8 +208,8 @@ const AccountingPlanService = {
     removeAll,
     findByName,
     getAccountsByPGC,
-    importXLSX, 
-    exportXLSXByPGC, 
+    importXLSX,
+    exportXLSXByPGC,
     exportToCSV,
     importCSV
 };
