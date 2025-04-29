@@ -25,7 +25,6 @@ const AccountingPlan = ({ id, onSaveSuccess, onCloseModal}) => {
           setError(""); 
         })
         .catch(e => {
-          console.log(e);
           setError("Error al cargar el plan contable.");
         });
     }

@@ -2,7 +2,6 @@ import http from "../http-common";
 
 const getAll = async () => {
   const response = await http.get(`/student_exercises`);
-  // console.log("all exercise info of user ", response) // Depuración
   return response;
 };
 
@@ -26,7 +25,6 @@ const getByExerciseId = async (id) => {
 };
 
 const create = async (data) => {
-  console.log(data)
   try {
     const response = await http.post("/exercises", data);
     return response;
@@ -39,7 +37,6 @@ const create = async (data) => {
 
 const deleteOnGroup = async (data) => {
   try {
-    console.log(data)
     const response = await http.delete(`/exercises/destroy_on_group`, { data });
     return response;
   } catch (error) {

@@ -3,12 +3,9 @@ import http from "../http-common";
 
 const getAll = (id) => {
   try {
-    console.log("servicio de mark", id)
     const marks = http.get(`/marks?exercise_id=${id}`)
-    console.log("marks getall", marks)
     return marks;
   } catch (error) {
-    console.log("Error en la petición getAll: ", error);
     return null;
   }
 };
@@ -35,11 +32,7 @@ const update = async (id, data) => {
 
 const manual_update_mark = async (marks) => {
   try {
-    // Verifica que la URL es correcta y los datos son los esperados
-    console.log("Enviando datos:", marks);
-
     const response = await http.put("/marks/update_multiple", { marks: marks });
-    // Devuelve la respuesta
     return response.data;
   } catch (error) {
     console.error("Error en la actualización:", error);

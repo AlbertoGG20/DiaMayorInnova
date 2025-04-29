@@ -33,7 +33,7 @@ const Entry = ({ number, updateEntryDate, annotations, updateAnnotation, deleteA
 
   return (
     <div className='entry_wrapper'>
-      <div className="entry_head" tabIndex={0} onKeyDown={changeStatus}>
+      <div className="entry_head">
         <div className="head_tittle" onClick={() => setEntryStatus(!entryStatus)} >
           <p>Asiento {number}</p>
           <i className={entryStatus ? 'fi fi-rr-angle-small-up' : 'fi fi-rr-angle-small-down'}></i>
@@ -46,6 +46,7 @@ const Entry = ({ number, updateEntryDate, annotations, updateAnnotation, deleteA
             value={entryDate} 
             onChange={handleChangeDate}
             disabled={exercise?.finished || false}
+            onClick={(e) => e.stopPropagation()}
           />
           <p className='entry_total'>Total: <span>{formattedTotal}</span></p>
         </div>
@@ -53,7 +54,10 @@ const Entry = ({ number, updateEntryDate, annotations, updateAnnotation, deleteA
         <button 
           className='btn-trash' 
           aria-label='Eliminar asiento' 
-          onClick={() => deleteEntry(entryIndex)}
+          onClick={(e) => {
+            e.stopPropagation();
+            deleteEntry(entryIndex);
+          }}
           disabled={exercise?.finished || false}
         >
           <i className='fi fi-rr-trash'></i>

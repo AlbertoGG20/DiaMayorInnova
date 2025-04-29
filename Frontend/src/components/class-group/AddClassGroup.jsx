@@ -76,7 +76,6 @@ const AddClassGroup = () => {
           setSubmitted(true);
         })
         .catch(e => {
-          console.log(e);
           setError("Hubo un problema al guardar el grupo de clase.");
         });
     }

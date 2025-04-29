@@ -50,11 +50,9 @@ const AddHelpExample = ({}) => {
           account_id: parseInt(response.data.account_id),
           description: response.data.description.trim(),
         });
-        console.log("no llega",response.data);
         setSubmitted(true);
       })
       .catch(e => {
-        console.log(e);
         setError("Problema al crear");
       });
     }
@@ -70,7 +68,6 @@ const AddHelpExample = ({}) => {
     AccountService.getAll()
       .then(({data}) => {
         setAccounts(data);
-        console.log(data);
       })
   },[])
 

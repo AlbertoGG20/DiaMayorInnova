@@ -2,12 +2,10 @@ import http from "../http-common";
 
 const getAll = (id) => {
   const response = http.get(`/student_entries?mark_id=${id}`);
-  console.log("entries get id", response)
   return response;
 };
 
 const create = async (data) => {
-  console.log(data)
   try {
     const response = await http.post("/student_entries", { student_entry: data });
     return response;

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react'
 import AuxSectionTwo from '../aux-section-two/AuxSectionTwo.jsx'
 import HelpSection from '../help-section/HelpSection'
 import RealTimeTrialBalance from '../trial-balance/RealTimeTrialBalance'
+import LedgerBook from '../trial-balance/LedgerBook'
 import "./AuxSection.css"
 import "../../components/entries-section/EntriesSection.css"
 import "../../pages/modes/practice-page/PracticePage.css"
@@ -26,8 +27,10 @@ export const AuxSection = ({ statements, examStarted, onSelectStatement, helpAva
         return <HelpSection />;
       case "balance":
         return <RealTimeTrialBalance entries={entries} />;
+      case "mayor":
+        return <LedgerBook entries={entries} />;
       default:
-        return <div>Pestaña Diario Mayor</div>;
+        return null;
     }
   }, [auxSection, statements, examStarted, onSelectStatement, entries, isExam]);
 

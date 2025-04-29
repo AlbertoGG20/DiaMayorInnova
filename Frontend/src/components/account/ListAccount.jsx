@@ -58,20 +58,8 @@ const AccountsList = ({ newAcc }) => {
   const handleSearchChange = (e) => {
     const searchTerm = e.target.value.toLowerCase();
     setSearchAccount(searchTerm);
-  
-    if (!searchTerm) {
-      retrieveAccounts(); // Si le champ est vide, récupérer tous les comptes
-      return;
-    }
-  
-    // Filtrage dynamique des comptes
-    setAccounts((prevAccounts) =>
-      prevAccounts.filter((acc) => {
-        acc.name.toLowerCase().includes(searchTerm);
-        setCurrentPage(1);
-      })
-    );
-  };
+    setCurrentPage(1);
+  };  
   
 
   //Accounts sorted by Name column

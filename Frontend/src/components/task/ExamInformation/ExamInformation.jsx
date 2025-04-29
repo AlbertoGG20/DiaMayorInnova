@@ -6,6 +6,7 @@ import "../../aux-section-two/AuxSectionTwo.css"
 import exerciseServices from "../../../services/exerciseServices";
 import marksServices from "../../../services/marksServices";
 import RealTimeTrialBalance from "../../trial-balance/RealTimeTrialBalance";
+import LedgerBook from "../../trial-balance/LedgerBook";
 
 const ExamInformation = () => {
   const navigate = useNavigate();
@@ -163,7 +164,14 @@ const ExamInformation = () => {
       case "mayor":
         return (
           <div className="exam_statement__list">
-            <p>Diario Mayor (en desarrollo)</p>
+            <LedgerBook 
+              entries={statements.flatMap(statement => 
+                statement.student_entries?.map(entry => ({
+                  ...entry,
+                  annotations: entry.student_annotations
+                })) || []
+              )} 
+            />
           </div>
         );
       case "balance":
@@ -233,7 +241,14 @@ const ExamInformation = () => {
           )}
           {activeTab === "mayor" && (
             <div className="exam_statement__list">
-              <p>Diario Mayor (en desarrollo)</p>
+              <LedgerBook 
+                entries={statements.flatMap(statement => 
+                  statement.student_entries?.map(entry => ({
+                    ...entry,
+                    annotations: entry.student_annotations
+                  })) || []
+                )} 
+              />
             </div>
           )}
 

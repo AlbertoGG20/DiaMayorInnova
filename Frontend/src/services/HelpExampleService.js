@@ -15,7 +15,6 @@ const get = async (id) => {
     const response = await http.get(`/help_examples/${id}`);
     return response;
   } catch (error) {
-    console.log("Error en la petición get", error);
     return null;
   }
 }

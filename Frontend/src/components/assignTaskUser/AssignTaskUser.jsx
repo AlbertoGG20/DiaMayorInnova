@@ -39,7 +39,6 @@ const AssignTaskUser = ({ assignedInclude, setCurrentUsers, currentUsers }) => {
 
     userService.getUserByClassId(currentClass)
       .then(({ data }) => {
-        console.log("all users ", data.data.data.users)
         setUsers(data.data.data.users);
       });
 

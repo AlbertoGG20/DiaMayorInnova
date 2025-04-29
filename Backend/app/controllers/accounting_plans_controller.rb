@@ -3,17 +3,18 @@ class AccountingPlansController < ApplicationController
     load_and_authorize_resource
     
     def index
-        accountingPlans = AccountingPlan.all
-        accountingPlans = accountingPlans.where("name LIKE ?", "%#{params[:name]}%")
-
-        paginated_pgc = accountingPlans.page(params[:page]).per(params[:per_page] || 10)
+        if params[:name].present?
+            accountingPlans = AccountingPlan.where("LOWER(name) LIKE ?", "%#{params[:name].downcase}%")
+        else
+            accountingPlans = AccountingPlan.all.page(params[:page]).per(params[:per_page] || 10)
+        end
 
         render json: {
-            accountingPlans: paginated_pgc,
+            accountingPlans: accountingPlans,
             meta: {
-                current_page: paginated_pgc.current_page,
-                total_pages: paginated_pgc.total_pages,
-                total_count: paginated_pgc.total_count
+                current_page: accountingPlans.try(:current_page) || 1,
+                total_pages: accountingPlans.try(:total_pages) || 1,
+                total_count: accountingPlans.size
             }
         }
     end

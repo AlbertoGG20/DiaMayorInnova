@@ -71,7 +71,6 @@ const ClassGroup = () => {
           setMessage("El grupo de clase fue actualizado correctamente.");
         })
         .catch(e => {
-          console.log(e);
           setError("Hubo un problema al actualizar el grupo de clase.");
         });
     }

@@ -4,10 +4,14 @@ class AccountsController < ApplicationController
 
   def index
     accounts = Account.all
-    accounts = accounts.where("name LIKE ?", "%#{params[:name]}%") if params[:name].present?
-    
+  
+    if params[:name].present?
+      name = params[:name].to_s.downcase
+      accounts = accounts.where("LOWER(name) LIKE ?", "%#{name}%")
+    end
+  
     paginated_accounts = accounts.page(params[:page]).per(params[:per_page] || 10)
-
+  
     render json: {
       accounts: paginated_accounts,
       meta: {

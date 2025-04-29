@@ -53,7 +53,6 @@ const AddAccount = ({ setNewAcc }) => {
           description: response.data.description.trim(),
           accounting_plan_id: parseInt(response.data.accounting_plan_id),
         })
-        console.log("nuevvooooooo", response.data);
         setNewAcc(true);
       })
         .catch(e => {

@@ -1,10 +1,10 @@
 import http from "../http-common";
 
 // Obtiene todos los enunciados
-const getAllStatements = async (page = 1, perPage = 10) => {
+const getAllStatements = async (page = 1, perPage = 10, search = "") => {
   try {
     const response = await http.get("/statements", {
-      params: { page, per_page: perPage},
+      params: { page, per_page: perPage, search},
     });
     return response;
   } catch (error) {

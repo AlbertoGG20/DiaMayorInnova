@@ -14,7 +14,6 @@ const EditSolutionModal = ({ solution, solutionIndex, solutions, setSolutions, o
     setSolutions((prevSolutions) => {
       const updatedSolutions = [...prevSolutions];
       updatedSolutions[solutionIndex] = editedSolution;
-      console.log('BBBB', updatedSolutions);
       return updatedSolutions;
     });
     onClose();
