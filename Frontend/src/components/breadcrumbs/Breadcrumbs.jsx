@@ -1,11 +1,9 @@
-import { NavLink, useLocation } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import useBreadcrumbs from "use-react-router-breadcrumbs";
 import "./Breadcrumbs.css"
 
 const Breadcrumbs = () => {
   const breadcrumbs = useBreadcrumbs();
-  const { pathname } = useLocation()
-  console.log(pathname)
 
   return (
     <>

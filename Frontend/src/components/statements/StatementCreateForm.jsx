@@ -145,12 +145,17 @@ const StatementCreateForm = () => {
           onEditSolution={handleEditSolution}
           onDeleteSolution={handleDeleteSolution}
           solutionToDeleteIndex={solutionToDeleteIndex}
-          solution={solutions[selectedSolutionIndex]}
-          solutionIndex={selectedSolutionIndex}
-          setSolutions={setPrevSolutions}
-          onClose={handleCloseModal}
-          onSave={handleSaveSolution}
         />
+        {isModalOpen && selectedSolutionIndex !== null && (
+          <EditSolutionModal
+            solution={solutions[selectedSolutionIndex]}
+            solutionIndex={selectedSolutionIndex}
+            solutions={solutions}
+            setSolutions={setPrevSolutions}
+            onClose={handleCloseModal}
+            onSave={handleSaveSolution}
+          />
+        )}
       </aside>
 
       <section className="statement-page__selection">

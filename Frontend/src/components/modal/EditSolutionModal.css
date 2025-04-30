@@ -11,14 +11,14 @@
   font: inherit;
 }
 
-/* .modal-content {
+.modal-content {
   background: var(--Color-Neutral-White);
   padding: var(--gap-m);
   border-radius: var(--r-xxs);
   max-width: 1200px;
   max-height: 80vh;
   overflow-y: auto;
-} */
+}
 
 .entry-item {
   margin-bottom: 20px;

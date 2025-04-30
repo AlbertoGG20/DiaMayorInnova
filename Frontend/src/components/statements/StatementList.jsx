@@ -16,25 +16,23 @@ const StatementsList = ({ onSelectStatement }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [statementToDelete, setStatementToDelete] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1); //Pagination
+  const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const itemsPerPage = 10;
-  const [localPage, setLocalPage] = useState(1);
-  const [allStatements, setAllStatements] = useState([]);
 
   useEffect(() => {
     const fetchStatements = async () => {
       try {
         setLoading(true);
-        const response = await statementService.getAllStatements(currentPage, 10, searchTerm);
+        const response = await statementService.getAllStatements(currentPage, itemsPerPage, searchTerm);
 
         if (Array.isArray(response.data.statements)) {
           const filteredStatements = response.data.statements.filter(
             (statement) => statement.is_public || statement.user_id === user?.id
           );
           setStatements(filteredStatements);
-          setTotalPages(response.data.meta.total_pages || 1)
+          setTotalPages(response.data.meta.total_pages || 1);
         } else {
           console.error("Error: La respuesta no es un arreglo válido.");
         }
@@ -103,7 +101,6 @@ const StatementsList = ({ onSelectStatement }) => {
 
   const handleStatementSelection = (statementId) => {
     const statement = statements.find(s => s.id === statementId);
-    console.log("Enunciado seleccionado:", statement);
     setSelectedStatement(statement);
     onSelectStatement(statement);
   };
@@ -127,8 +124,7 @@ const StatementsList = ({ onSelectStatement }) => {
   };
 
   const handleSearchChange = (e) => {
-    const searchTerm = e.target.value.toLowerCase();
-    setSearchTerm(searchTerm);
+    setSearchTerm(e.target.value);
     setCurrentPage(1);
   };
 
@@ -141,12 +137,12 @@ const StatementsList = ({ onSelectStatement }) => {
 
       <SearchBar
         value={searchTerm}
-        handleSearchChange={setSearchTerm}
+        handleSearchChange={handleSearchChange}
       />
 
       <Table
         titles={["Definición", "Acciones"]}
-        data={paginatedStatements.map(statement => ({
+        data={statements.map(statement => ({
           ...statement,
           current_user_id: user.id
         }))}
@@ -160,9 +156,9 @@ const StatementsList = ({ onSelectStatement }) => {
       />
 
       <PaginationMenu
-        currentPage={localPage}
-        setCurrentPage={setLocalPage}
-        totalPages={totalLocalPages}
+        currentPage={currentPage}
+        setCurrentPage={changePage}
+        totalPages={totalPages}
       />
 
       <ConfirmDeleteModal
