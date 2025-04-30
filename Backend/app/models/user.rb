@@ -8,7 +8,7 @@ class User < ApplicationRecord
   has_many :exercises, dependent: :destroy
   has_many :teacher_class_groups, dependent: :destroy
   has_many :class_groups, through: :teacher_class_groups
-  has_many :student_class_groups
+  has_many :student_class_groups, dependent: :destroy
   has_many :class_groups, through: :student_class_groups
   belongs_to :school_center, optional: true
 

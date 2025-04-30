@@ -13,6 +13,8 @@ class Ability
         can :manage, User, school_center_id: user.school_center.id
         can :manage, ClassGroup, school_center_id: user.school_center.id
         can :read, SchoolCenter, id: user.school_center.id
+        can :manage, AccountingPlan
+        can :manage, Account
       end
     elsif user.teacher?
       can :manage, Exercise
