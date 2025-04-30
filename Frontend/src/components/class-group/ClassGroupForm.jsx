@@ -10,8 +10,8 @@ const ClassGroupForm = ({ formData, handleInputChange, handleSubmit, errors, suc
     if (user.role === "admin") {
       SchoolsServices.getAll()
         .then((response) => {
-          if (response && response.data) {
-            setSchoolCenters(response.data);
+          if (response && response.schools) {
+            setSchoolCenters(response.schools);
           }
         })
         .catch((error) =>

@@ -12,13 +12,18 @@ const StudentAside = () => {
   const navigate = useNavigate();
   const modalRef = useRef(null);
   const { user } = useAuth();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 4; // Set value
+  const [onlyActive, setOnlyActive] = useState(true);
+
 
   const handleClick = (exerciseId) => {
     const selectedExercise = exercises.find((ex) => ex.id === exerciseId);
 
     if (!selectedExercise?.task) return;
 
-    const route = selectedExercise.task.is_exam 
+    const route = selectedExercise.task.is_exam
       ? `/modes/examen/${exerciseId}`
       : `/modes/tarea/${exerciseId}`;
 
@@ -27,24 +32,31 @@ const StudentAside = () => {
 
   useEffect(() => {
     if (!user?.id) return;
+
     const fetchExercises = async () => {
       try {
-        const response = await exerciseService.getAll();
-        if (response?.data) {
-          setExercises(response.data);
+        setLoading(true);
+        const response = await exerciseService.getAll(currentPage, itemsPerPage, onlyActive);
+
+        if (response?.data.exercises) {
+          setExercises(response.data.exercises);
+          setTotalPages(response.data.meta?.total_pages || 1);
         } else {
           setExercises([]);
+          setTotalPages(1);
         }
       } catch (error) {
         console.error("Error obteniendo los ejercicios:", error);
         setExercises([]);
+        setTotalPages(1);
       } finally {
         setLoading(false);
       }
     };
 
     fetchExercises();
-  }, [user?.id]);
+  }, [user?.id, currentPage, onlyActive]);
+
 
   return (
     <section className={exercises.length > 0 ? "student__aside " : "student__aside asidelSection__img"}>
@@ -54,30 +66,49 @@ const StudentAside = () => {
       {loading ? (
         <p>Cargando...</p>
       ) : exercises.length > 0 ? (
-        <ul className='student-aside__list-items'>
-          {exercises.map((exercise) => (
-            <li key={exercise.id} className='student-aside__list-item' onClick={() => handleClick(exercise.id)} style={{ cursor: "pointer" }}>
-              <div className="student-aside__list-info">
-                <div className="student-aside__info-header">
-                  <p><strong>Tarea:</strong> {exercise.task.title || "Sin título"}</p>
-                  <div className={`student-aside__square ${exercise.task.is_exam ? 'exam' : 'task'}`}>
-                    <i className="fi fi-rr-book-alt"></i>
+        <>
+          <ul className='student-aside__list-items'>
+            {exercises.map((exercise) => (
+              <li key={exercise.id} className='student-aside__list-item' onClick={() => handleClick(exercise.id)} style={{ cursor: "pointer" }}>
+                <div className="student-aside__list-info">
+                  <div className="student-aside__info-header">
+                    <p><strong>Tarea:</strong> {exercise.task.title || "Sin título"}</p>
+                    <div className={`student-aside__square ${exercise.task.is_exam ? 'exam' : 'task'}`}>
+                      <i className="fi fi-rr-book-alt"></i>
+                    </div>
+                  </div>
+                  <div className="student-aside__list-info--body">
+                    <div className="student-aside__date">
+                      <i className="fi fi-rr-calendar"></i>
+                      <p><strong>Apertura:</strong> {new Date(exercise.task.opening_date).toLocaleString('es-ES', { hour: '2-digit', minute: '2-digit', year: 'numeric', month: '2-digit', day: '2-digit', })}</p>
+                    </div>
+                    <div className="student-aside__date">
+                      <i className="fi fi-rr-calendar"></i>
+                      <p><strong>Cierre:</strong> {new Date(exercise.task.closing_date).toLocaleString('es-ES', { hour: '2-digit', minute: '2-digit', year: 'numeric', month: '2-digit', day: '2-digit', })}</p>
+                    </div>
                   </div>
                 </div>
-                <div className="student-aside__list-info--body">
-                  <div className="student-aside__date">
-                    <i className="fi fi-rr-calendar"></i>
-                    <p><strong>Apertura:</strong> {new Date(exercise.task.opening_date).toLocaleString('es-ES', { hour: '2-digit', minute: '2-digit', year: 'numeric', month: '2-digit', day: '2-digit', })}</p>
-                  </div>
-                  <div className="student-aside__date">
-                    <i className="fi fi-rr-calendar"></i>
-                    <p><strong>Cierre:</strong> {new Date(exercise.task.closing_date).toLocaleString('es-ES', { hour: '2-digit', minute: '2-digit', year: 'numeric', month: '2-digit', day: '2-digit', })}</p>
-                  </div>
-                </div>
-              </div>
-            </li>
-          ))}
-        </ul>
+              </li>
+            ))}
+          </ul>
+
+          {/* Paginacion */}
+          <div className="student-aside__pagination">
+              <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage(1)}>
+                <i className='fi fi-rr-angle-double-small-left' />
+              </button>
+              <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)}>
+                <i className='fi fi-rr-angle-small-left' />
+              </button>
+              <span>Página {currentPage} de {totalPages}</span>
+              <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage((prev) => prev + 1)}>
+                <i className='fi fi-rr-angle-small-right' />
+              </button>
+              <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage(totalPages)}>
+                <i className='fi fi-rr-angle-double-small-right' />
+              </button>
+            </div>
+        </>
       ) : (
         <p>No tienes tareas asignadas.</p>
       )}

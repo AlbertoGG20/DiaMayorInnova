@@ -1,7 +1,13 @@
 import http from "../http-common";
 
-const getAll = async () => {
-  const response = await http.get(`/student_exercises`);
+const getAll = async (page = 1, per_page = 5, only_active = true) => {
+  const response = await http.get(`/student_exercises`, {
+    params: {
+      page,
+      per_page,
+      only_active
+    }
+  });
   return response;
 };
 
@@ -107,8 +113,9 @@ const remove = async (id) => {
   }
 };
 
-const getAllCalification = async () => {
-  const response = await http.get(`/student_exercises/find_mark_exercise_by_user`);
+const getAllCalification = async (params) => {
+  const response = await http.get('/student_exercises/find_mark_exercise_by_user', { params });
+  // console.log("all exercise info of user - gelAllCalification ", response) // Depuración
   return response;
 };
 

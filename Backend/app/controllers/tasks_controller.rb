@@ -9,6 +9,11 @@ class TasksController < ApplicationController
     tasks = current_user.admin? ? Task.ordered_by_closing_date : Task.where(created_by: current_user.id).ordered_by_closing_date
     tasks = tasks.where("title ILIKE ?", "%#{params[:title]}%") if params[:title].present?
   
+    # Filter active tasks
+    if params[:only_active].present? && params[:only_active] == "true"
+      tasks = tasks.where("closing_date >= ?", Time.zone.now)
+    end
+  
     paginated_tasks = tasks.page(params[:page]).per(params[:per_page] || 10)
   
     render json: {
@@ -19,7 +24,8 @@ class TasksController < ApplicationController
         total_count: paginated_tasks.total_count
       }
     }
-  end  
+  end
+  
 
   # def index
   #   if current_user.student?

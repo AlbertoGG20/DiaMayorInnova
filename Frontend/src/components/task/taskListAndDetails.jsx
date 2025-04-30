@@ -29,25 +29,23 @@ const TaskListAndDetails = () => {
     if (location.state?.createTask || location.state?.newTask) {
       setIsCreatingTask(true);
     }
-  
+
     const fetchTasks = async () => {
       setLoading(true);
       try {
-        const response = await taskService.getAllTasks(currentPage, 10, searchTerm || "");
-    
+        const response = await taskService.getAllTasks(currentPage, 4, searchTerm || "", true); //Set value for items per page
+
         if (!response) {
           throw new Error("No se recibió ninguna respuesta del servidor.");
         }
-    
+
         if (!response.tasks) {
           throw new Error("La respuesta no tiene la estructura esperada.");
         }
-    
-        // Filtrar tareas del usuario actual
-        const filteredTasks = response.tasks.filter((task) => task.created_by === user.id);
-    
-        setTasks(filteredTasks);
+
+        setTasks(response.tasks);
         setTotalPages(response.meta?.total_pages || 1);
+
       } catch (err) {
         setError(err.message);
         console.error("Error fetching tasks:", err);
@@ -55,8 +53,8 @@ const TaskListAndDetails = () => {
         setLoading(false);
       }
     };
-    
-  
+
+
     if (user?.id) {
       fetchTasks();
     } else {
@@ -64,7 +62,7 @@ const TaskListAndDetails = () => {
       setTasks([]);
     }
   }, [user, location.state, currentPage, searchTerm]);
-  
+
 
   // useEffect(() => {
   //   if (location.state?.createTask) {
@@ -166,24 +164,24 @@ const TaskListAndDetails = () => {
 
   const handleDuplicatedTask = async (event, originalTask) => {
     event.stopPropagation();
-  
+
     try {
       const response = await taskService.getTaskWithStatements(originalTask.id);
       const fullTask = response.data;
-  
+
       const duplicatedTaskData = {
         ...fullTask,
         title: `${fullTask.title} - copia`,
         id: undefined, // remove id
       };
-  
+
       navigate("/tasks", { state: { newTask: duplicatedTaskData } });
     } catch (error) {
       console.error("Error al duplicar la tarea:", error);
     }
   };
-  
-  
+
+
 
   if (!user) return <p>Cargando usuario...</p>;
   if (loading) return <p>Cargando tareas... Por favor espera.</p>;
@@ -224,7 +222,7 @@ const TaskListAndDetails = () => {
                       </div>
                       <div className="task-list__square">
                         <button className="task-list__duplicate" onClick={(event) => handleDuplicatedTask(event, task)}>
-                          <i className="fi fi-rr-copy"/>
+                          <i className="fi fi-rr-copy" />
                         </button>
                       </div>
                     </div>
@@ -245,17 +243,17 @@ const TaskListAndDetails = () => {
 
             <div className="task-list__pagination">
               <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage(1)}>
-                <i className='fi fi-rr-angle-double-small-left'/>
+                <i className='fi fi-rr-angle-double-small-left' />
               </button>
               <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)}>
-                <i className='fi fi-rr-angle-small-left'/>
+                <i className='fi fi-rr-angle-small-left' />
               </button>
               <span>Página {currentPage} de {totalPages}</span>
               <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage((prev) => prev + 1)}>
-                <i className='fi fi-rr-angle-small-right'/>
+                <i className='fi fi-rr-angle-small-right' />
               </button>
               <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage(totalPages)}>
-                <i className='fi fi-rr-angle-double-small-right'/>
+                <i className='fi fi-rr-angle-double-small-right' />
               </button>
             </div>
           </section>

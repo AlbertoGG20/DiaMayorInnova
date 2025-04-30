@@ -1,11 +1,16 @@
 import http from "../http-common";
 
-const getAllTasks = async (page = 1, perPage = 10, title = "") => {
+const getAllTasks = async (page = 1, perPage = 10, title = "", onlyActive = false) => {
   try {
     const response = await http.get('/tasks', {
-      params: {page, per_page: perPage, title}
+      params: {
+        page,
+        per_page: perPage,
+        title,
+        only_active: onlyActive
+      }
     });
-    return response.data
+    return response.data;
   } catch (error) {
     console.error("Error en la petición getAll: ", error);
     return null;

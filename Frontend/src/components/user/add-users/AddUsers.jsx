@@ -243,12 +243,20 @@ const AddUsers = ({ setUsers, selectedUser, setSelectedUser }) => {
               className="user_item"
               value={input.role}
               onChange={handleInput}
-
             >
-              <option value="admin">Admin</option>
-              <option value="center_admin">Center_Admin</option>
-              <option value="teacher">Teacher</option>
-              <option value="student">Student</option>
+              {auth?.user?.role === "admin" ? (
+                <>
+                  <option value="admin">Admin</option>
+                  <option value="center_admin">Center_Admin</option>
+                  <option value="teacher">Teacher</option>
+                  <option value="student">Student</option>
+                </>
+              ) : (
+                <>
+                  <option value="teacher">Teacher</option>
+                  <option value="student">Student</option>
+                </>
+              )}
             </select>
           </label>
 

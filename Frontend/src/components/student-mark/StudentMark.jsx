@@ -7,16 +7,29 @@ import { Tooltip } from 'react-tooltip';
 const StudentMark = () => {
 
   const [marks, setMarks] = useState([]);
-  const [includeMark, setIncludeMark] = useState(false)
+  const [includeMark, setIncludeMark] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 5; // Set value
 
   useEffect(() => {
-    userExerciseDataService.getAllCalification()
-      .then(({ data }) => {
-        setMarks(data)
-        if (data.length !== 0)
-          setIncludeMark(true)
-      })
-  }, [])
+    const fetchMarks = async () => {
+      try {
+        const { data } = await userExerciseDataService.getAllCalification({
+          page: currentPage,
+          per_page: itemsPerPage
+        });
+
+        setMarks(data.exercises || []);
+        setIncludeMark((data.exercises || []).length !== 0);
+        setTotalPages(data.meta.total_pages || 1);
+      } catch (error) {
+        console.error('Error fetching marks', error);
+      }
+    };
+
+    fetchMarks();
+  }, [currentPage]);
 
   return (
     <section className={includeMark ? "mark__section " : "mark__section principalSection__img"}>
@@ -100,6 +113,23 @@ const StudentMark = () => {
 
           ))
         }
+      </div>
+
+      {/* Paginacion */}
+      <div className="marks__pagination">
+        <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage(1)}>
+          <i className='fi fi-rr-angle-double-small-left' />
+        </button>
+        <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)}>
+          <i className='fi fi-rr-angle-small-left' />
+        </button>
+        <span>Página {currentPage} de {totalPages}</span>
+        <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage((prev) => prev + 1)}>
+          <i className='fi fi-rr-angle-small-right' />
+        </button>
+        <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage(totalPages)}>
+          <i className='fi fi-rr-angle-double-small-right' />
+        </button>
       </div>
 
     </section>
