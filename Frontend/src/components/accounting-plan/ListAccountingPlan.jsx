@@ -8,6 +8,7 @@ import Modal from "../modal/Modal";
 import { SearchBar } from "../search-bar/SearchBar";
 import Table from "../table/Table";
 import PaginationMenu from "../pagination-menu/PaginationMenu";
+import ConfirmDeleteModal from "../modal/ConfirmDeleteModal";
 
 
 const AccountingPlansList = ({ newPGC }) => {
@@ -23,6 +24,8 @@ const AccountingPlansList = ({ newPGC }) => {
   const [currentPage, setCurrentPage] = useState(1); //Pagination
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [accountingPlanToDelete, setAccountingPlanToDelete] = useState(null);
 
 
   useEffect(() => {
@@ -115,6 +118,11 @@ const AccountingPlansList = ({ newPGC }) => {
     AccountingPlanDataService.exportToCSV(id);
   };
 
+  const openDeleteModal = (accountingPlanId) => {
+    const accountingPlan = accountingPlans.find(s => s.id === accountingPlanId);
+    setAccountingPlanToDelete(accountingPlan);
+    setIsDeleteModalOpen(true);
+  };
 
 
   const fetchAccountsByPGC = (pgcId) => {
@@ -155,7 +163,7 @@ const AccountingPlansList = ({ newPGC }) => {
               show={fetchAccountsByPGC}
               openModal={openEditModal}
               exportCSV={handleExportToCSV}
-              deleteItem={deleteAccountingPlan}
+              deleteItem={openDeleteModal}
               columnConfig={[
                 { field: 'name', sortable: true },
                 { field: 'acronym', sortable: true },
@@ -207,6 +215,14 @@ const AccountingPlansList = ({ newPGC }) => {
           />
         )}
       </Modal>
+
+      <ConfirmDeleteModal
+        isOpen={isDeleteModalOpen}
+        title="¿Estás seguro de que deseas eliminar este enunciado?"
+        message={`El enunciado "${accountingPlanToDelete?.name}" será eliminado permanentemente.`}
+        onDelete={() => deleteAccountingPlan(accountingPlanToDelete?.id)}
+        onClose={() => setIsDeleteModalOpen(false)}
+      />
     </>
   );
 };

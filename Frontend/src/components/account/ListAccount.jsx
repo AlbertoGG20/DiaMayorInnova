@@ -7,6 +7,7 @@ import Modal from '../modal/Modal';
 import { SearchBar } from '../search-bar/SearchBar';
 import Table from '../table/Table';
 import PaginationMenu from '../pagination-menu/PaginationMenu';
+import ConfirmDeleteModal from '../modal/ConfirmDeleteModal';
 
 const AccountsList = ({ newAcc }) => {
   const [accounts, setAccounts] = useState([]);
@@ -19,6 +20,8 @@ const AccountsList = ({ newAcc }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [accountToDelete, setAccountToDelete] = useState(null);
 
   useEffect(() => {
     retrieveAccounts(currentPage, searchAccount);
@@ -88,6 +91,12 @@ const AccountsList = ({ newAcc }) => {
     retrieveAccounts();
   };
 
+  const openDeleteModal = (accountId) => {
+    const account = accounts.find(s => s.id === accountId);
+    setAccountToDelete(account);
+    setIsDeleteModalOpen(true);
+  };
+
   return (
     <>
 
@@ -110,7 +119,7 @@ const AccountsList = ({ newAcc }) => {
                 data={accounts}
                 actions={true}
                 openModal={openEditModal}
-                deleteItem={deleteAccount}
+                deleteItem={openDeleteModal}
                 columnConfig={[
                   { field: 'account_number', sortable: true },
                   { field: 'name', sortable: true },
@@ -138,6 +147,14 @@ const AccountsList = ({ newAcc }) => {
           />
         )}
       </Modal>
+
+      <ConfirmDeleteModal
+        isOpen={isDeleteModalOpen}
+        title="¿Estás seguro de que deseas eliminar este enunciado?"
+        message={`La cuenta llamada "${accountToDelete?.name}" será eliminado permanentemente.`}
+        onDelete={() => deleteAccount(accountToDelete?.id)}
+        onClose={() => setIsDeleteModalOpen(false)}
+      />
     </>
   );
 };

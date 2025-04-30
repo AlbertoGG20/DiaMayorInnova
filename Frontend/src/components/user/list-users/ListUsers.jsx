@@ -45,7 +45,8 @@ const ListUsers = ({ setSelectedUser }) => {
       .catch(e => console.log(e));
   };
 
-  const handleDeleteClick = (user) => {
+  const handleDeleteClick = (userId) => {
+    const user = users.find(s => s.id === userId);
     setUserToDelete(user);
     setIsModalOpen(true);
   };
@@ -61,6 +62,11 @@ const ListUsers = ({ setSelectedUser }) => {
     : users;
 
   const totalLocalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+
+  const selectedUserById = (userId) => {
+    const user = users.find(s => s.id === userId);
+    setSelectedUser(user)
+  }
 
   useEffect(() => {
     setLocalPage(1);
@@ -84,8 +90,8 @@ const ListUsers = ({ setSelectedUser }) => {
           titles={["Nombre", "Correo", "Role", "Acciones"]}
           data={paginatedUsers}
           actions={true}
-          openModal={true}
-          deleteItem={deleteUser}
+          openModal={selectedUserById}
+          deleteItem={handleDeleteClick}
           columnConfig={[
             { field: "name", sortable: true },
             { field: "email", sortable: true },

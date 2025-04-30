@@ -9,6 +9,7 @@ const SchoolCenters = () => {
   const [selectedSchool, setSelectedSchool] = useState(null);
   const [searchSchoolName, setSeachSchoolName] = useState("");
   const [error, setError] = useState("");
+  const [handleEdit, setHandleEdit] = useState(false);
 
   useEffect(() => {
     SchoolServices.getAll()
@@ -38,11 +39,13 @@ const SchoolCenters = () => {
         setSelectedSchool={setSelectedSchool}
         searchSchoolName={searchSchoolName}
         setSeachSchoolName={setSeachSchoolName}
+        isEdited={handleEdit}
       />
       <AddSchoolCenter
         setSchools={setSchools}
         selectedSchool={selectedSchool}
         setSelectedSchool={setSelectedSchool}
+        setHandleEdit={setHandleEdit}
       />
     </main>
   );

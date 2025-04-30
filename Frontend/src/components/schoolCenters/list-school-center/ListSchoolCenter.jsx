@@ -7,7 +7,7 @@ import FindNameSchoolCenter from '../find-name-school-center/FindNameSchoolCente
 import { SearchBar } from '../../search-bar/SearchBar';
 import PaginationMenu from '../../pagination-menu/PaginationMenu';
 
-const ListSchoolCenter = ({ schools, setSchools, setSelectedSchool, searchSchoolName, setSeachSchoolName }) => {
+const ListSchoolCenter = ({ schools, setSchools, setSelectedSchool, searchSchoolName, setSeachSchoolName, isEdited }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [schoolToDelete, setSchoolToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1); //Pagination
