@@ -39,7 +39,7 @@
 .accountingPlan__addPGC {
   grid-area: form;
   padding-bottom: 24px;
-  height: 340px;
+  height: 485px;
   border-bottom: solid 1px var(--Color-grey-200);
 }
 

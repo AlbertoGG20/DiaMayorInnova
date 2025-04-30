@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import AccountingPlanDataService from "../../services/AccountingPlanService"
+import AccountingPlanDataService from "../../services/AccountingPlanService";
 import { useNavigate } from "react-router-dom";
 import "./AccountingPlan.css";
 import "../modal/AccountModal.css";
@@ -11,17 +11,18 @@ const AccountingPlansList = ({ newPGC }) => {
   const [accountingPlans, setAccountingPlans] = useState([]);
   const [selectedAccountingPlanId, setSelectedAccountingPlanId] = useState(null); // ID del plan a editar
   const modalRef = useRef(null); // Referencia para la modal
-  const accountsModalRef = useRef(null)
+  const accountsModalRef = useRef(null);
   const navigate = useNavigate();
   const [currentAccountingPlan, setCurrentAccountingPlan] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(-1);
   const [searchAccPlan, setSearchAccPlan] = useState("");
-  const [sortOrder, setSortOrder] = useState("ascending") //Sort control state
+  const [sortOrder, setSortOrder] = useState("ascending"); //Sort control state
   const [accounts, setAccounts] = useState([]); // Stocker les comptes récupérés
   const [isModalOpen, setIsModalOpen] = useState(false); // Gérer l'affichage de la modale
   const [currentPage, setCurrentPage] = useState(1); //Pagination
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [showExportDropdown, setShowExportDropdown] = useState(null);
 
 
   useEffect(() => {
@@ -88,7 +89,7 @@ const AccountingPlansList = ({ newPGC }) => {
     const newOrder = sortOrder === "ascending" ? "descending" : "ascending";
     setSortOrder(newOrder);
     sortAccountinPlans(newOrder);
-  }
+  };
 
   const openEditModal = (id) => {
     setSelectedAccountingPlanId(id);
@@ -119,8 +120,21 @@ const AccountingPlansList = ({ newPGC }) => {
         accountsModalRef.current?.showModal(); 
       })
       .catch(error => {
-        console.error("Erreur lors de la récupération des comptes :", error);
+        console.error("Error devolviendo las cuentas.", error);
       });
+  };
+
+  const toggleExportDropdown = (id) => {
+    setShowExportDropdown(showExportDropdown === id ? null : id);
+  };
+
+  const handleExport = (id, format) => {
+    if (format === "csv") {
+      AccountingPlanDataService.exportToCSV(id);
+    } else if (format === "xlsx") {
+      AccountingPlanDataService.exportXLSXByPGC(id);
+    }
+    setShowExportDropdown(null);
   };
 
   return (
@@ -187,9 +201,17 @@ const AccountingPlansList = ({ newPGC }) => {
                       <button className="accountingPlan__button--link pencil" onClick={() => openEditModal(accountingPlan.id)}>
                         <i className="fi-rr-pencil" />
                       </button>
-                      <button className="accountingPlan__button--link download" onClick={() => handleExportToCSV(accountingPlan.id)}>
-                        <i className="fi-rr-download" /> CSV
-                      </button>
+                      <div className="export-dropdown-wrapper">
+                        <button className="accountingPlan__button--link download" onClick={() => toggleExportDropdown(accountingPlan.id)}>
+                          <i className="fi-rr-download" /> Exportar
+                        </button>
+                        {showExportDropdown === accountingPlan.id && (
+                          <div className="export-dropdown">
+                            <button onClick={() => handleExport(accountingPlan.id, "csv")}>CSV</button>
+                            <button onClick={() => handleExport(accountingPlan.id, "xlsx")}>XLSX</button>
+                          </div>
+                        )}
+                      </div>
                       <button aria-label="Eliminar PGC" className="accountingPlan__button--remove trash"
                         onClick={(e) => {
                           e.stopPropagation();

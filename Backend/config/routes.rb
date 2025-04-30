@@ -3,9 +3,12 @@ Rails.application.routes.draw do
   resources :accounting_plans do
     member do
       get 'export_csv'
+      get 'accounts_by_PGC'
+      get 'export_xlsx_by_pgc'
     end
     collection do
       post 'import_csv'
+      post 'import_xlsx'
     end
   end
   
@@ -25,9 +28,6 @@ Rails.application.routes.draw do
     get 'find_by_account_id', on: :collection
   end
   
-resources :accounting_plans do
-  get 'accounts_by_PGC', on: :member
-end
   
   resources :teacher_class_groups
   resources :annotations

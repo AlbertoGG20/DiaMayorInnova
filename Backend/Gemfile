@@ -76,4 +76,9 @@ group :development, :test do
   # SimpleCov is a code coverage analysis tool for Ruby.
   gem 'simplecov', require: false
 
+  gem "axlsx_rails", "~> 0.5.2"
+
+  gem "caxlsx", "~> 4.2"
+
+  gem 'roo'
 end
