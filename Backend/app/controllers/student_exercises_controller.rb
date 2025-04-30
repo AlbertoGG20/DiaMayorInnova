@@ -2,10 +2,13 @@ class StudentExercisesController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    return render json: { error: "No autorizado" }, status: :unauthorized unless current_user.student?
+    return render json: { error: "No autorizado" }, status: :unauthorized unless current_user.student? || current_user.teacher?
   
     exercises = Exercise.includes(:task, marks: { student_entries: :student_annotations })
-                        .where(user_id: current_user.id)
+  
+    if current_user.student?
+      exercises = exercises.where(user_id: current_user.id)
+    end
   
     if params[:only_active].present? && params[:only_active] == "true"
       now = Time.zone.now

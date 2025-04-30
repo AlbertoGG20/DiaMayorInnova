@@ -23,6 +23,7 @@ const TaskListAndDetails = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [currentPage, setCurrentPage] = useState(1); //Pagination
   const [totalPages, setTotalPages] = useState(1);
+  const [showActiveTasks, setShowActiveTasks] = useState(true);
 
 
   useEffect(() => {
@@ -33,7 +34,7 @@ const TaskListAndDetails = () => {
     const fetchTasks = async () => {
       setLoading(true);
       try {
-        const response = await taskService.getAllTasks(currentPage, 4, searchTerm || "", true); //Set value for items per page
+        const response = await taskService.getAllTasks(currentPage, 5, searchTerm || "", showActiveTasks);
 
         if (!response) {
           throw new Error("No se recibió ninguna respuesta del servidor.");
@@ -61,39 +62,7 @@ const TaskListAndDetails = () => {
       setLoading(false);
       setTasks([]);
     }
-  }, [user, location.state, currentPage, searchTerm]);
-
-
-  // useEffect(() => {
-  //   if (location.state?.createTask) {
-  //     setIsCreatingTask(true);
-  //   }
-  //   const fetchTasks = async () => {
-  //     setLoading(true);
-  //     try {
-  //       //console.log("Solicitando tareas al servicio...");
-  //       const response = await taskService.getAllTasks();
-  //       //console.log("Tareas recibidas:", response.data);
-  //       const filteredTasks = response.data.filter((task) => task.created_by === user.id);
-  //       setTasks(filteredTasks);
-  //     } catch (err) {
-  //       setError("Error al cargar las tareas.");
-  //       console.error("Error fetching tasks:", err);
-  //     } finally {
-  //       //console.log("Finalizando la carga de tareas.");
-  //       setLoading(false);
-  //     }
-  //   };
-  //   //console.log("Usuario actual:", user);
-  //   if (user?.id) {
-  //     //console.log("Cargando tareas para el usuario:", user.id);
-  //     fetchTasks();
-  //   } else {
-  //     //console.log("Usuario no autenticado o ID faltante.");
-  //     setLoading(false);
-  //     setTasks([]);
-  //   }
-  // }, [user, location.state]);
+  }, [user, location.state, currentPage, searchTerm, showActiveTasks]);
 
   const fetchTaskDetails = async (taskId) => {
     setLoading(true);
@@ -181,7 +150,10 @@ const TaskListAndDetails = () => {
     }
   };
 
-
+  const handleFilterChange = (isActive) => {
+    setShowActiveTasks(isActive);
+    setCurrentPage(1); // Resetear a la primera página
+  };
 
   if (!user) return <p>Cargando usuario...</p>;
   if (loading) return <p>Cargando tareas... Por favor espera.</p>;
@@ -196,18 +168,38 @@ const TaskListAndDetails = () => {
           <section className="task-list">
             <header>
               <div className="task-list__header">
-                <h2 className="task-list__title">Tareas Activas</h2>
-              </div>
-              <div className="task-list__search-container">
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                  placeholder="Buscar por Título"
-                  className="task-list__search-input"
-                  aria-label="Búsqueda por Título"
-                />
-                <i className="fi fi-rr-search task-list__search-icon"></i>
+                <div className="task-list__title-container">
+                  <h2 className="task-list__title">
+                    {showActiveTasks ? "Tareas Activas" : "Tareas Cerradas"}
+                  </h2>
+                  <div className="task-list__filter">
+                    <button 
+                      className={`task-list__filter-button ${showActiveTasks ? 'active' : ''}`}
+                      onClick={() => handleFilterChange(true)}
+                    >
+                      <i className="fi fi-rr-clock"></i>
+                      Activas
+                    </button>
+                    <button 
+                      className={`task-list__filter-button ${!showActiveTasks ? 'active' : ''}`}
+                      onClick={() => handleFilterChange(false)}
+                    >
+                      <i className="fi fi-rr-check"></i>
+                      Cerradas
+                    </button>
+                  </div>
+                </div>
+                <div className="task-list__search-container">
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                    placeholder="Buscar por Título"
+                    className="task-list__search-input"
+                    aria-label="Búsqueda por Título"
+                  />
+                  <i className="fi fi-rr-search task-list__search-icon"></i>
+                </div>
               </div>
             </header>
 
