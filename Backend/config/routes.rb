@@ -48,6 +48,7 @@ end
     end
     collection do
       get 'students_mark_list'
+      get 'export_to_xlsx'  # Route pour l'exportation
       get 'find_mark_exercise_by_user'
     end
   end
