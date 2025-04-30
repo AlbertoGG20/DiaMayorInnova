@@ -1,13 +1,13 @@
 import http from "../http-common";
 
-const getAllTasks = async (page = 1, perPage = 10, title = "", onlyActive = false) => {
+const getAllTasks = async (page = 1, perPage = 10, title = "", onlyActive = true) => {
   try {
     const response = await http.get('/tasks', {
       params: {
         page,
         per_page: perPage,
         title,
-        only_active: onlyActive
+        only_active: onlyActive.toString()
       }
     });
     return response.data;

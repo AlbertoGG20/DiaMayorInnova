@@ -9,9 +9,14 @@ class TasksController < ApplicationController
     tasks = current_user.admin? ? Task.ordered_by_closing_date : Task.where(created_by: current_user.id).ordered_by_closing_date
     tasks = tasks.where("title ILIKE ?", "%#{params[:title]}%") if params[:title].present?
   
-    # Filter active tasks
-    if params[:only_active].present? && params[:only_active] == "true"
-      tasks = tasks.where("closing_date >= ?", Time.zone.now)
+    # Filter tasks based on active status
+    if params[:only_active].present?
+      now = Time.zone.now
+      if params[:only_active] == "true"
+        tasks = tasks.where("closing_date >= ?", now)
+      else
+        tasks = tasks.where("closing_date < ?", now)
+      end
     end
   
     paginated_tasks = tasks.page(params[:page]).per(params[:per_page] || 10)
