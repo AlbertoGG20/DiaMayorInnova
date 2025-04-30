@@ -142,7 +142,91 @@ class AccountingPlansController < ApplicationController
         else
             render json: @accountingPlan.errors, status: :bad_request
         end
-      end  
+      end 
+
+
+    # xlsx files methods
+    require 'caxlsx'
+    require 'roo'
+
+    def export_xlsx_by_pgc
+        accounting_plan = AccountingPlan.find_by(id: params[:id])
+        if accounting_plan
+          accounts = Account.where(accounting_plan_id: accounting_plan.id)
+          p = Axlsx::Package.new
+          wb = p.workbook
+    
+          wb.add_worksheet(name: "Cuentas de #{accounting_plan.name}") do |sheet|
+            sheet.add_row ["Número de cuenta", "Nombre de cuenta", "Descripción"]
+            accounts.each do |account|
+              sheet.add_row [account.account_number, account.name, account.description]
+            end
+          end
+    
+          send_data p.to_stream.read,
+                    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    disposition: "attachment",
+                    filename: "Cuentas_#{accounting_plan.acronym}.xlsx"
+        else
+          render json: { error: "PGC no encontrado" }, status: :not_found
+        end
+    end
+
+    def import_xlsx
+        authorize! :import_xlsx, AccountingPlan
+        if params[:file].blank?
+          return render json: { error: "No se proporcionó ningún archivo" }, status: :bad_request
+        end
+
+        file = params[:file]
+        xlsx = Roo::Spreadsheet.open(file.path)
+
+        # Validate headers in the first sheet
+        expected_headers = ['Nombre', 'Acronimo', 'Descripcion']
+        actual_headers = xlsx.sheet(0).row(1).map(&:to_s).map(&:strip)
+        missing_headers = expected_headers - actual_headers
+        unless missing_headers.empty?
+        return render json: { error: "Faltan columnas requeridas en la primera hoja: #{missing_headers.join(', ')}" }, status: :unprocessable_entity
+        end
+
+        ActiveRecord::Base.transaction do
+        pgc_data = nil
+        xlsx.sheet(0).each(name: 'Nombre', acronym: 'Acronimo', description: 'Descripcion') do |row|
+            next if row[:name] == 'Nombre'
+            pgc_data = {
+            name: row[:name],
+            acronym: row[:acronym],
+            description: row[:description]
+            }
+            break
+        end
+
+        unless pgc_data
+            raise "No se encontraron datos válidos para el PGC en la primera hoja"
+        end
+
+        accounting_plan = AccountingPlan.create!(pgc_data)
+
+        if xlsx.sheets.length > 1
+            # Validate headers in the second sheet
+            expected_account_headers = ['NombreC', 'NumeroC', 'DescripcionC']
+            actual_account_headers = xlsx.sheet(1).row(1).map(&:to_s).map(&:strip)
+            missing_account_headers = expected_account_headers - actual_account_headers
+            unless missing_account_headers.empty?
+            raise "Faltan columnas requeridas en la segunda hoja: #{missing_account_headers.join(', ')}"
+        end
+
+        xlsx.sheet(1).each(name: 'NombreC', account_number: 'NumeroC', description: 'DescripcionC') do |row|
+            next if row[:name] == 'NombreC'
+            Account.create!(
+              name: row[:name],
+              account_number: row[:account_number],
+              description: row[:description],
+              accounting_plan_id: accounting_plan.id
+            )
+          end
+        end
+    end
 
 
     # Filter accounts by Accounting Plan

@@ -322,3 +322,26 @@ th {
     font-size: var(--text-mobile-small);
   }
 }
+
+.accountingPlan__form--import {
+  margin-top: 20px;
+  padding: 10px;
+  border-top: 1px solid #ccc;
+}
+
+.accountingPlan__form--import h3 {
+  margin-bottom: 10px;
+}
+
+.accountingPlan__form--import input[type="file"] {
+  margin-bottom: 10px;
+}
+
+.accountingPlan__form--import button {
+  margin-top: 10px;
+}
+
+.accountingPlan__message {
+  margin-top: 10px;
+  color: green;
+}

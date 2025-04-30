@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import AccountingPlanDataService from "../../services/AccountingPlanService"
+import AccountingPlanDataService from "../../services/AccountingPlanService";
 import { useNavigate } from "react-router-dom";
 import "./AccountingPlan.css";
 import "../modal/AccountModal.css";
@@ -15,10 +15,10 @@ const AccountingPlansList = ({ newPGC }) => {
   const [accountingPlans, setAccountingPlans] = useState([]);
   const [selectedAccountingPlanId, setSelectedAccountingPlanId] = useState(null); // ID del plan a editar
   const modalRef = useRef(null); // Referencia para la modal
-  const accountsModalRef = useRef(null)
+  const accountsModalRef = useRef(null);
   const navigate = useNavigate();
   const [searchAccPlan, setSearchAccPlan] = useState("");
-  const [sortOrder, setSortOrder] = useState("ascending") //Sort control state
+  const [sortOrder, setSortOrder] = useState("ascending"); //Sort control state
   const [accounts, setAccounts] = useState([]); // Stocker les comptes récupérés
   const [isModalOpen, setIsModalOpen] = useState(false); // Gérer l'affichage de la modale
   const [currentPage, setCurrentPage] = useState(1); //Pagination
@@ -26,6 +26,7 @@ const AccountingPlansList = ({ newPGC }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [accountingPlanToDelete, setAccountingPlanToDelete] = useState(null);
+  const [showExportDropdown, setShowExportDropdown] = useState(null);
 
 
   useEffect(() => {
@@ -97,7 +98,7 @@ const AccountingPlansList = ({ newPGC }) => {
     const newOrder = sortOrder === "ascending" ? "descending" : "ascending";
     setSortOrder(newOrder);
     sortAccountinPlans(newOrder);
-  }
+  };
 
   const openEditModal = (id) => {
     setSelectedAccountingPlanId(id);
@@ -118,6 +119,10 @@ const AccountingPlansList = ({ newPGC }) => {
     AccountingPlanDataService.exportToCSV(id);
   };
 
+  const handleExportToXLSX = (id) => {
+    AccountingPlanDataService.exportXLSXByPGC(id);
+  };
+
   const openDeleteModal = (accountingPlanId) => {
     const accountingPlan = accountingPlans.find(s => s.id === accountingPlanId);
     setAccountingPlanToDelete(accountingPlan);
@@ -133,9 +138,22 @@ const AccountingPlansList = ({ newPGC }) => {
         accountsModalRef.current?.showModal();
       })
       .catch(error => {
-        console.error("Erreur lors de la récupération des comptes :", error);
+        console.error("Error devolviendo las cuentas.", error);
       });
   };
+
+  const toggleExportDropdown = (id) => {
+    setShowExportDropdown(showExportDropdown === id ? null : id);
+  };
+
+  // const handleExport = (id, format) => {
+  //   if (format === "csv") {
+  //     AccountingPlanDataService.exportToCSV(id);
+  //   } else if (format === "xlsx") {
+  //     AccountingPlanDataService.exportXLSXByPGC(id);
+  //   }
+  //   setShowExportDropdown(null);
+  // };
 
   return (
     <>
@@ -163,7 +181,9 @@ const AccountingPlansList = ({ newPGC }) => {
               show={fetchAccountsByPGC}
               openModal={openEditModal}
               exportCSV={handleExportToCSV}
+              exportXLSX={handleExportToXLSX}
               deleteItem={openDeleteModal}
+              showExportDropdown={showExportDropdown}
               columnConfig={[
                 { field: 'name', sortable: true },
                 { field: 'acronym', sortable: true },

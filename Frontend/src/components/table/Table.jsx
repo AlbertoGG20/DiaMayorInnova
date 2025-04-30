@@ -10,13 +10,15 @@ const Table = ({
   show,
   openModal,
   exportCSV,
+  exportXLSX,
   deleteItem,
   columnConfig,
   showCheckboxes,
   selectedItems,
   onItemSelection,
   onToggleVisibility,
-  customActions
+  customActions,
+  showExportDropdown
 }) => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const [sortedData, setSortedData] = useState(data);
@@ -122,9 +124,12 @@ const Table = ({
                     <button className="btn__icon " onClick={() => openModal(row.id)}>
                       <i className="fi-rr-pencil" />
                     </button>}
-                  {exportCSV && <button className="btn__icon download" onClick={() => exportCSV(row.id)}>
-                    <i className="fi-rr-download" /> CSV
-                  </button>}
+                  {exportCSV && showExportDropdown === row.id && (
+                    <div className="export-dropdown">
+                      <button onClick={() => exportCSV(row.id, "csv")}>CSV</button>
+                      <button onClick={() => exportXLSX(row.id, "xlsx")}>XLSX</button>
+                    </div>
+                  )}
                   {deleteItem && <button aria-label="Eliminar" className="btn__icon "
                     onClick={(e) => {
                       e.stopPropagation();

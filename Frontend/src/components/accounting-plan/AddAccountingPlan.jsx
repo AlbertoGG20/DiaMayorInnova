@@ -8,7 +8,7 @@ const AddAccountingPlan = ({ setNewPGC }) => {
     id: null,
     name: "",
     description: "",
-    acronym: ""
+    acronym: "",
   };
   const [accountingPlan, setAccountingPlan] = useState(initialAccountingPlanState);
   const [submitted, setSubmitted] = useState(false);
@@ -17,7 +17,7 @@ const AddAccountingPlan = ({ setNewPGC }) => {
   const [fileName, setFileName] = useState("Nada seleccionado");
 
 
-  const handleInputChange = event => {
+  const handleInputChange = (event) => {
     const { name, value } = event.target;
     setAccountingPlan({ ...accountingPlan, [name]: value });
   };
@@ -36,7 +36,7 @@ const AddAccountingPlan = ({ setNewPGC }) => {
       let data = {
         name: accountingPlan.name.trim(),
         description: accountingPlan.description.trim(),
-        acronym: accountingPlan.acronym.trim()
+        acronym: accountingPlan.acronym.trim(),
       };
 
       AccountingPlanDataService.create(data)
@@ -45,8 +45,9 @@ const AddAccountingPlan = ({ setNewPGC }) => {
             id: parseInt(response.data.id),
             name: response.data.name.trim(),
             description: response.data.description.trim(),
-            acronym: response.data.acronym.trim()
+            acronym: response.data.acronym.trim(),
           });
+          setSubmitted(true)
           setNewPGC(true);
         })
         .catch(e => {
@@ -60,39 +61,67 @@ const AddAccountingPlan = ({ setNewPGC }) => {
     setAccountingPlan(initialAccountingPlanState);
     setSubmitted(false);
     setError("");
+    setUploadMessage("");
+    setSelectedFile(null);
   };
 
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
-    if (file && file.name.endsWith(".csv")) {
+    if (file && (file.name.endsWith(".csv") || file.name.endsWith(".xlsx"))) {
       setSelectedFile(file);
       setError("");
       setFileName(file.name);
     } else {
-      setError("El archivo debe ser un .csv válido");
+      setError("El archivo no tiene el formato adecuado");
       setSelectedFile(null);
       setFileName("Nada seleccionado");
     }
   };
 
-  const handleUpload = async () => {
+  const handleFileUpload= async () => {
     if (!selectedFile) {
-      setError("Debes seleccionar un archivo CSV.");
+      setError("Debes seleccionar un archivo.");
       return;
     }
-
+  
+    const fileName = selectedFile.name.toLowerCase();
+  
+    // Resetear mensajes previos
     setError("");
-
-    const result = await AccountingPlanDataService.importCSV(selectedFile);
-    if (result) {
-      setNewPGC(true);
+    setUploadMessage("Subiendo archivo...");
+  
+    try {
+      if (fileName.endsWith(".csv")) {
+        const result = await AccountingPlanDataService.importCSV(selectedFile);
+        if (!result) {
+          setError("Hubo un problema al importar el CSV.");
+          return;
+        }
+      } else if (fileName.endsWith(".xlsx")) {
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+        await AccountingPlanDataService.importXLSX(formData);
+      } else {
+        setError("Formato de archivo no soportado. Solo se permiten .csv o .xlsx.");
+        return;
+      }
+  
+      setUploadMessage("¡Importación exitosa!");
       setSelectedFile(null);
-    } else {
-      setError("Hubo un problema al importar el CSV.");
+      setNewPGC(true);
+    } catch (error) {
+      console.error("Error al importar archivo:", error);
+      if (error.response) {
+        setUploadMessage(`Error al importar el archivo: ${error.response.data.message || "Error desconocido"}`);
+      } else if (error.request) {
+        setUploadMessage("Error de conexión. No se pudo enviar el archivo.");
+      } else {
+        setUploadMessage(`Error inesperado: ${error.message}`);
+      }
     }
   };
-
+  
 
   return (
     <>
@@ -161,19 +190,19 @@ const AddAccountingPlan = ({ setNewPGC }) => {
                 <div className="accountingPlan__form--upload">
                   <button
                     className="btn "
-                    onClick={handleUpload}
+                    onClick={handleFileUpload}
                     disabled={!selectedFile}
                   > Cargar archivo </button>
                   <label htmlFor="fileUpload" className="accountingPlan__file--label btn light">
                     <input
                       type="file"
-                      accept=".csv"
+                      accept=".csv,.xlsx"
                       id="fileUpload"
                       onChange={handleFileChange}
                       className="accountingPlan__file--input"
                     />
                     <i className="fi-rr-upload" />
-                    <p>CSV</p>
+                    <p>Importar</p>
                     <span id="file-name" className="accountingPlan__file--name">
                       {fileName}
                     </span>
