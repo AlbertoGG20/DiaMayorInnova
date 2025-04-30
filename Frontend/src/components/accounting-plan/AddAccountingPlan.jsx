@@ -14,9 +14,7 @@ const AddAccountingPlan = ({ setNewPGC }) => {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
-  const [fileName, setFileName] = useState("Nada seleccionado");
   const [uploadMessage, setUploadMessage] = useState("");
-
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -72,7 +70,7 @@ const AddAccountingPlan = ({ setNewPGC }) => {
     if (file && (file.name.endsWith(".csv") || file.name.endsWith(".xlsx"))) {
       setSelectedFile(file);
       setError("");
-      setFileName(file.name);
+      setUploadMessage("");
     } else {
       setError("El archivo no tiene el formato adecuado");
       setSelectedFile(null);
@@ -202,10 +200,13 @@ const AddAccountingPlan = ({ setNewPGC }) => {
                   <button className="btn " onClick={saveAccountingPlan}> <i className="fi-rr-plus" />Añadir plan</button>
                 </div>
 
+                {error && <div className="accountingPlan__error">{error}</div>}
+
+                {/* Sección de Importación de archivo */}
                 <div className="accountingPlan__form--upload">
-                  <button
-                    className="btn "
-                    onClick={handleFileUpload}
+                  <button 
+                    className="btn accountingPlan__button" 
+                    onClick={handleFileUpload} 
                     disabled={!selectedFile}
                   > Cargar archivo </button>
                   <label htmlFor="fileUpload" className="accountingPlan__file--label btn light">
