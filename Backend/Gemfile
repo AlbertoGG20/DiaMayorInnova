@@ -78,7 +78,7 @@ group :development, :test do
 
   gem "axlsx_rails", "~> 0.5.2"
 
-  gem "caxlsx", "~> 4.2"
+  gem "caxlsx", "~> 4.1"
 
   gem 'roo'
 end

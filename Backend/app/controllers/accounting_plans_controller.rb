@@ -3,21 +3,25 @@ class AccountingPlansController < ApplicationController
     load_and_authorize_resource
     
     def index
+        accountingPlans = AccountingPlan.all
+      
         if params[:name].present?
-            accountingPlans = AccountingPlan.where("LOWER(name) LIKE ?", "%#{params[:name].downcase}%")
-        else
-            accountingPlans = AccountingPlan.all.page(params[:page]).per(params[:per_page] || 10)
+          accountingPlans = accountingPlans.where("LOWER(name) LIKE ?", "%#{params[:name].downcase}%")
         end
-
+      
+        accountingPlans = accountingPlans.page(params[:page]).per(params[:per_page] || 10)
+      
         render json: {
-            accountingPlans: accountingPlans,
-            meta: {
-                current_page: accountingPlans.try(:current_page) || 1,
-                total_pages: accountingPlans.try(:total_pages) || 1,
-                total_count: accountingPlans.size
-            }
+          accountingPlans: ActiveModelSerializers::SerializableResource.new(accountingPlans, each_serializer: AccountingPlanSerializer),
+          meta: {
+            current_page: accountingPlans.current_page,
+            total_pages: accountingPlans.total_pages,
+            total_count: accountingPlans.total_count
+          }
         }
     end
+      
+      
 
     def show
         @accountingPlan = AccountingPlan.find(params[:id])
@@ -142,7 +146,7 @@ class AccountingPlansController < ApplicationController
         else
             render json: @accountingPlan.errors, status: :bad_request
         end
-      end 
+    end 
 
 
     # xlsx files methods
@@ -177,56 +181,56 @@ class AccountingPlansController < ApplicationController
         if params[:file].blank?
           return render json: { error: "No se proporcionó ningún archivo" }, status: :bad_request
         end
-
+      
         file = params[:file]
         xlsx = Roo::Spreadsheet.open(file.path)
-
-        # Validate headers in the first sheet
+      
         expected_headers = ['Nombre', 'Acronimo', 'Descripcion']
         actual_headers = xlsx.sheet(0).row(1).map(&:to_s).map(&:strip)
         missing_headers = expected_headers - actual_headers
         unless missing_headers.empty?
-        return render json: { error: "Faltan columnas requeridas en la primera hoja: #{missing_headers.join(', ')}" }, status: :unprocessable_entity
+          return render json: { error: "Faltan columnas requeridas en la primera hoja: #{missing_headers.join(', ')}" }, status: :unprocessable_entity
         end
-
+      
         ActiveRecord::Base.transaction do
-        pgc_data = nil
-        xlsx.sheet(0).each(name: 'Nombre', acronym: 'Acronimo', description: 'Descripcion') do |row|
+          pgc_data = nil
+          xlsx.sheet(0).each(name: 'Nombre', acronym: 'Acronimo', description: 'Descripcion') do |row|
             next if row[:name] == 'Nombre'
             pgc_data = {
-            name: row[:name],
-            acronym: row[:acronym],
-            description: row[:description]
+              name: row[:name],
+              acronym: row[:acronym],
+              description: row[:description]
             }
             break
-        end
-
-        unless pgc_data
+          end
+      
+          unless pgc_data
             raise "No se encontraron datos válidos para el PGC en la primera hoja"
-        end
-
-        accounting_plan = AccountingPlan.create!(pgc_data)
-
-        if xlsx.sheets.length > 1
-            # Validate headers in the second sheet
+          end
+      
+          accounting_plan = AccountingPlan.create!(pgc_data)
+      
+          if xlsx.sheets.length > 1
             expected_account_headers = ['NombreC', 'NumeroC', 'DescripcionC']
             actual_account_headers = xlsx.sheet(1).row(1).map(&:to_s).map(&:strip)
             missing_account_headers = expected_account_headers - actual_account_headers
             unless missing_account_headers.empty?
-            raise "Faltan columnas requeridas en la segunda hoja: #{missing_account_headers.join(', ')}"
-        end
-
-        xlsx.sheet(1).each(name: 'NombreC', account_number: 'NumeroC', description: 'DescripcionC') do |row|
-            next if row[:name] == 'NombreC'
-            Account.create!(
-              name: row[:name],
-              account_number: row[:account_number],
-              description: row[:description],
-              accounting_plan_id: accounting_plan.id
-            )
+              raise "Faltan columnas requeridas en la segunda hoja: #{missing_account_headers.join(', ')}"
+            end
+      
+            xlsx.sheet(1).each(name: 'NombreC', account_number: 'NumeroC', description: 'DescripcionC') do |row|
+              next if row[:name] == 'NombreC'
+              Account.create!(
+                name: row[:name],
+                account_number: row[:account_number],
+                description: row[:description],
+                accounting_plan_id: accounting_plan.id
+              )
+            end
           end
         end
     end
+      
 
 
     # Filter accounts by Accounting Plan
