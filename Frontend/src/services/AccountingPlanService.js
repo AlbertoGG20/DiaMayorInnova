@@ -1,9 +1,16 @@
 import http from "../http-common";
 
+// ✅ Ajout automatique du token dans toutes les requêtes protégées
+const getAuthHeaders = () => {
+    const token = localStorage.getItem("jwt_token");
+    return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
 const getAll = async (page = 1, perPage = 10, name = "") => {
     try {
         const response = await http.get("/accounting_plans", {// "Backend/config/routes.rb"
-            params: {page, per_page: perPage, name}
+            params: {page, per_page: perPage, name},
+            headers: getAuthHeaders()
         });
         return response.data;
     } catch (error) {
@@ -14,7 +21,9 @@ const getAll = async (page = 1, perPage = 10, name = "") => {
 
 const get = async (id) => {
     try {
-        const response = await http.get(`/accounting_plans/${id}`);
+        const response = await http.get(`/accounting_plans/${id}`, {
+            headers: getAuthHeaders()
+        });
         return response;
     } catch (error) {
         console.error("Error en la petición get:", error);
@@ -25,7 +34,9 @@ const get = async (id) => {
   
 const create = async (data) => {
     try {
-        const response = await http.post("/accounting_plans", data);
+        const response = await http.post("/accounting_plans", data, {
+            headers: getAuthHeaders()
+        });
         return response;
     } catch (error) {
         console.error("Error en la creación:", error);
@@ -35,7 +46,9 @@ const create = async (data) => {
 
 const update = async (id, data) => {
     try {
-        const response = await http.put(`/accounting_plans/${id}`, data);
+        const response = await http.put(`/accounting_plans/${id}`, data, {
+            headers: getAuthHeaders()
+        });
         return response;
     } catch (error) {
         console.error("Error en la actualización:", error);
@@ -45,7 +58,9 @@ const update = async (id, data) => {
 
 const remove = async (id) => {
     try {
-        const response = await http.delete(`/accounting_plans/${id}`);
+        const response = await http.delete(`/accounting_plans/${id}`, {
+            headers: getAuthHeaders()
+        })
         return response;
     } catch (error) {
         console.error("Error en la eliminación:", error);
@@ -55,7 +70,9 @@ const remove = async (id) => {
 
 const removeAll = async () => {
     try {
-        const response = await http.delete("/accounting_plans");
+        const response = await http.delete("/accounting_plans", {
+            headers: getAuthHeaders()
+        });
         return response;
     } catch (error) {
         console.error("Error en la eliminación de todos:", error);
@@ -65,7 +82,10 @@ const removeAll = async () => {
 
 const findByName = async (name) => {
     try {
-        const response = await http.get(`/accounting_plans?name=${name}`);
+        const response = await http.get(`/accounting_plans`, {
+            params: {name}, 
+            headers: getAuthHeaders()
+        });
         return response.data;
     } catch (error) {
         console.error("Error en la búsqueda por módulo:", error);
@@ -75,7 +95,9 @@ const findByName = async (name) => {
 
 
 const getAccountsByPGC = (id) => {
-    return http.get(`/accounting_plans/${id}/accounts_by_PGC`);
+    return http.get(`/accounting_plans/${id}/accounts_by_PGC`,{
+        headers: getAuthHeaders()
+    });
   };
 
   
@@ -83,6 +105,7 @@ const exportToCSV = async (id) => {
     try {
         const response = await http.get(`/accounting_plans/${id}/export_csv`, {
             headers: {
+                ...getAuthHeaders(),
                 "Accept": "text/csv" // csv response
             },
             responseType: "blob", // as file
@@ -116,7 +139,8 @@ const importCSV = async (file) => {
 
         const response = await http.post("/accounting_plans/import_csv", formData, {
             headers: { 
-                "Content-Type": "multipart/form-data"
+                "Content-Type": "multipart/form-data",
+                ...getAuthHeaders() 
             },
         });
 
@@ -134,6 +158,7 @@ const exportXLSXByPGC = async (id) => {
     try {
         const response = await http.get(`/accounting_plans/${id}/export_xlsx_by_pgc`, {
             headers: {
+                ...getAuthHeaders(),
                 "Accept": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             },
             responseType: "blob"
@@ -163,7 +188,8 @@ const importXLSX = async (formData) => {
     try {
         const response = await http.post("/accounting_plans/import_xlsx", formData, {
             headers: {
-                "Content-Type": "multipart/form-data"
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${localStorage.getItem("jwt_token")}`,
             }
         });
 
