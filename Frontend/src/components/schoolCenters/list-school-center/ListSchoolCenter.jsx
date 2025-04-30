@@ -33,7 +33,7 @@ const ListSchoolCenter = ({ schools, setSchools, setSelectedSchool, searchSchool
 
   useEffect(() => {
     allSchools();
-  }, [currentPage]);
+  }, [currentPage, isEdited]);
 
   const deleteSchool = (schoolId) => {
     SchoolsServices.remove(schoolId)

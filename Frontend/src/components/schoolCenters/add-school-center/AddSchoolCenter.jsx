@@ -52,11 +52,16 @@ const AddSchoolCenter = ({ setSchools, selectedSchool, setSelectedSchool, setHan
       if (selectedSchool) {
         response = await SchoolsServices.update(selectedSchool.id, input);
         setSuccessMessage("Centro escolar actualizado con éxito");
+        setSchools((prevSchools) => 
+          prevSchools.map(school => 
+            school.id === selectedSchool.id ? response.data : school
+          )
+        );
       } else {
         response = await SchoolsServices.create(input);
         setSuccessMessage("Centro escolar creado con éxito");
+        setSchools((prevSchools) => [...prevSchools, response.data]);
       }
-      setSchools((prevSchools) => [...prevSchools, response.data]);
       setSelectedSchool(null);
       setInput(initialSchoolState);
       setTimeout(() => {

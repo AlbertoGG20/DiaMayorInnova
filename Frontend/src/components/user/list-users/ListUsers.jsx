@@ -72,10 +72,12 @@ const ListUsers = ({ setSelectedUser }) => {
     setLocalPage(1);
   }, [search]);
 
-  const paginatedUsers = filteredUsers.slice(
-    (isSearching ? (localPage - 1) : (currentPage - 1)) * itemsPerPage,
-    (isSearching ? localPage : currentPage) * itemsPerPage
-  );
+  const paginatedUsers = isSearching
+    ? filteredUsers.slice(
+        (localPage - 1) * itemsPerPage,
+        localPage * itemsPerPage
+      )
+    : users;
 
   return (
     <>

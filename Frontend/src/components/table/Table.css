@@ -52,6 +52,7 @@
   gap: var(--gap-xxs);
   align-items: center;
   height: auto;
+  justify-content: flex-end;
 }
 
 .btn__icon {
