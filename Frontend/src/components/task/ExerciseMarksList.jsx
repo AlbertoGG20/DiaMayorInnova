@@ -40,6 +40,14 @@ const ExerciseMarksList = () => {
         }
     };
 
+    const handleExportToXlsx = async () => {
+        try {
+            await exportMarksToXlsx(taskId);
+        } catch (error) {
+            console.error("Error al exportar las notas:", error);
+        }
+    };
+
     const columns = [
         { title: 'Fecha', data: 'date', className: 'left-align statement__date--header' },
         { title: 'Nombre', data: 'student', className: 'left-align' },
