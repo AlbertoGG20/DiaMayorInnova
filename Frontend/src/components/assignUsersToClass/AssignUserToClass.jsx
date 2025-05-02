@@ -6,18 +6,14 @@ import { useAuth } from "../../context/AuthContext";
 import "./AssignUserToClass.css"
 
 const AssignUserToClass = ({
-  assignedInclude,
   setCurrentUsers,
   currentUsers,
   classGroupId,
   onSave,
   disabled,
-  onStudentCountChange,
-  maxStudents,
 }) => {
   const { user } = useAuth();
   const [allUsers, setAllUsers] = useState([]);
-  const [classGroups, setClassGroups] = useState([]);
   const [assignedStudents, setAssignedStudents] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState(currentUsers || []);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,15 +30,6 @@ const AssignUserToClass = ({
 
   const rolesOrder = ['teacher', 'student'];
 
-  /*   const toggleUser = (userId) => {
-      setSelectedUsers(prev => {
-        if (prev.includes(userId)) {
-          return prev.filter(id => id !== userId);
-        } else {
-          return [...prev, userId];
-        }
-      });
-    }; */
   const toggleUser = (userId) => {
     setSelectedUsers(prev => {
       const newSelected = prev.includes(userId)
@@ -50,13 +37,6 @@ const AssignUserToClass = ({
         : [...prev, userId];
       return newSelected;
     });
-  };
-
-  const closeModal = (e) => {
-    e.preventDefault();
-    modalRef.current?.close();
-    setIsModalOpen(false);
-    setSelectedUsers(currentUsers || []);
   };
 
   useEffect(() => {
