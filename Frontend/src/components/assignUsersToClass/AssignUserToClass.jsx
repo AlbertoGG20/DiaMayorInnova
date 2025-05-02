@@ -98,13 +98,12 @@ const AssignUserToClass = ({
           usersResponse = await userService.getAllUsers();
         }
 
-        const users = usersResponse?.data?.data?.users || usersResponse?.data?.users || [];
+        // When current user's role is 'admin', the response is coming in extra nested
+        // data object. We need to handle that case.
+        // This is a temporary fix until we can refactor the backend to return consistent data.
+        const users = usersResponse?.data?.data?.data?.users || usersResponse?.data?.data?.users || usersResponse?.data?.users || [];
+        console.log(schoolCenterId,users)
         setAllUsers(users);
-
-        if (user.role === "teacher") {
-          const groupsResponse = await ClassGroupService.findByTeacherId(user.id);
-          setClassGroups(groupsResponse.data);
-        }
       } catch (error) {
         console.error("Error cargando datos:", error);
       } finally {
