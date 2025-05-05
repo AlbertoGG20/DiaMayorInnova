@@ -44,16 +44,6 @@ class AccountsController < ApplicationController
     end
   end
 
-  # Método de Strong Parameters
-  def account_params
-    params.require(:account).permit(
-      :accountNumber,
-      :description,
-      :name,
-      :accounting_plan_id
-    )
-  end
-
   def update
     @account = Account.find(params[:id])
     if @account.update(account_params)
@@ -82,7 +72,15 @@ class AccountsController < ApplicationController
   private
 
   def account_params
-    # Asegúrate de permitir los parámetros correctos
-    params.require(:account).permit(:name, :account_number, :description, :accounting_plan_id)
-  end
+    params.require(:account).permit(
+      :accountNumber, 
+      :account_number, 
+      :description, 
+      :name, 
+      :accounting_plan_id, 
+      :charge, 
+      :credit
+    )
+  end  
+  
 end
