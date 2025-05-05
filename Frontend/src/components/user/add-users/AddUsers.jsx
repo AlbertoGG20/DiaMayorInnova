@@ -5,7 +5,7 @@ import SchoolsServices from "../../../services/SchoolsServices.js";
 import { API_BASE_URL } from "../../../config.js";
 import './AddUsers.css';
 
-const AddUsers = ({ setUsers, selectedUser, setSelectedUser }) => {
+const AddUsers = ({ selectedUser, setSelectedUser, onUserAdded }) => {
   const initialUserState = {
     email: "",
     password: "",
@@ -63,6 +63,7 @@ const AddUsers = ({ setUsers, selectedUser, setSelectedUser }) => {
       [name]: value,
     }));
   };
+
   const onImageChange = (event) => {
     setInput({ ...input, featured_image: event.target.files[0] });
   };
@@ -100,21 +101,22 @@ const AddUsers = ({ setUsers, selectedUser, setSelectedUser }) => {
     if (input.school_center_id) {
       formData.append("user[school_center_id]", input.school_center_id);
     }
+
     try {
       if (selectedUser) {
         const response = await userService.updateUser(selectedUser.id, formData);
 
         if (response.data?.data?.user) {
-          setUsers(prev => prev.map(user => user.id === selectedUser.id ? response.data.data.user : user));
           setSuccessMessage("El usuario se ha modificado correctamente.");
+          onUserAdded();
         }
         setSelectedUser(null);
       } else {
         const response = await userService.createUser(formData);
 
         if (response.data?.data?.user) {
-          setUsers(prev => [...prev, response.data.data.user]);
           setSuccessMessage("El usuario se ha creado correctamente.");
+          onUserAdded();
         }
       }
       setInput(initialUserState);
@@ -146,7 +148,6 @@ const AddUsers = ({ setUsers, selectedUser, setSelectedUser }) => {
                 value={input.email}
                 onChange={handleInput}
                 placeholder="ejemplo@yahoo.es"
-
               />
             </label>
             <label htmlFor='password' className='user_label'>Contraseña
@@ -185,7 +186,6 @@ const AddUsers = ({ setUsers, selectedUser, setSelectedUser }) => {
                 value={input.name}
                 onChange={handleInput}
                 placeholder="Pedro"
-
               />
             </label>
             <label htmlFor='first_lastName' className='user_label'>Primer Apellido
@@ -197,7 +197,6 @@ const AddUsers = ({ setUsers, selectedUser, setSelectedUser }) => {
                 value={input.first_lastName}
                 onChange={handleInput}
                 placeholder="Leon"
-
               />
             </label>
             <label htmlFor='second_lastName' className='user_label'>Segundo Apellido
@@ -209,32 +208,9 @@ const AddUsers = ({ setUsers, selectedUser, setSelectedUser }) => {
                 value={input.second_lastName}
                 onChange={handleInput}
                 placeholder="Castillo"
-
               />
             </label>
           </fieldset>
-
-          {/* <div className="add-users__form--upload">
-            <button
-              className="btn "
-              onClick={onImageChange}
-              disabled={!selectedFile}
-            > Cargar imagen </button>
-            <label htmlFor="fileUpload" className="accountingPlan__file--label btn light">
-              <input
-                type="file"
-                accept=".png, .jpg, .jpeg"
-                id="fileUpload"
-                onChange={onImageChange}
-                className="accountingPlan__file--input"
-              />
-              <i className="fi-rr-upload" />
-              <p>Imágen</p>
-              <span id="file-name" className="accountingPlan__file--name">
-                {fileName}
-              </span>
-            </label>
-          </div> */}
 
           <label htmlFor='featured_image' className='user_label'>Introduzca una imagen de usuario
             {input.featured_image && (
@@ -295,13 +271,12 @@ const AddUsers = ({ setUsers, selectedUser, setSelectedUser }) => {
               </select>
             </label>
           )}
-        </div>
-        <button type="submit" className="createSchool_submit btn"><i className='fi fi-rr-plus'></i>{selectedUser ? "Actualizar Usuario" : "Registrar Usuario"}</button>
-        {selectedUser && <button type="button" className="btn light" onClick={() => setSelectedUser(null)}>Cancelar</button>}
-        {error && <p role="alert" style={{ color: "red" }}>{error}</p>}
-        {successMessage && <p role="alert" style={{ color: "green" }}>{successMessage}</p>}
-      </form>
-    </section >
+          <button type="submit" className="createSchool_submit btn"><i className='fi fi-rr-plus'></i>{selectedUser ? "Actualizar Usuario" : "Registrar Usuario"}</button>
+          {selectedUser && <button type="button" className="btn light" onClick={() => setSelectedUser(null)}>Cancelar</button>}
+          {error && <p role="alert" style={{ color: "red" }}>{error}</p>}
+          {successMessage && <p role="alert" style={{ color: "green" }}>{successMessage}</p>}
+        </form>
+      </section>
     </>
   );
 };

@@ -97,10 +97,12 @@ const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions,
   };
 
   const handleAnnotationChange = (event) => {
+    const { name, value } = event.target;
     const updatedSolutions = [...solutions];
-    updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex][event.target.name] = event.target.value;
-    if (event.target.name === "account_number") {
-      updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_number = Number(event.target.value);
+    updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex][name] = value;
+
+    if (name === "account_number") {
+      updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_number = Number(value);
       updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_id = null;
       updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_name = "";
     }

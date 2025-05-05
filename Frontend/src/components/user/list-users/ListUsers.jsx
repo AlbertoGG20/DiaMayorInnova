@@ -5,14 +5,21 @@ import './ListUsers.css';
 import Table from "../../table/Table";
 import { SearchBar } from "../../search-bar/SearchBar";
 import PaginationMenu from "../../pagination-menu/PaginationMenu";
-const ListUsers = ({ setSelectedUser }) => {
+
+const ListUsers = ({
+  setSelectedUser,
+  currentPage,
+  setCurrentPage,
+  totalPages,
+  setTotalPages,
+  search,
+  setSearch,
+  refreshTrigger
+}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [search, setSearch] = useState("");
   const itemsPerPage = 10;
   const [localPage, setLocalPage] = useState(1);
 
@@ -20,7 +27,7 @@ const ListUsers = ({ setSelectedUser }) => {
     const fetchUsers = async () => {
       setLoading(true);
       try {
-        const response = await userService.getAllUsers(currentPage, 10);
+        const response = await userService.getAllUsers(currentPage, itemsPerPage);
 
         if (response) {
           setUsers(response.data.data.users);
@@ -34,7 +41,7 @@ const ListUsers = ({ setSelectedUser }) => {
     }
 
     fetchUsers()
-  }, [currentPage])
+  }, [currentPage, setTotalPages, refreshTrigger])
 
   const deleteUser = (userId) => {
     userService.deleteUser(userId)
@@ -74,9 +81,9 @@ const ListUsers = ({ setSelectedUser }) => {
 
   const paginatedUsers = isSearching
     ? filteredUsers.slice(
-        (localPage - 1) * itemsPerPage,
-        localPage * itemsPerPage
-      )
+      (localPage - 1) * itemsPerPage,
+      localPage * itemsPerPage
+    )
     : users;
 
   return (
@@ -106,7 +113,7 @@ const ListUsers = ({ setSelectedUser }) => {
           setCurrentPage={isSearching ? setLocalPage : setCurrentPage}
           totalPages={isSearching ? totalLocalPages : totalPages}
         />
-      </section >
+      </section>
 
       <ConfirmDeleteModal
         isOpen={isModalOpen}

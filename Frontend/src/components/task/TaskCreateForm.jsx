@@ -160,7 +160,6 @@ const TaskCreateForm = ({ onTaskCreated }) => {
     }
 
     if (!valid) return;
-    console.log(openingDate);
     const taskData = {
       title,
       opening_date: openingDate,
@@ -173,7 +172,6 @@ const TaskCreateForm = ({ onTaskCreated }) => {
     };
 
     try {
-      console.log("Task data:", taskData);
       if (task?.id) {
         await taskService.updateTask(task.id, taskData);
         addUsers(task.id);

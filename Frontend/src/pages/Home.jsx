@@ -10,7 +10,6 @@ import StatementsSelection from "../components/task/StatementsSelection";
 
 function Home() {
   const location = useLocation();
-  console.log(location.pathname);
   const { currentRole } = useContext(navContext);
 
   if (currentRole === 'admin' || currentRole === 'center_admin') {
