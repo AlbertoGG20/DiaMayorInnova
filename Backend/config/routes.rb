@@ -33,7 +33,10 @@ Rails.application.routes.draw do
   resources :teacher_class_groups
   resources :annotations
   resources :entries
-  resources :solutions
+  resources :solutions, only: [:index, :show, :create, :update, :destroy] do
+    post 'mark_as_example', on: :member
+    post 'unmark_as_example', on: :member
+  end
   resources :student_entries
   resources :student_annotations
   resources :marks do
