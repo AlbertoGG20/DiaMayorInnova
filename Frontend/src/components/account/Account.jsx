@@ -8,7 +8,9 @@ const Account = ({id, onSaveSuccess, onCloseModal}) => {
     account_number: 0,
     description: "",
     accounting_plan_id: 0,
-    name: ""
+    name: "",
+    charge: "",
+    credit: ""
   };
 
   const [currentAccount, setCurrentAccount] = useState(initialAccountState);
@@ -107,6 +109,35 @@ const Account = ({id, onSaveSuccess, onCloseModal}) => {
               </label>
             </div>
           </div>
+
+          <div className='editForm__form--row'>
+            <div className='editForm__form--group'>
+              <label> Cargo
+                <input
+                  className='editForm__input'
+                  name='charge'
+                  type='number'
+                  value={currentAccount.charge}
+                  onChange={handleInputChange}
+                />
+              </label>
+            </div>
+          </div>
+
+          <div className='editForm__form--row'>
+            <div className='editForm__form--group'>
+              <label> Abono
+                <input
+                  className='editForm__input'
+                  name='credit'
+                  type='number'
+                  value={currentAccount.credit}
+                  onChange={handleInputChange}
+                />
+              </label>
+            </div>
+          </div>
+          
 
           {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
           {message && <p style={{ color: 'green', textAlign: 'center'}}>{message}</p>}
