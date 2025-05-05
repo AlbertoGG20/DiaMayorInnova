@@ -11,6 +11,8 @@ const AddAccount = ({ setNewAcc }) => {
     description: "",
     accounting_plan_id: 0,
     name: "",
+    charge: "",
+    credit: ""
   };
 
   const [account, setAccount] = useState(initialAccountState);
@@ -42,6 +44,8 @@ const AddAccount = ({ setNewAcc }) => {
         account_number: account.account_number,
         description: account.description.trim(),
         accounting_plan_id: account.accounting_plan_id,
+        charge: account.charge?.trim() || "",
+        credit: account.credit?.trim() || ""
       };
 
       AccountDataService.create(data)
@@ -52,6 +56,8 @@ const AddAccount = ({ setNewAcc }) => {
             account_number: parseInt(response.data.account_number),
             description: response.data.description.trim(),
             accounting_plan_id: parseInt(response.data.accounting_plan_id),
+            charge: response.data.charge ?? "",
+            credit: response.data.credit ?? ""
           })
           setNewAcc(true);
         })
@@ -162,6 +168,36 @@ const AddAccount = ({ setNewAcc }) => {
                     value={account.description}
                     onChange={handleInputChange}
                     name='description'
+                  />
+                </label>
+              </div>
+            </div>
+
+            <div className='account__form--row'>
+              <div className='account__form--group'>
+                <label>Cargo
+                  <input
+                    className='account__input'
+                    placeholder='Ej. Pago de servicios'
+                    type="text"
+                    name='charge'
+                    value={account.charge}
+                    onChange={handleInputChange}
+                  />
+                </label>
+              </div>
+            </div>
+
+            <div className='account__form--row'>
+              <div className='account__form--group'>
+                <label>Abono
+                  <input
+                    className='account__input'
+                    placeholder='Ej. Ingreso mensual'
+                    type="text"
+                    name='credit'
+                    value={account.credit}
+                    onChange={handleInputChange}
                   />
                 </label>
               </div>

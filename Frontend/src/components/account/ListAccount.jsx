@@ -36,7 +36,7 @@ const AccountsList = ({ newAcc }) => {
         setTotalPages(data.meta.total_pages);
       }
     } catch (error) {
-      console.log(e);
+      console.log(error);
     } finally {
       setIsLoading(false);
     }
@@ -63,6 +63,7 @@ const AccountsList = ({ newAcc }) => {
   const handleSearchChange = (value) => {
     const searchTerm = value;
     setSearchAccount(searchTerm);
+    setCurrentPage(1);
 
     if (!searchTerm) {
       retrieveAccounts();
@@ -124,7 +125,9 @@ const AccountsList = ({ newAcc }) => {
                   { field: 'account_number', sortable: true },
                   { field: 'name', sortable: true },
                   { field: 'description', sortable: true },
-                  { field: 'accounting_plan_id', sortable: true }
+                  { field: 'accounting_plan_id', sortable: true },
+                  { field: 'charge',},
+                  { field: 'credit'}
                 ]}
               />
             )}
