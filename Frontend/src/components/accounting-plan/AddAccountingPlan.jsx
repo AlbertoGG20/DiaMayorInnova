@@ -15,6 +15,7 @@ const AddAccountingPlan = ({ setNewPGC }) => {
   const [error, setError] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
   const [fileName, setFileName] = useState("Nada seleccionado");
+  const [uploadMessage, setUploadMessage] = useState("");
 
 
   const handleInputChange = (event) => {
@@ -216,7 +217,6 @@ const AddAccountingPlan = ({ setNewPGC }) => {
                       className="accountingPlan__file--input"
                     />
                     <i className="fi-rr-upload" />
-                    <p>Importar</p>
                     <span id="file-name" className="accountingPlan__file--name">
                       {fileName}
                     </span>
@@ -227,11 +227,12 @@ const AddAccountingPlan = ({ setNewPGC }) => {
                     onChange={handleFileChange}
                     className="accountingPlan__file--input"
                   />
-                  <button className="btn light accountingPlan__button" onClick={handleDownloadTemplate}> <i className="fi-rr-download" />Descargar plantilla</button>
+                  <button className="btn light accountingPlan__button" onClick={handleDownloadTemplate}> <i className="fi-rr-download" />Plantilla</button>
                 </div>
               </div>
             </div>
             {error && <div className="accountingPlan__error">{error}</div>}
+            {uploadMessage && <div className="accountingPlan__message">{uploadMessage}</div>}
           </div>
         </>
       )}

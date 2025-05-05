@@ -124,10 +124,10 @@ const Table = ({
                     <button className="btn__icon " onClick={() => openModal(row.id)}>
                       <i className="fi-rr-pencil" />
                     </button>}
-                  {exportCSV && showExportDropdown === row.id && (
+                  {exportCSV && (
                     <div className="export-dropdown">
-                      <button onClick={() => exportCSV(row.id, "csv")}>CSV</button>
-                      <button onClick={() => exportXLSX(row.id, "xlsx")}>XLSX</button>
+                      <button className="btn__icon download" onClick={() => exportCSV(row.id, "csv")}><i className="fi-rr-download" />CSV</button>
+                      <button className="btn__icon download" onClick={() => exportXLSX(row.id, "xlsx")}><i className="fi-rr-download" />XLSX</button>
                     </div>
                   )}
                   {deleteItem && <button aria-label="Eliminar" className="btn__icon "

@@ -78,6 +78,7 @@
   align-items: center;
   gap: 0.25rem;
   font-weight: 500;
+  width: auto;
 }
 
 .expand-button {
@@ -129,6 +130,11 @@
 
 .table-row .text-right {
   text-align: right;
+}
+
+.export-dropdown {
+  display: flex;
+  gap: var(--gap-s);
 }
 
 @media (max-width: 768px) {
