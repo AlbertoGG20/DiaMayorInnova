@@ -4,12 +4,11 @@ import EntryForm from "../entry/EntryForm.jsx";
 const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
 
   const handleSolutionChange = (event) => {
-    setSolutions((solution) => {
-      const updatedSolutions = [...solutions];
+    setSolutions((prevSolution) => {
+      const updatedSolutions = [...prevSolution];
       updatedSolutions[solutionIndex].description = event.target.value;
       return updatedSolutions;
     });
-
   };
 
   const [collapsedEntries, setCollapsedEntries] = useState(
@@ -78,7 +77,6 @@ const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
           placeholder="Descripción de la solución"
           aria-label="Descripción de la solución"
         />
-        {/* <button type="button" onClick={removeSolution}>Eliminar Solución</button> */}
       </div>
 
       {
@@ -121,7 +119,6 @@ const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
 
           </div>
         ))}
-
 
       <div className="statement-page-modal__actions" >
         <div className="statement-page-modal__actions-buttons" >
