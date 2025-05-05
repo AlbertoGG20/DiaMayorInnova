@@ -4,12 +4,11 @@ import EntryForm from "../entry/EntryForm.jsx";
 const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
 
   const handleSolutionChange = (event) => {
-    setSolutions((solution) => {
-      const updatedSolutions = [...solutions];
+    setSolutions((prevSolution) => {
+      const updatedSolutions = [...prevSolution];
       updatedSolutions[solutionIndex].description = event.target.value;
       return updatedSolutions;
     });
-
   };
 
   const [collapsedEntries, setCollapsedEntries] = useState(
@@ -31,16 +30,6 @@ const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
     });
     setSolutions(updatedSolutions);
   };
-
-  /* En caso de querer un botón "Eliminar Asiento", por asiento  
-   const removeEntry = (entryIndex) => {
-      const updatedSolutions = [...solutions];
-      updatedSolutions[solutionIndex].entries = updatedSolutions[solutionIndex].entries.filter(
-        (_, i) => i !== entryIndex
-      );
-      setSolutions(updatedSolutions);
-      console.log("Soluciones actualizadas después de eliminar asiento:", updatedSolutions);
-    }; */
 
   const removeLastEntry = () => {
     const updatedSolutions = [...solutions];
@@ -79,7 +68,6 @@ const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
           placeholder="Descripción de la solución"
           aria-label="Descripción de la solución"
         />
-        {/* <button type="button" onClick={removeSolution}>Eliminar Solución</button> */}
       </div>
 
       {solution.entries.map((entry, entryIndex) => (
@@ -109,18 +97,8 @@ const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
               setSolutions={setSolutions}
             />
           )}
-          {/* En caso de querer un botón "Eliminar Asiento", por Asiento.
-          <button
-            type="button"
-            className="statement-page__button--remove-entry"
-            onClick={() => removeEntry(entryIndex)}
-          >
-            <i className="fi fi-rr-trash"></i>
-            <span className="statement-page__span--remove-entry">Asiento</span>
-          </button> */}
         </div>
       ))}
-
 
       <div className="statement-page-modal__actions" >
         <div className="statement-page-modal__actions-buttons" >
