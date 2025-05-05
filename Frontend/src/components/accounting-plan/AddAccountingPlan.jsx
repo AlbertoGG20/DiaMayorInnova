@@ -122,6 +122,20 @@ const AddAccountingPlan = ({ setNewPGC }) => {
     }
   };
   
+  const handleDownloadTemplate = async () => {
+    try {
+      const blob = await AccountingPlanDataService.downloadTemplateXLSX();
+      const url = window.URL.createObjectURL(new Blob([blob], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "Plantilla_PGC.xlsx");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      alert("Error al descargar la plantilla.");
+    }
+  };
 
   return (
     <>
@@ -207,6 +221,13 @@ const AddAccountingPlan = ({ setNewPGC }) => {
                       {fileName}
                     </span>
                   </label>
+                  <input
+                    type="file"
+                    accept=".csv,.xlsx"
+                    onChange={handleFileChange}
+                    className="accountingPlan__file--input"
+                  />
+                  <button className="btn light accountingPlan__button" onClick={handleDownloadTemplate}> <i className="fi-rr-download" />Descargar plantilla</button>
                 </div>
               </div>
             </div>

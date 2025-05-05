@@ -9,6 +9,7 @@ Rails.application.routes.draw do
     collection do
       post 'import_csv'
       post 'import_xlsx'
+      get 'download_template_xlsx'
     end
   end
   

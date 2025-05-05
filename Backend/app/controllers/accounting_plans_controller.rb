@@ -156,14 +156,32 @@ class AccountingPlansController < ApplicationController
     def export_xlsx_by_pgc
         accounting_plan = AccountingPlan.find_by(id: params[:id])
         if accounting_plan
-          accounts = Account.where(accounting_plan_id: accounting_plan.id)
+          accounts = Account.where(accounting_plan_id: accounting_plan.id).order(:account_number)
           p = Axlsx::Package.new
           wb = p.workbook
     
-          wb.add_worksheet(name: "Cuentas de #{accounting_plan.name}") do |sheet|
-            sheet.add_row ["Número de cuenta", "Nombre de cuenta", "Descripción"]
+          sheet_name = "Cuentas de #{accounting_plan.name}"[0, 31]
+    
+          wb.add_worksheet(name: sheet_name) do |sheet|
+
+            sheet.add_row ['Nombre', 'Acronimo', 'Descripcion']
+
+            sheet.add_row [
+              accounting_plan.name,
+              accounting_plan.acronym,
+              accounting_plan.description
+            ]
+
+            sheet.add_row []
+
+            sheet.add_row ['Numero cuenta', 'Nombre', 'Descripcion']
+
             accounts.each do |account|
-              sheet.add_row [account.account_number, account.name, account.description]
+              sheet.add_row [
+                account.account_number,
+                account.name,
+                account.description
+              ]
             end
           end
     
@@ -184,51 +202,41 @@ class AccountingPlansController < ApplicationController
       
         file = params[:file]
         xlsx = Roo::Spreadsheet.open(file.path)
+        sheet = xlsx.sheet(0)
+
+        plan_headers = sheet.row(1).map(&:to_s).map(&:strip)
+        plan_data = sheet.row(2)
       
-        expected_headers = ['Nombre', 'Acronimo', 'Descripcion']
-        actual_headers = xlsx.sheet(0).row(1).map(&:to_s).map(&:strip)
-        missing_headers = expected_headers - actual_headers
-        unless missing_headers.empty?
-          return render json: { error: "Faltan columnas requeridas en la primera hoja: #{missing_headers.join(', ')}" }, status: :unprocessable_entity
+        unless plan_headers[0..2] == ['Nombre', 'Acronimo', 'Descripcion']
+          return render json: { error: "La primera fila debe tener los encabezados: Nombre, Acronimo, Descripcion" }, status: :unprocessable_entity
         end
       
-        ActiveRecord::Base.transaction do
-          pgc_data = nil
-          xlsx.sheet(0).each(name: 'Nombre', acronym: 'Acronimo', description: 'Descripcion') do |row|
-            next if row[:name] == 'Nombre'
-            pgc_data = {
-              name: row[:name],
-              acronym: row[:acronym],
-              description: row[:description]
-            }
-            break
-          end
-      
-          unless pgc_data
-            raise "No se encontraron datos válidos para el PGC en la primera hoja"
-          end
-      
-          accounting_plan = AccountingPlan.create!(pgc_data)
-      
-          if xlsx.sheets.length > 1
-            expected_account_headers = ['NombreC', 'NumeroC', 'DescripcionC']
-            actual_account_headers = xlsx.sheet(1).row(1).map(&:to_s).map(&:strip)
-            missing_account_headers = expected_account_headers - actual_account_headers
-            unless missing_account_headers.empty?
-              raise "Faltan columnas requeridas en la segunda hoja: #{missing_account_headers.join(', ')}"
-            end
-      
-            xlsx.sheet(1).each(name: 'NombreC', account_number: 'NumeroC', description: 'DescripcionC') do |row|
-              next if row[:name] == 'NombreC'
-              Account.create!(
-                name: row[:name],
-                account_number: row[:account_number],
-                description: row[:description],
-                accounting_plan_id: accounting_plan.id
-              )
-            end
-          end
+        accounting_plan = AccountingPlan.create!(
+          name: plan_data[0].to_s.strip,
+          acronym: plan_data[1].to_s.strip,
+          description: plan_data[2].to_s.strip
+        )
+
+        account_headers = sheet.row(3).map(&:to_s).map(&:strip)
+        unless account_headers[0..2] == ['NombreC', 'NumeroC', 'DescripcionC']
+          return render json: { error: "La tercera fila debe tener los encabezados: NombreC, NumeroC, DescripcionC" }, status: :unprocessable_entity
         end
+      
+        ((4)..sheet.last_row).each do |i|
+          row = sheet.row(i)
+          next if row[0].blank? && row[1].blank?
+      
+          Account.create!(
+            name: row[0].to_s.strip,
+            account_number: row[1].to_s.strip,
+            description: row[2].to_s.strip,
+            accounting_plan_id: accounting_plan.id
+          )
+        end
+      
+        render json: { success: true }, status: :ok
+    rescue => e
+        render json: { error: "Error al importar: #{e.message}" }, status: :unprocessable_entity
     end
       
 
@@ -244,10 +252,31 @@ class AccountingPlansController < ApplicationController
         end
     end
 
+    def download_template_xlsx
+      p = Axlsx::Package.new
+      wb = p.workbook
+
+      sheet_name = "Plantilla PGC"[0, 31]
+      wb.add_worksheet(name: sheet_name) do |sheet|
+        # Encabezado del plan
+        sheet.add_row ['Nombre', 'Acronimo', 'Descripcion']
+        # Fila de ejemplo vacía para el plan
+        sheet.add_row ['', '', '']
+        # Encabezado de cuentas (debe coincidir con el importador)
+        sheet.add_row ['NombreC', 'NumeroC', 'DescripcionC']
+        # Fila de ejemplo vacía para cuentas
+        sheet.add_row ['', '', '']
+      end
+
+      send_data p.to_stream.read,
+                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                disposition: "attachment",
+                filename: "Plantilla_PGC.xlsx"
+    end
+
     private
 
     def accounting_plan_params
         params.require(:accounting_plan).permit(:name, :description, :acronym)
     end
-
 end
