@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 import Modal from "../../../modal/Modal";
 import http from "../../../../http-common";
 import AccountService from "../../../../services/AccountService";
+import PaginationMenu from "../../../pagination-menu/PaginationMenu";
 import "./EntryForm.css"
 
 const EntryForm = ({ aptNumber, annotation, updateAnnotation, onDelete, exercise }) => {
@@ -65,11 +66,11 @@ const EntryForm = ({ aptNumber, annotation, updateAnnotation, onDelete, exercise
       if (response.data) {
         setAccounts(prevAccounts => {
           // Verificar si la cuenta ya existe con el mismo número e ID
-          const exists = prevAccounts.some(acc => 
-            acc.account_number === response.data.account_number && 
+          const exists = prevAccounts.some(acc =>
+            acc.account_number === response.data.account_number &&
             acc.id === response.data.id
           );
-          
+
           if (!exists) {
             // Si no existe, agregar la nueva cuenta
             return [...prevAccounts, response.data];
@@ -195,7 +196,7 @@ const EntryForm = ({ aptNumber, annotation, updateAnnotation, onDelete, exercise
               onChange={handleChange}
               value={annotation.account_number || ''}
               min={0}
-              ref={accountNumberInputRef} 
+              ref={accountNumberInputRef}
               disabled={exercise?.finished} />
           </div>
           <div className="form_group tittle_account-name--no-visible">
@@ -254,21 +255,11 @@ const EntryForm = ({ aptNumber, annotation, updateAnnotation, onDelete, exercise
           ))}
         </div>
 
-        <div className="account-list__pagination">
-          <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => changePage(1)}>
-            <i className='fi fi-rr-angle-double-small-left' />
-          </button>
-          <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => changePage(currentPage - 1)}>
-            <i className='fi fi-rr-angle-small-left' />
-          </button>
-          <span>Página {currentPage} de {totalPages}</span>
-          <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => changePage(currentPage + 1)}>
-            <i className='fi fi-rr-angle-small-right' />
-          </button>
-          <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => changePage(totalPages)}>
-            <i className='fi fi-rr-angle-double-small-right' />
-          </button>
-        </div>
+        <PaginationMenu
+          currentPage={currentPage}
+          setCurrentPage={changePage}
+          totalPages={totalPages}
+        />
       </Modal>
     </div>
   );
