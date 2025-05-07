@@ -138,3 +138,18 @@
     }
 
 }
+
+.forgot-password-link {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.forgot-password-link a {
+  color: var(--Color-letra-claro);
+  text-decoration: none;
+  font-size: 0.875rem;
+}
+
+.forgot-password-link a:hover {
+  text-decoration: underline;
+}
