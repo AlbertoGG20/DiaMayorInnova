@@ -32,13 +32,35 @@ Rails.application.configure do
   config.active_storage.service = :local
 
   # Don't care if the mailer can't send.
-  config.action_mailer.raise_delivery_errors = false
+  config.action_mailer.raise_delivery_errors = true
+  config.action_mailer.perform_deliveries = true
 
   # Disable caching for Action Mailer templates even if Action Controller
   # caching is enabled.
   config.action_mailer.perform_caching = false
 
-  config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
+  # Configuración de URL para Devise
+  config.action_mailer.default_url_options = { 
+    host: ENV['MAILER_HOST'] || 'localhost',
+    port: ENV['MAILER_PORT'] || 3000,
+    protocol: 'http'
+  }
+  
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address: ENV['SMTP_ADDRESS'] || 'smtp.gmail.com',
+    port: (ENV['SMTP_PORT'] || 587).to_i,
+    domain: ENV['SMTP_DOMAIN'] || 'gmail.com',
+    user_name: ENV['SMTP_USERNAME'],
+    password: ENV['SMTP_PASSWORD'],
+    authentication: :plain,
+    enable_starttls_auto: true
+  }
+
+  # Configuración del remitente por defecto
+  config.action_mailer.default_options = {
+    from: ENV['SMTP_USERNAME'] || 'noreply@diamayorinnova.com'
+  }
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log

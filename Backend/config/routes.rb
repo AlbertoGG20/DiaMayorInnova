@@ -88,12 +88,20 @@ Rails.application.routes.draw do
   end
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
-  devise_for :users, controllers: { sessions: 'sessions' }, skip: [ :registrations ]
+  devise_for :users, controllers: {
+    sessions: 'sessions',
+    passwords: 'passwords'
+  }, skip: [ :registrations ]
   devise_scope :user do
     post 'sign_in', to: 'sessions#create'
     delete 'log_out', to: 'sessions#destroy'
     post 'validate_token', to: 'sessions#valid_token'
     resources :registrations
+
+    # Rutas para recuperación de contraseña
+    post 'password/forgot', to: 'passwords#forgot'
+    get 'users/password/edit', to: 'passwords#edit'
+    put 'users/password', to: 'passwords#update'
   end
 
   resources :users, only: [ :index, :show, :create, :update, :destroy ] do

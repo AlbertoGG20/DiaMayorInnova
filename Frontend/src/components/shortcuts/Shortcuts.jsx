@@ -10,6 +10,10 @@ const Shortcuts = () => {
   const navigate = useNavigate();
   const auth = useAuth();
 
+  if (!auth.user) {
+    return null;
+  }
+
   return (
     <section className="top">
       <h1 className="shortcut__title">Bienvenido, {auth.user.name}</h1>
@@ -33,6 +37,7 @@ const Shortcuts = () => {
               />
             );
           }
+          return null;
         })}
       </div>
     </section>
