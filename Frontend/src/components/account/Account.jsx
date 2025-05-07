@@ -116,7 +116,6 @@ const Account = ({id, onSaveSuccess, onCloseModal}) => {
                 <input
                   className='editForm__input'
                   name='charge'
-                  type='number'
                   value={currentAccount.charge}
                   onChange={handleInputChange}
                 />
@@ -130,7 +129,6 @@ const Account = ({id, onSaveSuccess, onCloseModal}) => {
                 <input
                   className='editForm__input'
                   name='credit'
-                  type='number'
                   value={currentAccount.credit}
                   onChange={handleInputChange}
                 />
