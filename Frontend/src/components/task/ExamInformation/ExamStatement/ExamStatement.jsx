@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import './ExamStatement.css'
+import React from "react"
 
 
 const ExamStatement = ({ statement_id, statement_title, index, mark, student_entries, open_statement, handleMarkChange, handleCommentChange, setIsModifiedMark, comment }) => {
@@ -78,18 +79,27 @@ const ExamStatement = ({ statement_id, statement_title, index, mark, student_ent
               <tbody>
                 {
                   student_entries.map((entry) => (
-                    entry.student_annotations.map((annotation, index) => {
-                      return (
-                        <tr key={annotation.id}>
-                          <td className="right-align">{index + 1}</td>
-                          <td className="right-align">{annotation.account_number}</td>
-                          <td className="left-align examen_statement__account_name">{annotation.account.name}</td>
-                          <td className="right-align">{annotation.debit} €</td>
-                          <td className="right-align">{annotation.credit} €</td>
+                    <React.Fragment key={entry.id}>
+                      {entry.student_annotations.map((annotation, index) => {
+                        return (
+                          <tr key={annotation.id}>
+                            <td className="right-align">{index + 1}</td>
+                            <td className="right-align">{annotation.account_number}</td>
+                            <td className="left-align examen_statement__account_name">{annotation.account.name}</td>
+                            <td className="right-align">{annotation.debit} €</td>
+                            <td className="right-align">{annotation.credit} €</td>
+                          </tr>
+                        )
+                      })}
+                      {entry.observations && (
+                        <tr>
+                          <td colSpan="5" className="observations-cell">
+                            <strong>Observaciones:</strong> {entry.observations}
+                          </td>
                         </tr>
-                      )
-                    }))
-                  )
+                      )}
+                    </React.Fragment>
+                  ))
                 }
 
               </tbody>

@@ -2,10 +2,15 @@ import { useEffect, useState, useMemo } from 'react'
 import "./Entry.css"
 import EntryForm from './entry-form/EntryForm'
 
-const Entry = ({ number, updateEntryDate, annotations, updateAnnotation, deleteAnnotation, addAnnotation, deleteEntry, entryIndex, selectedStatement, date, exercise }) => {
+const Entry = ({ number, updateEntryDate, annotations, updateAnnotation, deleteAnnotation, addAnnotation, deleteEntry, entryIndex, selectedStatement, date, exercise, observations: initialObservations }) => {
   const [entryStatus, setEntryStatus] = useState(exercise?.finished || false);
   const [entryDate, setDate] = useState(date || "2024-10-10");
+  const [observations, setObservations] = useState(initialObservations || "");
   const formattedDate = new Date(`${entryDate}T00:00:00`).toLocaleDateString("es-ES");
+
+  useEffect(() => {
+    setObservations(initialObservations || "");
+  }, [initialObservations]);
 
   const total = useMemo(() => {
     return annotations.reduce((acc, annotation) => {
@@ -27,7 +32,15 @@ const Entry = ({ number, updateEntryDate, annotations, updateAnnotation, deleteA
     const newDate = e.target.value;
     setDate(newDate);
     if (selectedStatement) {
-      updateEntryDate(selectedStatement.id, entryIndex, newDate);
+      updateEntryDate(selectedStatement.id, entryIndex, newDate, observations);
+    }
+  }
+
+  const handleObservationsChange = (e) => {
+    const newObservations = e.target.value;
+    setObservations(newObservations);
+    if (selectedStatement) {
+      updateEntryDate(selectedStatement.id, entryIndex, entryDate, newObservations);
     }
   }
 
@@ -100,6 +113,16 @@ const Entry = ({ number, updateEntryDate, annotations, updateAnnotation, deleteA
                 />
               );
             })}
+          </div>
+
+          <div className="entry_observations">
+            <textarea
+              placeholder="Observaciones..."
+              value={observations}
+              onChange={handleObservationsChange}
+              disabled={exercise?.finished}
+              className="entry_observations_textarea"
+            />
           </div>
 
           {entryStatus &&
