@@ -3,10 +3,11 @@ import Modal from "../../../modal/Modal";
 import http from "../../../../http-common";
 import AccountService from "../../../../services/AccountService";
 import PaginationMenu from "../../../pagination-menu/PaginationMenu";
-import "./EntryForm.css"
+import "./EntryForm.css";
 
 const EntryForm = ({ aptNumber, annotation, updateAnnotation, onDelete, exercise }) => {
   const [accounts, setAccounts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState(""); // New state for search query
   const accountNumberInputRef = useRef(null);
   const modalRef = useRef(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -16,22 +17,39 @@ const EntryForm = ({ aptNumber, annotation, updateAnnotation, onDelete, exercise
   useEffect(() => {
     const loadAccounts = async () => {
       try {
-        const response = await http.get(`/accounts?page=${currentPage}&limit=${5}`);
-        setAccounts(response.data.accounts);
-        setTotalPages(response.data.meta.total_pages || 1);
+        if (searchQuery) {
+          // Perform server-side search across all accounts
+          const isNumber = !isNaN(searchQuery) && searchQuery.trim() !== "";
+          let response;
+          if (isNumber) {
+            response = await AccountService.findByNumber(searchQuery);
+            setAccounts(response.data ? [response.data] : []);
+          } else {
+            response = await AccountService.findByName(searchQuery);
+            setAccounts(response.data.accounts || []);
+          }
+          setTotalPages(1); // No pagination for search results
+        } else {
+          // Load paginated accounts without search
+          const response = await http.get(`/accounts?page=${currentPage}&limit=${5}`);
+          setAccounts(response.data.accounts || []);
+          setTotalPages(response.data.meta.total_pages || 1);
+        }
       } catch (error) {
-        console.error("Error al cargar las cuentas:", error);
+        console.error("Error loading accounts:", error);
+        setAccounts([]);
       }
     };
     loadAccounts();
-  }, [currentPage, totalPages]);
+  }, [currentPage, searchQuery]); // Add searchQuery as a dependency
 
   const openAccountModal = async () => {
     try {
       const response = await http.get(`/accounts`);
+      setAccounts(response.data.accounts); // Reload all accounts when opening the modal
       modalRef.current?.showModal();
     } catch (error) {
-      console.error("Error al cargar las cuentas:", error);
+      console.error("Error loading accounts:", error);
     }
   };
 
@@ -54,7 +72,7 @@ const EntryForm = ({ aptNumber, annotation, updateAnnotation, onDelete, exercise
       number: aptNumber,
       account_number: account.account_number,
       account_name: account.name,
-      account_id: account.id
+      account_id: account.id,
     };
     updateAnnotation(updated);
     modalRef.current?.close();
@@ -62,26 +80,15 @@ const EntryForm = ({ aptNumber, annotation, updateAnnotation, onDelete, exercise
 
   const searchAccount = useCallback(async (accountNumber) => {
     try {
-      const response = await AccountService.findByNumber(accountNumber);
-      if (response.data) {
-        setAccounts(prevAccounts => {
-          // Verificar si la cuenta ya existe con el mismo número e ID
-          const exists = prevAccounts.some(acc =>
-            acc.account_number === response.data.account_number &&
-            acc.id === response.data.id
-          );
-
-          if (!exists) {
-            // Si no existe, agregar la nueva cuenta
-            return [...prevAccounts, response.data];
-          }
-          return prevAccounts;
-        });
-        return response.data;
-      }
-      return null;
+      const response = await http.get(`/accounts`); // Fetch all accounts
+      const allAccounts = response.data.accounts || [];
+      const filteredAccounts = allAccounts.filter(
+        (acc) => acc.account_number.toString().includes(accountNumber)
+      );
+      setAccounts(filteredAccounts);
+      return filteredAccounts.length > 0 ? filteredAccounts[0] : null;
     } catch (error) {
-      console.error("Error al buscar la cuenta:", error);
+      console.error("Error searching for account:", error);
       return null;
     }
   }, []);
@@ -90,72 +97,64 @@ const EntryForm = ({ aptNumber, annotation, updateAnnotation, onDelete, exercise
     const { name, value } = event.target;
     let processedValue = value;
 
-    if (name === 'debit' || name === 'credit') {
-      // Reemplazar comas por puntos
-      processedValue = value.replace(',', '.');
-      // Asegurarse de que solo hay un punto decimal
-      const parts = processedValue.split('.');
+    if (name === "debit" || name === "credit") {
+      processedValue = value.replace(",", ".");
+      const parts = processedValue.split(".");
       if (parts.length > 2) {
-        processedValue = parts[0] + '.' + parts.slice(1).join('');
+        processedValue = parts[0] + "." + parts.slice(1).join("");
       }
     }
 
     const updatedAnnotation = { ...annotation, [name]: processedValue };
 
-    if (name === 'account_number') {
-      // Limpiar el timeout anterior si existe
+    if (name === "account_number") {
       if (debounceTimeout.current) {
         clearTimeout(debounceTimeout.current);
       }
 
-      // Actualizar inmediatamente el número de cuenta
       updateAnnotation(updatedAnnotation);
 
-      // Si el valor está vacío, limpiar los campos
       if (!value) {
         updateAnnotation({
           ...updatedAnnotation,
           account_id: "",
-          account_name: ""
+          account_name: "",
         });
         return;
       }
 
-      // Buscar primero en las cuentas cargadas
-      const foundAccount = accounts.find(acc => acc.account_number === value);
+      const foundAccount = accounts.find((acc) => acc.account_number === value);
       if (foundAccount) {
         updateAnnotation({
           ...updatedAnnotation,
           account_id: foundAccount.id,
-          account_name: foundAccount.name
+          account_name: foundAccount.name,
         });
         return;
       }
 
-      // Si no se encuentra, usar debounce para buscar en la API
       debounceTimeout.current = setTimeout(async () => {
         const account = await searchAccount(value);
         if (account) {
           updateAnnotation({
             ...updatedAnnotation,
             account_id: account.id,
-            account_name: account.name || ""
+            account_name: account.name || "",
           });
         } else {
-          // Si no se encuentra la cuenta, mantener el número pero limpiar los otros campos
           updateAnnotation({
             ...updatedAnnotation,
             account_id: "",
             account_name: "",
-            account_number: value // Mantener el número introducido
+            account_number: value,
           });
         }
-      }, 500); // 500ms de debounce
-    } else if (name === 'debit' && processedValue) {
-      updatedAnnotation.credit = '';
+      }, 500);
+    } else if (name === "debit" && processedValue) {
+      updatedAnnotation.credit = "";
       updateAnnotation(updatedAnnotation);
-    } else if (name === 'credit' && processedValue) {
-      updatedAnnotation.debit = '';
+    } else if (name === "credit" && processedValue) {
+      updatedAnnotation.debit = "";
       updateAnnotation(updatedAnnotation);
     } else {
       updateAnnotation(updatedAnnotation);
@@ -172,7 +171,11 @@ const EntryForm = ({ aptNumber, annotation, updateAnnotation, onDelete, exercise
     setCurrentPage(newPage);
   };
 
-  // Limpiar el timeout cuando el componente se desmonte
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+    setCurrentPage(1); // Reset to the first page on new search
+  };
+
   useEffect(() => {
     return () => {
       if (debounceTimeout.current) {
@@ -182,84 +185,110 @@ const EntryForm = ({ aptNumber, annotation, updateAnnotation, onDelete, exercise
   }, []);
 
   return (
-    <div className='entry_form_wrapper'>
-      <p className='entry_apt'>{aptNumber}</p>
-      <form action="" className='entry_form'>
+    <div className="entry_form_wrapper">
+      <p className="entry_apt">{aptNumber}</p>
+      <form action="" className="entry_form">
         <div className="entry_form_inputs__wrapper">
           <div className="form_group">
             <input
               type="number"
-              id='account_number'
+              id="account_number"
               aria-labelledby="tittle_account-number"
-              name='account_number'
-              placeholder='477'
+              name="account_number"
+              placeholder="477"
               onChange={handleChange}
-              value={annotation.account_number || ''}
+              value={annotation.account_number || ""}
               min={0}
               ref={accountNumberInputRef}
-              disabled={exercise?.finished} />
+              disabled={exercise?.finished}
+            />
           </div>
           <div className="form_group tittle_account-name--no-visible">
             <input
               type="text"
-              id='account_name'
+              id="account_name"
               aria-labelledby="tittle_account-name"
-              placeholder='Hacienda Pública, IGIC soportado'
-              name='account_name'
+              placeholder="Hacienda Pública, IGIC soportado"
+              name="account_name"
               onChange={handleChange}
-              value={annotation.account_name || ''}
+              value={annotation.account_name || ""}
               disabled={exercise?.finished}
-              readOnly />
+              readOnly
+            />
           </div>
           <div className="form_group">
             <input
               type="text"
-              id='debit'
+              id="debit"
               aria-labelledby="tittle_debit"
-              name='debit'
-              placeholder='1000.00'
+              name="debit"
+              placeholder="1000.00"
               onChange={handleChange}
-              value={annotation.debit || ''}
+              value={annotation.debit || ""}
               disabled={annotation.credit || exercise?.finished}
               pattern="[0-9]*[.,]?[0-9]*"
-              inputMode="decimal" />
+              inputMode="decimal"
+            />
           </div>
           <div className="form_group">
             <input
               type="text"
-              id='credit'
+              id="credit"
               aria-labelledby="tittle_credit"
-              name='credit'
-              placeholder='1000.00'
+              name="credit"
+              placeholder="1000.00"
               onChange={handleChange}
-              value={annotation.credit || ''}
+              value={annotation.credit || ""}
               disabled={annotation.debit || exercise?.finished}
               pattern="[0-9]*[.,]?[0-9]*"
-              inputMode="decimal" />
+              inputMode="decimal"
+            />
           </div>
         </div>
-        <button className='btn-trash' aria-label="Eliminar Apunte" onClick={handleDelete} disabled={exercise?.finished}><i className='fi fi-rr-trash'></i></button>
+        <button
+          className="btn-trash"
+          aria-label="Eliminar Apunte"
+          onClick={handleDelete}
+          disabled={exercise?.finished}
+        >
+          <i className="fi fi-rr-trash"></i>
+        </button>
       </form>
 
       <Modal ref={modalRef} modalTitle="Seleccionar Cuenta" showButton={false}>
+        <div className="search-bar">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            placeholder="Search by number or description..."
+            className="search-input"
+          />
+        </div>
         <div className="account-list">
-          {accounts.map((account) => (
-            <div
-              key={`${account.account_number}-${account.id}`}
-              className="account-item"
-              onClick={() => handleAccountSelect(account)}
-            >
-              <span className="account-item_account">{account.account_number}</span>
-              <span className="account-item_account">{account.name}</span>
-            </div>
-          ))}
+          {accounts.length > 0 ? (
+            accounts.map((account) => (
+              <div
+                key={`${account.account_number}-${account.id}`}
+                className="account-item"
+                onClick={() => handleAccountSelect(account)}
+              >
+                <span className="account-item_account">{account.account_number}</span>
+                <span className="account-item_account">{account.name}</span>
+              </div>
+            ))
+          ) : (
+            <p>No accounts found.</p>
+          )}
         </div>
 
-        <PaginationMenu
-          currentPage={currentPage}
-          setCurrentPage={changePage}
-          totalPages={totalPages}
-        />
+        {!searchQuery && (
+          <PaginationMenu
+            currentPage={currentPage}
+            setCurrentPage={changePage}
+            totalPages={totalPages}
+          />
+        )}
       </Modal>
     </div>
   );
