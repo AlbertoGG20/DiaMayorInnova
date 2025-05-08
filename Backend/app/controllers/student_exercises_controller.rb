@@ -334,6 +334,7 @@ class StudentExercisesController < ApplicationController
           :id,
           :entry_number,
           :entry_date,
+          :observations,
           :_destroy,
           student_annotations_attributes: [
             :id,

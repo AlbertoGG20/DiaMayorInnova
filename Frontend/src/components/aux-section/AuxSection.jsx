@@ -49,7 +49,7 @@ export const AuxSection = ({ statements, examStarted, onSelectStatement, helpAva
           route !== "/modes/practica" &&
           (<button className={auxSection === "statements" ? 'btn__tabs btn__tabs--active' : 'btn__tabs'} onClick={() => changeAuxSection("statements")}>Enunciados</button>)
         }
-        <button className={auxSection === "mayor" ? 'btn__tabs btn__tabs--active' : 'btn__tabs'} onClick={() => changeAuxSection("mayor")}>Diario Mayor</button>
+        <button className={auxSection === "mayor" ? 'btn__tabs btn__tabs--active' : 'btn__tabs'} onClick={() => changeAuxSection("mayor")}>Mayor</button>
         <button className={auxSection === "balance" ? 'btn__tabs btn__tabs--active' : 'btn__tabs'} onClick={() => changeAuxSection("balance")}>Balance</button>
       </div>
       {sectionAux}

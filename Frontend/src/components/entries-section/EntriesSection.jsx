@@ -29,7 +29,8 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
           return {
             id: entry.id,
             entry_number: entry.entry_number,
-            entry_date: entry.entry_date
+            entry_date: entry.entry_date,
+            observations: entry.observations || ""
           };
         }) || [];
         
@@ -57,7 +58,8 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
         const entries = mark.student_entries?.map(entry => ({
           id: entry.id,
           entry_number: entry.entry_number,
-          entry_date: entry.entry_date
+          entry_date: entry.entry_date,
+          observations: entry.observations || ""
         })) || [];
   
         const annotations = mark.student_entries?.flatMap(entry => 
@@ -84,6 +86,16 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
     }
   }, [exercise?.marks]);
 
+  useEffect(() => {
+    if (entries.length > 0) {
+      const formattedEntries = entries.map(entry => ({
+        ...entry,
+        observations: entry.observations || ""
+      }));
+      setEntriesData(formattedEntries);
+    }
+  }, [entries]);
+
   const addEntry = useCallback((statementId) => {
     // Obtener todas las entradas de todos los statements
     const allEntries = Object.values(statementData).flatMap(data => data.entries || []);
@@ -99,6 +111,7 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
     const newEntry = {
       entry_number: newEntryNumber,
       entry_date: "2024-10-10",
+      observations: ""
     };
   
     setStatementData(prev => ({
@@ -130,14 +143,14 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
     });
   }, [selectedStatement]);
 
-  const updateEntryDate = useCallback((statementId, entryNumber, newDate) => {
+  const updateEntryDate = useCallback((statementId, entryNumber, newDate, observations) => {
     setStatementData((prevData) => ({
       ...prevData,
       [statementId]: {
         ...prevData[statementId],
         entries: prevData[statementId].entries.map((entry) =>
           entry.entry_number === entryNumber
-            ? { ...entry, entry_date: newDate }
+            ? { ...entry, entry_date: newDate, observations: observations || "" }
             : entry
         ),
       },
@@ -275,6 +288,7 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
               entryIndex={entry.entry_number}
               number={entry.entry_number}
               date={entry.entry_date}
+              observations={entry.observations || ""}
               annotations={annotations.filter(
                 (annotation) => annotation.student_entry_id === entry.entry_number
               )}
