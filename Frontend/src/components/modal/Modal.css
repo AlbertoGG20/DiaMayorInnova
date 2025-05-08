@@ -59,3 +59,19 @@
 .account-item_account {
   text-align: left;
 }
+.search-bar {
+  margin-bottom: 1rem;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0rem;
+  border-radius: 4px;
+  font-size: 1,5rem;
+ background-color:var(--Color-Neutral-White);
+ margin-bottom: 0rem;
+}
+
+.search-input:focus {
+  outline: none;
+}
