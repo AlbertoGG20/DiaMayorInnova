@@ -49,22 +49,22 @@ describe('auxSection Component for Practice ', () => {
       </MemoryRouter>,
     );
     expect(screen.getByRole('button', { name: /Ayuda/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Diario Mayor/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Mayor/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Balance/i })).toBeInTheDocument();
   })
 
-  it('In practice, change component when click on Diario Mayor button', async () => {
+  it('In practice, change component when click on Mayor button', async () => {
     const route = '/modes/practica'
     render(
       <MemoryRouter initialEntries={[route]}>
         <AuxSection />
       </MemoryRouter>,
     );
-    const diarioButton = screen.getByRole('button', { name: /Diario Mayor/i });
+    const diarioButton = screen.getByRole('button', { name: /Mayor/i });
     fireEvent.click(diarioButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/Pestaña Diario Mayor/i)).toBeInTheDocument();
+      expect(screen.getByText(/Pestaña Mayor/i)).toBeInTheDocument();
     });
   })
 
@@ -128,11 +128,11 @@ describe('auxSection Component for Practice ', () => {
         <AuxSection />
       </MemoryRouter>,
     );
-    const mayorButton = screen.getByRole('button', { name: /Diario Mayor/i });
+    const mayorButton = screen.getByRole('button', { name: /Mayor/i });
     fireEvent.click(mayorButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/Pestaña Diario Mayor/i)).toBeInTheDocument();
+      expect(screen.getByText(/Pestaña Mayor/i)).toBeInTheDocument();
     });
   })
 

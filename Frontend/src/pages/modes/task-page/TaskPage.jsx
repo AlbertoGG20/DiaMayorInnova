@@ -35,7 +35,8 @@ const TaskPage = () => {
           [selectedStatement.id]: {
             entries: entries.map(entry => ({
               entry_number: entry.entry_number,
-              entry_date: entry.entry_date
+              entry_date: entry.entry_date,
+              observations: entry.observations || '',
             })),
             annotations: entries.flatMap(entry =>
               entry.annotations.map(anno => ({
@@ -71,23 +72,49 @@ const TaskPage = () => {
             setTaskStarted(true);
           }
 
-          const newStatementData = {};
-          response.exercise.marks?.forEach(mark => {
-            newStatementData[mark.statement_id] = {
-              entries: mark.student_entries?.map(entry => ({
-                entry_number: entry.entry_number,
-                entry_date: entry.entry_date
-              })) || [],
-              annotations: mark.student_entries?.flatMap(entry =>
-                entry.student_annotations?.map(anno => ({
-                  ...anno,
-                  student_entry_id: entry.entry_number,
-                  account_number: anno.account?.account_number
-                })) || []
-              )
-            };
-          });
-          setStatementData(newStatementData);
+          // Formatear los datos de las observaciones
+          const formattedData = {};
+          if (response.exercise.marks) {
+            response.exercise.marks.forEach(mark => {
+              formattedData[mark.statement_id] = {
+                entries: mark.student_entries?.map(entry => ({
+                  id: entry.id,
+                  entry_number: entry.entry_number,
+                  entry_date: entry.entry_date,
+                  observations: entry.observations || '',
+                })) || [],
+                annotations: mark.student_entries?.flatMap(entry =>
+                  entry.student_annotations?.map(anno => ({
+                    ...anno,
+                    student_entry_id: entry.entry_number
+                  })) || []
+                ) || []
+              };
+            });
+            setStatementData(formattedData);
+          }
+
+          // Si la tarea está finalizada, asegurarnos de que los datos se carguen correctamente
+          if (response.exercise.finished) {
+            const finishedData = {};
+            response.exercise.marks?.forEach(mark => {
+              finishedData[mark.statement_id] = {
+                entries: mark.student_entries?.map(entry => ({
+                  id: entry.id,
+                  entry_number: entry.entry_number,
+                  entry_date: entry.entry_date,
+                  observations: entry.observations || '',
+                })) || [],
+                annotations: mark.student_entries?.flatMap(entry =>
+                  entry.student_annotations?.map(anno => ({
+                    ...anno,
+                    student_entry_id: entry.entry_number
+                  })) || []
+                ) || []
+              };
+            });
+            setStatementData(finishedData);
+          }
 
           const firstStatement = response.exercise.task.statements?.[0];
           if (firstStatement) {
@@ -101,16 +128,6 @@ const TaskPage = () => {
 
     if (exerciseId) fetchExercise();
   }, [exerciseId, handleSave]);
-
-  useEffect(() => {
-    if (exercise?.marks?.length > 0 && exercise.task?.statements) {
-      const firstMark = exercise.marks[0];
-      const targetStatement = exercise.task.statements.find(
-        s => s.id === firstMark.statement_id
-      );
-      setSelectedStatement(targetStatement || exercise.task.statements[0]);
-    }
-  }, [exercise]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -159,6 +176,7 @@ const TaskPage = () => {
             id: entry.id,
             entry_number: entry.entry_number,
             entry_date: entry.entry_date,
+            observations: entry.observations || '',
             _destroy: entry._destroy,
             student_annotations_attributes: statementData.annotations
               .filter((a) => a.student_entry_id === entry.entry_number)
@@ -183,6 +201,7 @@ const TaskPage = () => {
       const response = await userExerciseDataService.updateTask(exercise.id, payload);
 
       if (response?.status === 200) {
+        // Actualizar el estado del ejercicio con los datos del servidor
         setExercise(prev => {
           const serverData = response.data?.exercise || {};
           const serverMarks = serverData.marks || [];
@@ -193,29 +212,42 @@ const TaskPage = () => {
               .filter(entry => !entry._destroy)
               .map(entry => ({
                 ...entry,
+                observations: entry.observations || '',
                 student_annotations: (entry.student_annotations || [])
                   .filter(anno => !anno._destroy)
               }))
           }));
 
-          const newState = {
+          return {
             ...prev,
-            marks: prev.marks.map(prevMark => {
-              const updatedMark = processedMarks.find(
-                m => m.statement_id === prevMark.statement_id
-              );
-              return updatedMark || prevMark;
-            })
+            marks: processedMarks
           };
+        });
 
-          processedMarks.forEach(mark => {
-            if (!newState.marks.some(m => m.statement_id === mark.statement_id)) {
-              newState.marks.push(mark);
-            }
-          });
+        // Actualizar statementData con los datos del servidor
+        setStatementData(prev => {
+          const newData = { ...prev };
+          const serverData = response.data?.exercise || {};
 
-          setSaveStatus(null);
-          return newState;
+          if (serverData.marks) {
+            serverData.marks.forEach(mark => {
+              newData[mark.statement_id] = {
+                entries: mark.student_entries?.map(entry => ({
+                  id: entry.id,
+                  entry_number: entry.entry_number,
+                  entry_date: entry.entry_date,
+                  observations: entry.observations || '',
+                })) || [],
+                annotations: mark.student_entries?.flatMap(entry =>
+                  entry.student_annotations?.map(anno => ({
+                    ...anno,
+                    student_entry_id: entry.entry_number
+                  })) || []
+                ) || []
+              };
+            });
+          }
+          return newData;
         });
         if(!exercise?.task?.is_exam){
           setHandleSave(true);

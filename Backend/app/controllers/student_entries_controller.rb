@@ -43,7 +43,7 @@ class StudentEntriesController < ApplicationController
 
   def student_entry_params
     params.require(:student_entry).permit(
-      :entry_number, :entry_date, :mark_id,
+      :entry_number, :entry_date, :mark_id, :observations,
       student_annotations_attributes: [
         :id, :account_id, :account_number, :debit, :credit, :student_entry_id
       ]

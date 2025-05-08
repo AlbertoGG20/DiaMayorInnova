@@ -191,6 +191,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_15_125450) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "mark_id", null: false
+    t.text "observations"
     t.index ["mark_id"], name: "index_student_entries_on_mark_id"
   end
 

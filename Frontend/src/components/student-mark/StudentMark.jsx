@@ -89,6 +89,11 @@ const StudentMark = () => {
                                 <p>Asiento {entry.entry_number}</p>
                                 <p>Fecha {entry.entry_date}</p>
                               </div>
+                              {entry.observations && (
+                                <div className="exercise_entry__observations">
+                                  <p><strong>Observaciones:</strong> {entry.observations}</p>
+                                </div>
+                              )}
                               <div className="exercise_annotations">
                                 <table>
                                   <thead>

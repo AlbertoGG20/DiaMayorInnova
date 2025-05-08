@@ -16,6 +16,7 @@ const taskSubmitService = async (data, navigate) => {
     student_entries_attributes: (data.entries || []).map((entry) => ({
       entry_number: entry.entry_number,
       entry_date: entry.entry_date,
+      observations: entry.observations || "",
       student_annotations_attributes: (data.annotations || [])
         .filter((annotation) => annotation.student_entry_id === entry.entry_number)
         .map(({ number, account_id, account_number, credit, debit }) => ({

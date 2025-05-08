@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, Fragment } from 'react'
 import './ExamStatement.css'
 
 
@@ -32,7 +32,7 @@ const ExamStatement = ({ statement_id, statement_title, index, mark, student_ent
       if (statementRef.current) {
         statementRef.current.scrollIntoView({
           behavior: 'smooth',
-          block: 'start'
+          block: 'start',
         })
       } else {
         setIsOpen(false)
@@ -85,15 +85,24 @@ const ExamStatement = ({ statement_id, statement_title, index, mark, student_ent
                     </tr>
                   </thead>
                   <tbody>
-                    {entry.student_annotations.map((annotation, index) => (
-                      <tr key={annotation.id}>
-                        <td className="right-align">{index + 1}</td>
-                        <td className="right-align">{annotation.account?.account_number}</td>
-                        <td className="left-align examen_statement__account_name">{annotation.account.name}</td>
-                        <td className="right-align">{annotation.debit} €</td>
-                        <td className="right-align">{annotation.credit} €</td>
-                      </tr>
-                    ))}
+                    <Fragment key={entry.id}>
+                      {entry.student_annotations.map((annotation, index) => (
+                        <tr key={annotation.id}>
+                          <td className="right-align">{index + 1}</td>
+                          <td className="right-align">{annotation.account?.account_number}</td>
+                          <td className="left-align examen_statement__account_name">{annotation.account.name}</td>
+                          <td className="right-align">{annotation.debit} €</td>
+                          <td className="right-align">{annotation.credit} €</td>
+                        </tr>
+                      ))}
+                      {entry.observations && (
+                        <tr>
+                          <td colSpan="5" className="observations-cell">
+                            <strong>Observaciones:</strong> {entry.observations}
+                          </td>
+                        </tr>
+                      )}
+                    </Fragment>
                   </tbody>
                 </table>
               </div>
