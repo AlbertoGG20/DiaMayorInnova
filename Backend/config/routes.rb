@@ -34,8 +34,13 @@ Rails.application.routes.draw do
   resources :annotations
   resources :entries
   resources :solutions, only: [:index, :show, :create, :update, :destroy] do
-    post 'mark_as_example', on: :member
-    post 'unmark_as_example', on: :member
+    member do
+      post 'mark_as_example'
+      post 'unmark_as_example'
+    end
+    collection do
+      get 'example'
+    end
   end
   resources :student_entries
   resources :student_annotations
@@ -73,6 +78,15 @@ Rails.application.routes.draw do
   resources :statements, only: [:create, :index, :show, :update, :destroy] do
     post 'add_solution', on: :member
     get 'solutions', to: 'statements#get_solutions', on: :member
+    member do
+      get 'example_solution'
+    end
+    resources :solutions, only: [:create, :update, :destroy] do
+      member do
+        post 'mark_as_example'
+        post 'unmark_as_example'
+      end
+    end
   end
   
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
