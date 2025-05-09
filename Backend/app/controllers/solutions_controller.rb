@@ -79,24 +79,46 @@ class SolutionsController < ApplicationController
       return
     end
 
-    if @solution.update(solution_params)
-      update_entries_and_annotations
-      render json: @solution.as_json(
-        include: {
-          entries: {
-            include: {
-              annotations: {
-                include: { account: { only: [:account_number, :name] } },
-                methods: [:account_name],
-                order: :number
+    ActiveRecord::Base.transaction do
+      if @solution.update(solution_params)
+        # Actualizar entradas y anotaciones
+        if solution_params[:entries_attributes].present?
+          solution_params[:entries_attributes].each do |entry_attr|
+            entry = @solution.entries.find_by(id: entry_attr[:id])
+            if entry
+              entry.update!(entry_attr.permit(:entry_number, :entry_date))
+              
+              if entry_attr[:annotations_attributes].present?
+                entry_attr[:annotations_attributes].each do |annotation_attr|
+                  annotation = entry.annotations.find_by(id: annotation_attr[:id])
+                  if annotation
+                    annotation.update!(annotation_attr.permit(:number, :credit, :debit, :account_number))
+                  end
+                end
+              end
+            end
+          end
+        end
+
+        render json: @solution.as_json(
+          include: {
+            entries: {
+              include: {
+                annotations: {
+                  include: { account: { only: [:account_number, :name] } },
+                  methods: [:account_name],
+                  order: :number
+                }
               }
             }
           }
-        }
-      ), status: :ok
-    else
-      render json: @solution.errors, status: :unprocessable_entity
+        ), status: :ok
+      else
+        render json: @solution.errors, status: :unprocessable_entity
+      end
     end
+  rescue ActiveRecord::RecordInvalid => e
+    render json: { error: e.message }, status: :unprocessable_entity
   end
 
   def destroy
@@ -117,6 +139,29 @@ class SolutionsController < ApplicationController
     end
   
     ActiveRecord::Base.transaction do
+      # Actualizamos la solución con los datos proporcionados
+      if params[:solution].present?
+        @solution.update!(params[:solution].permit(:description))
+        
+        if params[:solution][:entries_attributes].present?
+          params[:solution][:entries_attributes].each do |entry_attr|
+            entry = @solution.entries.find_by(id: entry_attr[:id])
+            if entry
+              entry.update!(entry_attr.permit(:entry_number, :entry_date))
+              
+              if entry_attr[:annotations_attributes].present?
+                entry_attr[:annotations_attributes].each do |annotation_attr|
+                  annotation = entry.annotations.find_by(id: annotation_attr[:id])
+                  if annotation
+                    annotation.update!(annotation_attr.permit(:number, :credit, :debit, :account_number))
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+
       @help_example = HelpExample.create!(
         solution_id: @solution.id,
         creditMoves: params[:creditMoves] || "Ejemplo crédito",
@@ -129,7 +174,19 @@ class SolutionsController < ApplicationController
   
     render json: { 
       success: true,
-      solution: @solution,
+      solution: @solution.as_json(
+        include: {
+          entries: {
+            include: {
+              annotations: {
+                include: { account: { only: [:account_number, :name] } },
+                methods: [:account_name],
+                order: :number
+              }
+            }
+          }
+        }
+      ),
       help_example: @help_example
     }
   rescue ActiveRecord::RecordInvalid => e
@@ -152,6 +209,50 @@ class SolutionsController < ApplicationController
     else
       errors = (@help_example&.errors&.full_messages || []) + (@solution.errors.full_messages || [])
       render json: { success: false, errors: errors }, status: :unprocessable_entity
+    end
+  end
+
+  def example
+    @solution = Solution.find_by(is_example: true)
+    if @solution
+      render json: @solution.as_json(
+        include: { 
+          entries: { 
+            include: { 
+              annotations: {
+                include: { account: { only: [:account_number, :name, :charge, :credit, :description] } },
+                methods: [:account_name],
+                order: :number
+              }
+            }
+          }
+        }
+      )
+    else
+      render json: { error: "No hay solución de ejemplo disponible" }, status: :not_found
+    end
+  end
+
+  def example_solution
+    @statement = Statement.find(params[:statement_id])
+    @solution = @statement.solutions.find_by(is_example: true)
+    
+    if @solution
+      render json: @solution.as_json(
+        include: { 
+          entries: { 
+            include: { 
+              annotations: {
+                include: { account: { only: [:account_number, :name, :charge, :credit, :description] } },
+                methods: [:account_name],
+                order: :number
+              }
+            }
+          }
+        }
+      )
+    else
+      render json: { error: "No hay solución de ejemplo disponible para este enunciado" }, status: :not_found
     end
   end
 
@@ -233,6 +334,10 @@ class SolutionsController < ApplicationController
 
   def update_entries_and_annotations
     if solution_params[:entries_attributes].present?
+      # Primero eliminamos todas las entradas existentes que no estén en los nuevos datos
+      existing_entry_ids = solution_params[:entries_attributes].map { |attr| attr[:id] }.compact
+      @solution.entries.where.not(id: existing_entry_ids).destroy_all
+
       solution_params[:entries_attributes].each do |entry_attr|
         if entry_attr[:id].present?
           entry = @solution.entries.find_by(id: entry_attr[:id])
@@ -245,6 +350,10 @@ class SolutionsController < ApplicationController
               end
 
               if entry_attr[:annotations_attributes].present?
+                # Primero eliminamos todas las anotaciones existentes que no estén en los nuevos datos
+                existing_annotation_ids = entry_attr[:annotations_attributes].map { |attr| attr[:id] }.compact
+                entry.annotations.where.not(id: existing_annotation_ids).destroy_all
+
                 entry_attr[:annotations_attributes].each do |annotation_attr|
                   if annotation_attr[:id].present?
                     annotation = entry.annotations.find_by(id: annotation_attr[:id])
