@@ -57,7 +57,7 @@ class HelpExamplesController < ApplicationController
   def find_by_account_id
     @helpExample = HelpExample.find_by(account_id: params[:account_id])
     if @helpExample
-      render json: @helpExample
+      render json: @helpExample.as_json(include: { solution: { include: { entries: { include: :annotations } } } })
     else
       render json: { error: "Cuenta no encontrada" }, status: :not_found
     end

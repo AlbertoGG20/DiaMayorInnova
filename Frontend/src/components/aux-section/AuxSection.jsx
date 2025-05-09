@@ -8,7 +8,7 @@ import "../../components/entries-section/EntriesSection.css"
 import "../../pages/modes/practice-page/PracticePage.css"
 import { useLocation } from 'react-router-dom'
 
-export const AuxSection = ({ statements, examStarted, onSelectStatement, helpAvailable = false, entries = [] }) => {
+export const AuxSection = ({ statements, examStarted, onSelectStatement, helpAvailable = false, entries = [], selectedStatement }) => {
   const route = useLocation().pathname
   const [auxSection, setAuxSection] = useState("balance")
   const isExam = route.includes("/modes/examen/");
@@ -24,7 +24,7 @@ export const AuxSection = ({ statements, examStarted, onSelectStatement, helpAva
           />
         );
       case "help_example":
-        return <HelpSection />;
+        return <HelpSection statementId={selectedStatement?.id} />;
       case "balance":
         return <RealTimeTrialBalance entries={entries} />;
       case "mayor":

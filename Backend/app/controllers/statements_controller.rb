@@ -123,59 +123,78 @@ class StatementsController < ApplicationController
       # Gérer les entrées et annotations imbriquées
       if params[:solution][:entries_attributes].present?
         params[:solution][:entries_attributes].each do |entry_attr|
-          entry = @solution.entries.build(
-            entry_number: entry_attr[:entry_number],
-            entry_date: entry_attr[:entry_date]
-          )
+          # Verificamos si ya existe una entrada con el mismo número
+          existing_entry = @solution.entries.find_by(entry_number: entry_attr[:entry_number])
+          
+          if existing_entry
+            # Si existe, actualizamos sus datos
+            existing_entry.update(
+              entry_number: entry_attr[:entry_number],
+              entry_date: entry_attr[:entry_date]
+            )
+            entry = existing_entry
+          else
+            # Si no existe, creamos una nueva
+            entry = @solution.entries.build(
+              entry_number: entry_attr[:entry_number],
+              entry_date: entry_attr[:entry_date]
+            )
+            entry.save
+          end
 
-          if entry.save
-            if entry_attr[:annotations_attributes].present?
-              entry_attr[:annotations_attributes].each do |annotation_attr|
+          if entry.persisted? && entry_attr[:annotations_attributes].present?
+            entry_attr[:annotations_attributes].each do |annotation_attr|
+              # Verificamos si ya existe una anotación con el mismo número
+              existing_annotation = entry.annotations.find_by(number: annotation_attr[:number])
+              
+              if existing_annotation
+                # Si existe, actualizamos sus datos
+                existing_annotation.update(
+                  number: annotation_attr[:number],
+                  credit: annotation_attr[:credit],
+                  debit: annotation_attr[:debit],
+                  account_number: annotation_attr[:account_number]
+                )
+                annotation = existing_annotation
+              else
+                # Si no existe, creamos una nueva
                 annotation = entry.annotations.build(
                   number: annotation_attr[:number],
                   credit: annotation_attr[:credit],
                   debit: annotation_attr[:debit],
                   account_number: annotation_attr[:account_number]
                 )
+              end
 
-                unless process_account_ids(annotation)
-                  annotation.errors.full_messages.each do |msg|
-                    @solution.errors.add(:base, "Anotación #{annotation.number}: #{msg}")
-                  end
-                end
-
-                unless annotation.save
-                  annotation.errors.full_messages.each do |msg|
-                    @solution.errors.add(:base, "Anotación #{annotation.number}: #{msg}")
-                  end
+              unless process_account_ids(annotation)
+                annotation.errors.full_messages.each do |msg|
+                  @solution.errors.add(:base, "Anotación #{annotation.number}: #{msg}")
                 end
               end
-            end
-          else
-            entry.errors.full_messages.each do |msg|
-              @solution.errors.add(:base, "Entrada #{entry.entry_number}: #{msg}")
+
+              unless annotation.save
+                annotation.errors.full_messages.each do |msg|
+                  @solution.errors.add(:base, "Anotación #{annotation.number}: #{msg}")
+                end
+              end
             end
           end
         end
       end
 
-      if @solution.errors.empty?
-        render json: @solution.as_json(
-          include: {
-            entries: {
-              include: {
-                annotations: {
-                  include: { account: { only: [:account_number, :name] } },
-                  methods: [:account_name],
-                  order: :number
-                }
+      render json: @solution.as_json(
+        include: {
+          entries: {
+            include: {
+              annotations: {
+                include: { account: { only: [:account_number, :name] } },
+                methods: [:account_name],
+                order: :number
               }
             }
           }
-        ), status: :created
-      else
-        render json: @solution.errors, status: :unprocessable_entity
-      end
+        }
+      ), status: :created
     else
       render json: @solution.errors, status: :unprocessable_entity
     end
@@ -210,6 +229,29 @@ class StatementsController < ApplicationController
       end
     else
       render json: { error: "No autorizado" }, status: :forbidden
+    end
+  end
+
+  def example_solution
+    @statement = Statement.find(params[:id])
+    @solution = @statement.solutions.find_by(is_example: true)
+    
+    if @solution
+      render json: @solution.as_json(
+        include: { 
+          entries: { 
+            include: { 
+              annotations: {
+                include: { account: { only: [:account_number, :name, :charge, :credit, :description] } },
+                methods: [:account_name],
+                order: :number
+              }
+            }
+          }
+        }
+      )
+    else
+      render json: { error: "No hay solución de ejemplo disponible para este enunciado" }, status: :not_found
     end
   end
 

@@ -10,25 +10,51 @@ const SolutionList = ({ solutions, onEditSolution, onDeleteSolution, solutionToD
     setIsToggling(solutionId);
 
     try {
+      const solution = solutions.find(s => s.id === solutionId);
+      if (!solution) {
+        throw new Error("No se encontró la solución");
+      }
+
       if (isCurrentlyExample) {
         await solutionService.unmarkAsExample(solutionId);
-
       } else {
-        // Vérifier si account_id est valide (par exemple, via une requête au backend)
-        const accountId = 1; // Remplacer par une logique dynamique si possible
-        if (!accountId) {
-          throw new Error("Aucun compte disponible pour marquer comme exemple");
-        }
+        // Primero actualizamos la solución con sus datos actuales
+        const solutionData = {
+          description: solution.description,
+          entries_attributes: solution.entries.map(entry => ({
+            id: entry.id,
+            entry_number: entry.entry_number,
+            entry_date: entry.entry_date,
+            annotations_attributes: entry.annotations.map(annotation => ({
+              id: annotation.id,
+              number: annotation.number,
+              credit: annotation.credit,
+              debit: annotation.debit,
+              account_number: annotation.account_number
+            }))
+          }))
+        };
+
+        await solutionService.updateSolution(solutionId, solutionData);
+
+        // Luego la marcamos como ejemplo
         await solutionService.markAsExample(solutionId, {
-          creditMoves: "Ejemplo crédito",
-          debitMoves: "Ejemplo débito",
-          account_id: accountId
+          creditMoves: "0",
+          debitMoves: "0",
+          account_id: 1,
+          solution: solutionData
         });
       }
-      refreshSolutions();
+      
+      // Refrescamos las soluciones después de la actualización
+      await refreshSolutions();
     } catch (error) {
-      console.error("Error:", error);
-      alert(error.message || error.response?.data?.message || "Ocurrió un error al procesar la solicitud");
+      console.error("Error detallado:", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      alert(error.response?.data?.message || error.message || "Ocurrió un error al procesar la solicitud");
     } finally {
       setIsToggling(null);
     }

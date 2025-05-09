@@ -41,7 +41,7 @@
 .account__addAcc {
   grid-area: form;
   padding-bottom: 24px;
-  height: 340px;
+  height: 460px; /* Aumentado aún más para dar más espacio al botón */
   border-bottom: solid 1px var(--Color-grey-200);
 }
 
@@ -49,7 +49,7 @@
 .account__listAcc {
   padding: var(--gap-s);
   grid-area: list;
-  height: calc(100vh - 400px); /* Adjusts the height dynamically */
+  height: calc(100vh - 520px); /* Ajustado para dar más espacio al formulario */
   overflow-y: auto; /* Enables scrolling only for the account list */
   padding-right: 10px; /* Space for scrollbar */
   position: relative;

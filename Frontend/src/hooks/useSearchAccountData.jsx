@@ -5,6 +5,7 @@ import HelpExampleService from "../services/HelpExampleService";
 const useSearchAccountData = (searchNumber) => {
   const [example, setExample] = useState({});
   const [account, setAccount] = useState({});
+  const [solution, setSolution] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false)
   const [isData, setIsData] = useState(false)
@@ -21,11 +22,17 @@ const useSearchAccountData = (searchNumber) => {
         const accountExampledata = await HelpExampleService.findByAccount(accountData.data.id)
         setExample(accountExampledata.data);
 
+        // La solución ya viene incluida en la respuesta del HelpExample
+        if (accountExampledata.data.solution) {
+          setSolution(accountExampledata.data.solution);
+        }
+
         setIsLoading(false);
         setIsData(true);
       }
 
-      catch {
+      catch (error) {
+        console.error("Error fetching data:", error);
         setIsLoading(false);
         setIsError(true);
         setIsData(false);
@@ -42,6 +49,7 @@ const useSearchAccountData = (searchNumber) => {
     isError,
     example,
     account,
+    solution,
     isData,
   }
 }
