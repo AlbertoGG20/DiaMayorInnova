@@ -1,22 +1,19 @@
 .user-list__container {
-  height: 100%;
-  width: 100%;
-  overflow-y: scroll;
-  padding: var(--gap-s);
   display: flex;
   flex-direction: column;
-  gap: var(--gap-xxs);
-  border-radius: var(--r-s);
-  box-shadow: var(--box-shadow-btn);
+  height: 100%;
+  width: 100%;
   background-color: var(--Color-White);
+  border-radius: var(--gap-xs);
+  padding: var(--gap-s);
+  box-shadow: var(--box-shadow-btn);
+  gap: var(--gap-s);
 
   & h2 {
     font-size: var(--text-desktop-subtitles-2);
     color: var(--Color-Principal);
   }
-
 }
-
 
 .user_list {
   background-color: var(--Color-White);
@@ -59,7 +56,6 @@
   justify-content: space-between;
 }
 
-
 .edit-btn,
 .delete-btn {
   padding: var(--gap-xxs) var(--gap-xs);
@@ -93,5 +89,20 @@
   & span {
     padding: var(--gap-s);
     color: var(--Color-Principal);
+  }
+}
+
+@media (max-width: 768px) {
+  .user-list__container {
+    padding: var(--gap-xs);
+  }
+
+  .user-list_item {
+    font-size: var(--text-mobile-tiny);
+    padding: var(--gap-xxs);
+  }
+
+  .user-list__container h2 {
+    font-size: var(--text-mobile-subtitles-2);
   }
 }

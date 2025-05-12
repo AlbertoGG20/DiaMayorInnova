@@ -41,19 +41,19 @@ const SolutionsViewer = ({ solutions }) => {
                   <ul className="modal-solutionViewer__annotation-items">
                     <div className="modal-solutionViewer__annotation-items-title">
                       <span className="annotation-items--header">
-                        <strong>Apunte</strong>
+                        <strong className="header-text" data-mobile="Apt">Apunte</strong>
                       </span>
                       <span className="annotation-items--header">
-                        <strong>Nº de Cuenta</strong>
+                        <strong className="header-text" data-mobile="Cuenta">Nº de Cuenta</strong>
                       </span>
                       <span className="annotation-items--header">
-                        <strong>Nombre Cuenta</strong>
+                        <strong className="header-text" data-mobile="Nombre">Nombre Cuenta</strong>
                       </span>
                       <span className="annotation-items--header">
-                        <strong>Debe</strong>
+                        <strong className="header-text" data-mobile="Debe">Debe</strong>
                       </span>
                       <span className="annotation-items--header">
-                        <strong>Haber</strong>
+                        <strong className="header-text" data-mobile="Haber">Haber</strong>
                       </span>
                     </div>
                     {entry.annotations.map((annotation) => (
