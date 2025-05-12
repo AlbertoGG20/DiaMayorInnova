@@ -86,6 +86,7 @@ const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
               <div
                 className="statement-page__entry-collapse"
                 onClick={() => toggleCollapse(entryIndex)}
+                aria-expanded={!collapsedEntries[entryIndex]}
               >
                 <span className="statement-page__entry-title">{`Asiento ${entry.entry_number}`}</span>
                 <span className="statement-page__entry-icon">
@@ -123,7 +124,7 @@ const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
       <div className="statement-page-modal__actions" >
         <div className="statement-page-modal__actions-buttons" >
           <button type="button" onClick={addEntry} className="btn">
-            + Asiento
+            <span className="desktop-only">+ </span>Asiento
           </button>
           {/* <button
             type="button"

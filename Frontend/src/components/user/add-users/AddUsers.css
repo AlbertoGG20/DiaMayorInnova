@@ -12,6 +12,7 @@
   background-color: var(--Color-White);
   border-radius: var(--r-xs);
   box-shadow: var(--box-shadow-btn);
+  overflow-y: auto;
 
   & h2 {
     font-size: var(--text-desktop-subtitles-2);
@@ -62,7 +63,16 @@ legend {
 
 .add-users__selectors-container {
   display: flex;
+  flex-direction: row;
   gap: var(--gap-s);
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .add-users__selectors-container {
+    flex-direction: column;
+    gap: var(--gap-xs);
+  }
 }
 
 .user_label--select {
