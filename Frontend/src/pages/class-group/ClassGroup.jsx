@@ -24,6 +24,7 @@ const ClassGroup = () => {
   const [errors, setErrors] = useState({});
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const [studentCounts, setStudentCounts] = useState({});
 
   const handleEditClassGroup = (group) => {
@@ -42,16 +43,27 @@ const ClassGroup = () => {
     const newErrors = {};
     if (!formData.course) newErrors.course = "El curso es obligatorio.";
     if (!formData.course_module) newErrors.course_module = "El módulo es obligatorio.";
-    if (!formData.course) newErrors.course = "El curso es obligatorio.";
+    if (!formData.modality) newErrors.modality = "La modalidad es obligatoria.";
+    if (!formData.location) newErrors.location = "El aula es obligatoria.";
+    if (!formData.max_students || formData.max_students <= 0) {
+      newErrors.max_students = "El número máximo de estudiantes debe ser mayor que 0.";
+    }
+    if (!formData.weekly_hours || formData.weekly_hours <= 0) {
+      newErrors.weekly_hours = "Las horas semanales deben ser mayores que 0.";
+    }
+    if (formData.number_students > formData.max_students) {
+      newErrors.number_students = "El número de estudiantes no puede exceder el máximo permitido.";
+    }
     return newErrors;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage("");
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length) {
       setErrors(validationErrors);
-      //setTimeout(() => setErrors({}), 5000);
+      setTimeout(() => setErrors({}), 5000);
       return;
     }
     try {
@@ -72,11 +84,13 @@ const ClassGroup = () => {
       }
 
       setFormData(initialClassGroupState);
-      setErrors("");
+      setErrors({});
       setRefreshTrigger((prev) => prev + 1);
       setTimeout(() => setSuccessMessage(""), 5000);
     } catch (error) {
       console.error("Error al guardar el grupo de clase:", error);
+      setErrorMessage("Error al guardar el grupo de clase. Por favor, inténtelo de nuevo.");
+      setTimeout(() => setErrorMessage(""), 5000);
     }
   };
 
@@ -84,6 +98,7 @@ const ClassGroup = () => {
     setFormData(initialClassGroupState());
     setErrors({});
     setSuccessMessage("");
+    setErrorMessage("");
   };
 
   return (
@@ -99,6 +114,7 @@ const ClassGroup = () => {
         handleSubmit={handleSubmit}
         errors={errors}
         successMessage={successMessage}
+        errorMessage={errorMessage}
         onCancelEdit={handleCancelEdit}
       />
       <ClassGroupsList
