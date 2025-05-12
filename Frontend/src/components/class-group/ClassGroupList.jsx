@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ClassGroupService from "../../services/ClassGroupService";
 import userService from "../../services/userService";
+import SchoolsServices from "../../services/SchoolsServices";
 import ConfirmDeleteModal from "../modal/ConfirmDeleteModal";
 import AssignUserToClass from "../assignUsersToClass/AssignUserToClass";
 import { SearchBar } from "../search-bar/SearchBar";
@@ -18,8 +19,10 @@ const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [schoolCenters, setSchoolCenters] = useState({});
   const itemsPerPage = 10;
   const [localPage, setLocalPage] = useState(1);
+  const [allGroups, setAllGroups] = useState([]);
 
   const isSearching = searchTerm.trim().length > 0;
 
@@ -37,9 +40,10 @@ const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange }) => {
   const fetchClassGroups = async (page, name) => {
     setLoading(true);
     try {
-      const response = await ClassGroupService.getAll(page, 10, name);
+      const response = await ClassGroupService.getAll(page, itemsPerPage, name);
       if (response?.data?.data?.class_groups) {
-        setClassGroups(response?.data?.data?.class_groups);
+        const groups = response?.data?.data?.class_groups;
+        setClassGroups(groups);
         setTotalPages(response?.data?.data?.meta?.total_pages || 1);
       } else {
         console.error("No se recibieron datos válidos");
@@ -141,7 +145,7 @@ const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange }) => {
       />
 
       {filteredGroups.length === 0 ? (
-        <p>No hay grupos de clase creados.</p>
+        <p>No hay grupos de clase {searchTerm ? "que coincidan con la búsqueda" : "creados"}.</p>
       ) : (
         <div className="class-group-page__list-content">
           {
