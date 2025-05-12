@@ -52,7 +52,7 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: var(--gap-s);
+  gap: var(--gap-xxxs);
 }
 
 .class-group-page__form--row {
@@ -80,15 +80,16 @@
 
 .class-group-page__form--button-container {
   margin-top: var(--gap-m);
-  align-self: flex-start;
   display: flex;
   gap: var(--gap-s);
+  flex-wrap: wrap;
 }
 
 .form-row {
   display: flex;
   gap: var(--gap-m);
   flex-wrap: wrap;
+  margin-bottom: 4px;
 }
 
 .class-group-row {
@@ -111,13 +112,21 @@
   width: 100%;
   display: flex;
   gap: var(--gap-m);
-  align-items: end;
+  margin-bottom: var(--gap-s);
 }
 
+.form-row__sub-group--left,
+.form-row__sub-group--right {
+  display: flex;
+  gap: var(--gap-m);
+  flex: 1;
+}
 
 .form-group {
   display: flex;
   flex-direction: column;
+  gap: 4px;
+  flex: 1;
 }
 
 .form-group--small {
@@ -130,6 +139,38 @@
 
 .form-group--full {
   flex: 1 1 100%;
+}
+
+.error-message {
+  color: var(--Color-Error);
+  font-size: var(--text-desktop-small);
+  margin: 0;
+  padding: 4px 0;
+}
+
+/* Cuando hay error en un grupo, ajustamos el espaciado */
+.form-row__sub-group:has(.error-message) {
+  margin-bottom: var(--gap-m);
+}
+
+.form-row__sub-group:has(.error-message) .form-group {
+  margin-bottom: 0;
+}
+
+.class-group-page__form--button-container p[role="alert"] {
+  width: 100%;
+  margin: 0;
+  padding: var(--gap-xs);
+  border-radius: var(--r-xs);
+  text-align: center;
+}
+
+.class-group-page__form--button-container p[role="alert"][style*="color: green"] {
+  background-color: var(--Color-Success-Light);
+}
+
+.class-group-page__form--button-container p[role="alert"][style*="color: red"] {
+  background-color: var(--Color-Error-Light);
 }
 
 /* LISTA */
@@ -203,20 +244,6 @@
   align-items: center;
 }
 
-.form-row__sub-group--left {
-  width: 100%;
-  display: flex;
-  gap: var(--gap-m);
-}
-
-.form-row__sub-group--right {
-  width: 100%;
-  display: flex;
-  gap: var(--gap-m);
-}
-
-
-
 /*Afecta a los inputs de sign_in */
 input {
   -webkit-box-sizing: border-box;
@@ -262,16 +289,21 @@ input {
   }
 
   .form-row__sub-group {
-    gap: var(--gap-s);
-    width: 100%;
-
-  }
-
-  .form-row__sub-group--left {
     flex-direction: column;
+    gap: var(--gap-s);
   }
 
+  .form-row__sub-group--left,
   .form-row__sub-group--right {
     flex-direction: column;
+    width: 100%;
+  }
+
+  .form-group {
+    width: 100%;
+  }
+
+  .error-message {
+    font-size: var(--text-mobile-small);
   }
 }

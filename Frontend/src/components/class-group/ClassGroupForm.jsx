@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import SchoolsServices from "../../services/SchoolsServices";
 
-const ClassGroupForm = ({ formData, handleInputChange, handleSubmit, errors, successMessage, onCancelEdit }) => {
+const ClassGroupForm = ({ formData, handleInputChange, handleSubmit, errors, successMessage, errorMessage, onCancelEdit }) => {
   const { user } = useAuth();
   const [schoolCenters, setSchoolCenters] = useState([]);
 
@@ -110,6 +110,7 @@ const ClassGroupForm = ({ formData, handleInputChange, handleSubmit, errors, suc
                   onChange={handleInputChange}
                   name="max_students"
                 />
+                {errors.max_students && <p className="error-message">{errors.max_students}</p>}
               </div>
 
               <div className="form-group form-group--small">
@@ -123,7 +124,7 @@ const ClassGroupForm = ({ formData, handleInputChange, handleSubmit, errors, suc
                   onChange={handleInputChange}
                   name="weekly_hours"
                 />
-
+                {errors.weekly_hours && <p className="error-message">{errors.weekly_hours}</p>}
               </div>
             </div>
           </div>
@@ -166,6 +167,7 @@ const ClassGroupForm = ({ formData, handleInputChange, handleSubmit, errors, suc
           </button>
           {formData.id && <button type="button" className="btn light" onClick={onCancelEdit}>Cancelar</button>}
           {successMessage && <p role="alert" style={{ color: "green" }}>{successMessage}</p>}
+          {errorMessage && <p role="alert" style={{ color: "red" }}>{errorMessage}</p>}
         </div>
       </form>
     </section>
