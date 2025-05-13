@@ -106,7 +106,8 @@ class StudentExercisesController < ApplicationController
         task_tittle: exercise.task.title,  
         student: exercise.user.name,
         mark: exercise.total_mark.round(1),
-        date: exercise.updated_at.strftime("%d/%m/%Y, %H:%M:%S")
+        date: exercise.updated_at.strftime("%d/%m/%Y, %H:%M:%S"),
+        published: exercise.published
       }
     end
 
@@ -159,20 +160,21 @@ class StudentExercisesController < ApplicationController
   end
 
   def find_mark_exercise_by_user
-
-    @exercises = Exercise.includes(:task, marks: { student_entries: :student_annotations })
-                          .where(user_id: current_user.id)
-                          .page(params[:page])
-                          .per(params[:per_page] || 5)
+    exercises = current_user.exercises
+      .includes(:task, :marks)
+      .where(published: params[:only_published] == 'true')
+      .page(params[:page]).per(params[:per_page])
   
     render json: {
-      exercises: @exercises.as_json(
+      exercises: exercises.as_json(
         include: {
           task: { only: [:title] },
           marks: {
             include: {
               student_entries: {
-                include: :student_annotations
+                include: {
+                  student_annotations: { include: { account: { only: [:name] } } }
+                }
               }
             }
           }
@@ -180,9 +182,9 @@ class StudentExercisesController < ApplicationController
         methods: [:total_mark]
       ),
       meta: {
-        current_page: @exercises.current_page,
-        total_pages: @exercises.total_pages,
-        total_count: @exercises.total_count
+        current_page: exercises.current_page,
+        total_pages: exercises.total_pages,
+        total_count: exercises.total_count
       }
     }
   end
@@ -318,6 +320,12 @@ class StudentExercisesController < ApplicationController
   else
       render json: { errors: @exercise.errors.full_messages }, status: :unprocessable_entity
     end
+  end
+
+  def toggle_publish
+    @exercise = Exercise.find(params[:id])
+    @exercise.update(published: params[:published])
+    render json: @exercise
   end
   
   private

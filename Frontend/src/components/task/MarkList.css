@@ -116,3 +116,33 @@
     color: var(--Color-Principal);
   }
 }
+
+.btn__table.published {
+    background-color: var(--Color-green-200);
+    color: var(--Color--green-800);
+    border-radius: var(--r-xs);
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn__table.unpublished {
+    background-color: var(--Color-red-200);
+    color: var(--Color-red-800);
+    border-radius: var(--r-xs);
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn__table.published:hover {
+    background-color: var(--Color-green-400);;
+}
+
+.btn__table.unpublished:hover {
+    background-color: var(--Color-red-400);;
+}

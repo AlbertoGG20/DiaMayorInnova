@@ -114,7 +114,12 @@ const remove = async (id) => {
 };
 
 const getAllCalification = async (params) => {
-  const response = await http.get('/student_exercises/find_mark_exercise_by_user', { params });
+  const response = await http.get('/student_exercises/find_mark_exercise_by_user', { 
+    params: {
+      ...params,
+      only_published: params.only_published ? 'true' : 'false'
+    }
+  });
   // console.log("all exercise info of user - gelAllCalification ", response) // Depuración
   return response;
 };

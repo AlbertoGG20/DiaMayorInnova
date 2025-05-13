@@ -18,14 +18,25 @@ const StudentMark = () => {
       try {
         const { data } = await userExerciseDataService.getAllCalification({
           page: currentPage,
-          per_page: itemsPerPage
+          per_page: itemsPerPage,
+          only_published: true
         });
 
-        setMarks(data.exercises || []);
-        setIncludeMark((data.exercises || []).length !== 0);
+        const exercises = data.exercises || [];
+        setMarks(exercises);
+        setIncludeMark(exercises.length > 0);
         setTotalPages(data.meta.total_pages || 1);
+        
+        // Si la página actual es mayor que el total de páginas y hay páginas disponibles,
+        // volvemos a la primera página
+        if (currentPage > data.meta.total_pages && data.meta.total_pages > 0) {
+          setCurrentPage(1);
+        }
       } catch (error) {
         console.error('Error fetching marks', error);
+        setMarks([]);
+        setIncludeMark(false);
+        setTotalPages(1);
       }
     };
 
@@ -127,11 +138,13 @@ const StudentMark = () => {
         }
       </div>
 
-      <PaginationMenu
-        currentPage={currentPage}
-        setCurrentPage={changePage}
-        totalPages={totalPages}
-      />
+      {includeMark && (
+        <PaginationMenu
+          currentPage={currentPage}
+          setCurrentPage={changePage}
+          totalPages={totalPages}
+        />
+      )}
 
     </section>
   )
