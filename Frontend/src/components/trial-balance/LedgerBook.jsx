@@ -59,6 +59,12 @@ const LedgerBook = ({ entries, title = "Libro Mayor" }) => {
         const bValue = parseInt(b.accountNumber);
         return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
       });
+    } else if (sortConfig.key === 'entryNumber') {
+      accounts.sort((a, b) => {
+        const aMinEntry = Math.min(...a.entries.map(e => e.entryNumber));
+        const bMinEntry = Math.min(...b.entries.map(e => e.entryNumber));
+        return sortConfig.direction === 'asc' ? aMinEntry - bMinEntry : bMinEntry - aMinEntry;
+      });
     }
 
     // Ordenar los asientos dentro de cada cuenta

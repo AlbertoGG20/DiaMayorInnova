@@ -32,9 +32,6 @@ const EditSolutionModal = ({ solution, solutionIndex, solutions, setSolutions, o
           setEditedSolution={setEditedSolution}
         />
         <div className="modal-buttons__actions">
-          <button className="modal-close" onClick={onClose}>
-            Cerrar
-          </button>
           <button className="modal-save" onClick={handleSave}>
             Guardar
           </button>

@@ -20,6 +20,16 @@
   overflow-y: auto;
 }
 
+.modal-content h4 {
+  font-size: var(--text-desktop-subtitles-2);
+  margin-bottom: var(--gap-s);
+}
+
+.modal-content h5 {
+  font-size: var(--text-desktop-subtitles-3);
+  margin-bottom: var(--gap-xs);
+}
+
 .entry-item {
   margin-bottom: 20px;
 }
@@ -36,11 +46,13 @@ textarea {
 .modal-buttons__actions {
   display: flex;
   justify-content: space-between;
-  /* Esto distribuye los botones a los extremos */
   gap: 20px;
 }
 
-.modal-close,
+.modal-close {
+  display: none;
+}
+
 .modal-save {
   padding: 8px 16px;
   background-color: var(--Color-Neutral-Dark);
@@ -140,8 +152,10 @@ textarea {
 }
 
 .statement-page__annotation-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 2fr 3fr 2fr 2fr 1fr;
   gap: 10px;
+  align-items: center;
 }
 
 .statement-page__input {
@@ -150,8 +164,20 @@ textarea {
   border-radius: 4px;
 }
 
-.statement-page__entry-columns span:nth-child(2) {
-  width: 30px;
+.statement-page__input--edit:nth-child(1) {
+  width: 100px;
+}
+
+.statement-page__input--edit:nth-child(2) {
+  width: 100px;
+}
+
+.statement-page__input--edit:nth-child(4) {
+  width: 100px;
+}
+
+.statement-page__input--edit:nth-child(5) {
+  width: 100px;
 }
 
 .SolutionForm__entry_header {
@@ -159,21 +185,8 @@ textarea {
   display: flex;
 }
 
-.statement-page__input--edit-solution:nth-child(2) {
-  width: 100px;
-}
-
-.statement-page__input--edit-solution:nth-child(4) {
-  width: 100px;
-}
-
-.statement-page__input--edit-solution:nth-child(5) {
-  width: 100px;
-}
-
 .SolutionForm__entry_container {
   background-color: var(--Color-White);
-  margin: var(--gap-xxs);
   padding: var(--gap-xs);
   border-radius: var(--r-xs);
   box-shadow: var(--box-shadow-btn);
@@ -299,22 +312,6 @@ textarea {
   padding: 5px;
 }
 
-.statement-page__entry-columns {
-  display: grid;
-  grid-template-columns: 1fr 2fr 3fr 2fr 2fr 1fr;
-  font-weight: bold;
-  margin-bottom: 10px;
-  padding-bottom: var(--gap-xxs);
-  border-bottom: 1px solid var(--Color-grey-100);
-}
-
-.statement-page__annotation-row {
-  display: grid;
-  grid-template-columns: 1fr 2fr 3fr 2fr 2fr 1fr;
-  gap: 10px;
-  align-items: center;
-}
-
 .statement-page__entry-expanded--date {
   display: flex;
   flex-direction: row;
@@ -334,4 +331,96 @@ textarea {
   width: 150px;
   border: 1px solid #ccc;
   border-radius: 4px;
+}
+
+@media screen and (max-width: 768px) {
+  .desktop-only {
+    display: none;
+  }
+
+  .modal-content {
+    min-width: unset;
+    font-size: var(--text-mobile-body-small);
+    padding: var(--gap-s);
+    margin: var(--gap-xs);
+  }
+
+  .modal-content h4 {
+    font-size: var(--text-mobile-subtitles-2);
+  }
+
+  .modal-content h5 {
+    font-size: var(--text-mobile-subtitles-3);
+  }
+
+  .SolutionForm__entry_container {
+    margin: 0;
+    margin-bottom: var(--gap-xs);
+  }
+
+  .SolutionForm__entry_container:last-child {
+    margin-bottom: 0;
+  }
+
+  .statement-page__input {
+    padding: 4px;
+    font-size: var(--text-mobile-body-small);
+    margin-bottom: 0;
+  }
+
+  .statement-page__entry-columns {
+    grid-template-columns: 1fr 2fr 2fr 1fr;
+  }
+
+  .statement-page__entry-columns span:nth-child(2) {
+    visibility: hidden;
+    position: relative;
+  }
+
+  .statement-page__entry-columns span:nth-child(2)::before {
+    content: "Cuenta";
+    visibility: visible;
+    position: absolute;
+    left: 0;
+  }
+
+  .statement-page__entry-columns span:nth-child(3) {
+    display: none;
+  }
+
+  .statement-page__annotation-row {
+    grid-template-columns: 1fr 2fr 2fr 2fr;
+  }
+
+  .statement-page__annotation-row span:nth-child(3),
+  .statement-page__annotation-row input:nth-child(3) {
+    display: none;
+  }
+
+  .statement-page__annotation-row input[id="number"],
+  .statement-page__annotation-row input[id="account_number"],
+  .statement-page__annotation-row input[id="debit"],
+  .statement-page__annotation-row input[id="credit"] {
+    width: 100%;
+    margin-bottom: 0;
+    padding: var(--gap-xxxs);
+  }
+
+  .statement-page__totals span {
+    font-size: var(--text-mobile-body-small);
+  }
+
+  .statement-page__entry-expanded--date input {
+    margin-bottom: 0;
+  }
+
+  .statement-page__entry-date {
+    display: none;
+  }
+
+  .statement-page__entry-collapse[aria-expanded="false"] .statement-page__entry-date {
+    display: block;
+    margin-left: auto;
+    font-size: var(--text-mobile-body-small);
+  }
 }

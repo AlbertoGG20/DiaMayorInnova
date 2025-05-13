@@ -3,15 +3,37 @@
   align-items: center;
   gap: 0.5rem;
   list-style: none;
+  flex-wrap: wrap;
+  padding: 0;
+  margin: 0;
 }
 
 .breadcrumb__item {
   color: var(--Color-Principal-claro);
   font-weight: 600;
   font-size: var(--text-desktop-small);
+  white-space: nowrap;
 }
-
 
 .breadcrumb__item--active {
   color: var(--Color-Principal);
+}
+
+@media (max-width: 768px) {
+  .breadcrumb__container {
+    gap: 0.25rem;
+    font-size: 0.85rem;
+  }
+
+  .breadcrumb__item {
+    font-size: 0.85rem;
+  }
+
+  .breadcrumb__item a {
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+  }
 }

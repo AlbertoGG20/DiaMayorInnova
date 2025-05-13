@@ -77,16 +77,20 @@ const TaskDetails = ({ selectedTask, onDeleteStatement, onDeleteTask, onCloseMod
       </section>
       <footer className="task-details__footer">
         <button onClick={handleEditTask} className="task-details__footer--edit-btn">
-          Editar tarea
+          <i className="fi fi-rr-edit"></i>
+          <span>Editar tarea</span>
         </button>
         <button onClick={handleDeleteTask} className="task-details__footer--delete-btn">
-          Eliminar tarea
+          <i className="fi fi-rr-trash"></i>
+          <span>Eliminar tarea</span>
         </button>
-        <button onClick={(e) => onDuplicateTask(e, selectedTask)} className="btn light">
-          Duplicar tarea
+        <button onClick={(e) => onDuplicateTask(e, selectedTask)} className="task-details__footer--duplicate-btn btn light">
+          <i className="fi fi-rr-copy"></i>
+          <span>Duplicar tarea</span>
         </button>
-        <button onClick={handleShowMarks} className="btn light">
-          Ver notas
+        <button onClick={handleShowMarks} className="task-details__footer--view-notes-btn btn light">
+          <i className="fi fi-rr-eye"></i>
+          <span>Ver notas</span>
         </button>
       </footer>
 
