@@ -142,18 +142,38 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
   }, [selectedStatement]);
 
   const updateEntryDate = useCallback((statementId, entryNumber, newDate) => {
-    setStatementData((prevData) => ({
-      ...prevData,
-      [statementId]: {
-        ...prevData[statementId],
-        entries: prevData[statementId].entries.map((entry) =>
-          entry.entry_number === entryNumber
-            ? { ...entry, entry_date: newDate }
-            : entry
-        ),
-      },
-    }));
-  }, []);
+    setStatementData((prevData) => {
+      const updatedData = {
+        ...prevData,
+        [statementId]: {
+          ...prevData[statementId],
+          entries: prevData[statementId].entries.map((entry) =>
+            entry.entry_number === entryNumber
+              ? { ...entry, entry_date: newDate }
+              : entry
+          ),
+        },
+      };
+
+      // Notificar cambios si hay un callback
+      if (onEntriesChange) {
+        const formattedEntries = updatedData[statementId].entries
+          .filter(entry => !entry._destroy)
+          .map(entry => ({
+            ...entry,
+            annotations: updatedData[statementId].annotations
+              .filter(anno => anno.student_entry_id === entry.entry_number && !anno._destroy)
+              .map(anno => ({
+                ...anno,
+                _destroy: anno._destroy || false
+              }))
+          }));
+        onEntriesChange(formattedEntries);
+      }
+
+      return updatedData;
+    });
+  }, [onEntriesChange]);
 
   const addAnnotation = useCallback((statementId, entryId) => {
     if (!selectedStatement) return;
