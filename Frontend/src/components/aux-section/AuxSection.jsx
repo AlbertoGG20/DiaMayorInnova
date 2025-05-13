@@ -10,7 +10,7 @@ import { useLocation } from 'react-router-dom'
 
 export const AuxSection = ({ statements, examStarted, onSelectStatement, helpAvailable = false, entries = [] }) => {
   const route = useLocation().pathname
-  const [auxSection, setAuxSection] = useState("balance")
+  const [auxSection, setAuxSection] = useState("help_example")
   const isExam = route.includes("/modes/examen/");
 
   const sectionAux = useMemo(() => {
