@@ -1,7 +1,7 @@
+import { useEffect, useState, useRef } from "react";
 import userService from '../../services/userService';
 import Modal from '../modal/Modal';
 import ClassGroupService from '../../services/ClassGroupService';
-import { useEffect, useState } from 'react';
 import { useAuth } from "../../context/AuthContext";
 import "./AssignTaskUser.css"
 
@@ -11,6 +11,7 @@ const AssignTaskUser = ({ assignedInclude, setCurrentUsers, currentUsers }) => {
   const [users, setUsers] = useState([]);
   const [teacherClass, setTeacherClass] = useState([]);
   const [currentClass, setCurrentClass] = useState(0)
+  const modalRef = useRef(null);
 
   const selectUser = (userId) => {
     if (!currentUsers.includes(userId))
@@ -52,6 +53,7 @@ const AssignTaskUser = ({ assignedInclude, setCurrentUsers, currentUsers }) => {
   return (
     <>
       <Modal
+        ref={modalRef}
         btnText="Asignar Alumnos"
         modalTitle="Asignar tarea a usuario"
       >
@@ -85,7 +87,15 @@ const AssignTaskUser = ({ assignedInclude, setCurrentUsers, currentUsers }) => {
             </div>
           </div>
         </div>
-        <button className='btn btn--tasks-assigned' onClick={(e) => e.preventDefault()}>Guardar asignación</button>
+        <button
+          className="btn btn--tasks-assigned"
+          onClick={(e) => {
+            e.preventDefault();
+            modalRef.current?.close();
+          }}
+        >
+          Guardar asignación
+        </button>
       </Modal>
     </>
   )
