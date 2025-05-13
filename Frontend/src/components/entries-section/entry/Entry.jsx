@@ -28,8 +28,16 @@ const Entry = ({ number, updateEntryDate, annotations, updateAnnotation, deleteA
     setDate(newDate);
     if (selectedStatement) {
       updateEntryDate(selectedStatement.id, entryIndex, newDate);
+    } else {
+      updateEntryDate(entryIndex, newDate);
     }
   }
+
+  useEffect(() => {
+    if (date) {
+      setDate(date);
+    }
+  }, [date]);
 
   return (
     <div className='entry_wrapper'>
