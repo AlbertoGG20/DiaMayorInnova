@@ -81,7 +81,7 @@ const RealTimeTrialBalance = ({ entries }) => {
             <tr key={row.account_number}>
               <td data-label="Orden">{row.orden}</td>
               <td data-label="Nº de cuenta">{row.account_number}</td>
-              <td data-label="Nombre Cuenta">{row.account_name}</td>
+              <td data-label="Nombre Cuenta" title={row.account_name}>{row.account_name}</td>
               <td data-label="Debe">{row.debe.toFixed(2)}</td>
               <td data-label="Haber">{row.haber.toFixed(2)}</td>
               <td data-label="Deudores">{row.deudor !== '' ? row.deudor.toFixed(2) : ''}</td>

@@ -202,7 +202,7 @@ const ExamInformation = () => {
       <main className="exam_statements__main">
         <h2 className="exam_statement__statement">
           {activeTab === "statements" ? "Enunciados" :
-            activeTab === "mayor" ? "Diario Mayor" :
+            activeTab === "mayor" ? "Mayor" :
               "Balance"}
         </h2>
         <div className="exam_statements__container">
