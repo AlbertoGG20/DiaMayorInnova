@@ -10,8 +10,21 @@ import { useLocation } from 'react-router-dom'
 
 export const AuxSection = ({ statements, examStarted, onSelectStatement, helpAvailable = false, entries = [] }) => {
   const route = useLocation().pathname
-  const [auxSection, setAuxSection] = useState("help_example")
   const isExam = route.includes("/modes/examen/");
+  const [auxSection, setAuxSection] = useState(() => {
+    if (helpAvailable && !isExam) {
+      return "help_example"
+    }
+    return "balance"
+  });
+
+  useEffect(() => {
+    if (helpAvailable && !isExam) {
+      setAuxSection("help_example");
+    } else {
+      setAuxSection("balance");
+    }
+  }, [helpAvailable, isExam]);
 
   const sectionAux = useMemo(() => {
     switch (auxSection) {

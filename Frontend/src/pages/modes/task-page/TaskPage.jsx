@@ -75,10 +75,24 @@ const TaskPage = () => {
             setTaskStarted(true);
           }
 
-          const firstMarkedStatement = response.exercise.marks?.[0]?.statement_id;
-          const targetStatement = firstMarkedStatement
-            ? response.exercise.task.statements.find(s => s.id === firstMarkedStatement)
-            : response.exercise.task.statements[0];
+          const newStatementData = {};
+          response.exercise.marks?.forEach(mark => {
+            newStatementData[mark.statement_id] = {
+              entries: mark.student_entries?.map(entry => ({
+                entry_number: entry.entry_number,
+                entry_date: entry.entry_date
+              })) || [],
+              annotations: mark.student_entries?.flatMap(entry =>
+                entry.student_annotations?.map(anno => ({
+                  ...anno,
+                  student_entry_id: entry.entry_number
+                })) || []
+              )
+            };
+          });
+          setStatementData(newStatementData);
+
+          const targetStatement = response.exercise.marks?.[0]?.statement_id;
 
           setSelectedStatement(targetStatement);
         }
@@ -136,34 +150,36 @@ const TaskPage = () => {
 
   const handleSaveProgress = async (statementId, data) => {
     try {
-      const existingMark = exercise.marks.find(
-        (mark) => mark.statement_id === parseInt(statementId)
-      );
+      const marksAttributes = Object.entries(data).map(([statementId, statementData]) => {
+        const existingMark = exercise.marks.find(
+          (mark) => mark.statement_id === parseInt(statementId)
+        );
+
+        return {
+          id: existingMark?.id,
+          statement_id: statementId,
+          student_entries_attributes: statementData.entries.map((entry) => ({
+            id: entry.id,
+            entry_number: entry.entry_number,
+            entry_date: entry.entry_date,
+            _destroy: entry._destroy,
+            student_annotations_attributes: statementData.annotations
+              .filter((a) => a.student_entry_id === entry.entry_number)
+              .map((anno, index) => ({
+                id: anno.id,
+                account_id: anno.account_id,
+                number: index + 1,
+                debit: anno.debit,
+                credit: anno.credit,
+                _destroy: anno._destroy
+              })),
+          })),
+        };
+      });
 
       const payload = {
         exercise: {
-          marks_attributes: [
-            {
-              id: existingMark?.id,
-              statement_id: statementId,
-              student_entries_attributes: data.entries.map((entry) => ({
-                id: entry.id,
-                entry_number: entry.entry_number,
-                entry_date: entry.entry_date,
-                _destroy: entry._destroy,
-                student_annotations_attributes: data.annotations
-                  .filter((a) => a.student_entry_id === entry.entry_number && !a._destroy)
-                  .map((anno, index) => ({
-                    id: anno.id,
-                    account_id: anno.account_id,
-                    number: index + 1,
-                    debit: anno.debit,
-                    credit: anno.credit,
-                    _destroy: anno._destroy
-                  })),
-              })),
-            },
-          ],
+          marks_attributes: marksAttributes
         },
       };
 
@@ -171,11 +187,9 @@ const TaskPage = () => {
 
       if (response?.status === 200) {
         setExercise(prev => {
-          // Verificación en profundidad de la respuesta
           const serverData = response.data?.exercise || {};
           const serverMarks = serverData.marks || [];
 
-          // Procesar marcas del servidor
           const processedMarks = serverMarks.map(mark => ({
             ...mark,
             student_entries: (mark.student_entries || [])
@@ -187,11 +201,9 @@ const TaskPage = () => {
               }))
           }));
 
-          // Crear nuevo estado
           const newState = {
             ...prev,
             marks: prev.marks.map(prevMark => {
-              // Buscar si existe en la respuesta
               const updatedMark = processedMarks.find(
                 m => m.statement_id === prevMark.statement_id
               );
@@ -199,7 +211,6 @@ const TaskPage = () => {
             })
           };
 
-          // Añadir nuevas marcas si no existían
           processedMarks.forEach(mark => {
             if (!newState.marks.some(m => m.statement_id === mark.statement_id)) {
               newState.marks.push(mark);

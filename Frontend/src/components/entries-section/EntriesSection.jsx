@@ -46,6 +46,7 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
       });
       
       setStatementData(newStatementData);
+      setAllStatementsData(newStatementData);
     }
   }, [savedMarks]);
 
@@ -83,6 +84,15 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
       setStatementData(newStatementData);
     }
   }, [exercise?.marks]);
+
+  useEffect(() => {
+    if (selectedStatement && currentStatementData) {
+      setAllStatementsData(prevData => ({
+        ...prevData,
+        [selectedStatement.id]: currentStatementData
+      }));
+    }
+  }, [selectedStatement, currentStatementData]);
 
   const addEntry = useCallback((statementId) => {
     // Obtener todas las entradas de todos los statements
@@ -200,22 +210,36 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
 
   const handleSubmitStatement = useCallback(() => {
     if (!selectedStatement) return;
-    if(exercise?.task?.is_exam === false){
-      handleSave(true);
-    }
-    setAllStatementsData((prevData) => ({
+
+    const currentData = { entries, annotations };
+    
+    setStatementData(prevData => ({
       ...prevData,
-      [selectedStatement.id]: { entries, annotations },
+      [selectedStatement.id]: currentData
     }));
 
-    setStatementData((prevData) => ({
+    setAllStatementsData(prevData => ({
       ...prevData,
-      [selectedStatement.id]: prevData[selectedStatement.id] || { entries: [], annotations: [] },
+      [selectedStatement.id]: currentData
     }));
+
     if (onStatementComplete) {
-      onStatementComplete(selectedStatement.id, { entries, annotations });
+      if (!exercise?.task?.is_exam) {
+        const allData = {
+          ...allStatementsData,
+          [selectedStatement.id]: currentData
+        };
+        onStatementComplete(selectedStatement.id, allData);
+      } else {
+        onStatementComplete(selectedStatement.id, currentData);
+      }
     }
-  }, [selectedStatement, exercise?.task?.is_exam, handleSave, entries, annotations, onStatementComplete]);
+    
+    if(!exercise?.task?.is_exam){
+      handleSave(true);
+      navigate('/');
+    }
+  }, [selectedStatement, exercise?.task?.is_exam, handleSave, entries, annotations, onStatementComplete, allStatementsData]);
 
   const handleFinalSubmit = useCallback(() => {
     if (!exercise || !exercise.id) {
@@ -225,6 +249,11 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
 
     const updatedStatementsData = { ...allStatementsData, ...statementData };
 
+    if (Object.keys(updatedStatementsData).length === 0) {
+      console.error("❌ Error: No hay datos en updatedStatementsData", updatedStatementsData);
+      return;
+    }
+
     const filteredStatementsData = Object.entries(updatedStatementsData).reduce((acc, [statementId, data]) => {
       acc[statementId] = {
         entries: data.entries,
@@ -232,11 +261,6 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
       };
       return acc;
     }, {});
-
-    if (Object.keys(filteredStatementsData).length === 0) {
-      console.error("❌ Error: No hay datos en updatedStatementsData", filteredStatementsData);
-      return;
-    }
 
     const dataToSubmit = {
       statementsData: filteredStatementsData,
