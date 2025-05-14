@@ -5,21 +5,21 @@ class StatementsController < ApplicationController
 
   def index
     return render json: { error: "No autorizado" }, status: :forbidden if current_user.student?
-  
+
     begin
       statements = Statement.includes(solutions: { entries: :annotations })
-  
+
       unless current_user.admin?
         statements = statements.where("is_public = ? OR user_id = ?", true, current_user.id)
       end
-  
+
       if params[:search].present?
         search_term = "%#{params[:search]}%"
         statements = statements.where("definition ILIKE ? OR explanation ILIKE ?", search_term, search_term)
-      end     
+      end
 
       paginated_statements = statements.page(params[:page]).per(params[:per_page] || 10)
-  
+
       render json: {
         statements: paginated_statements.as_json(
           include: {
@@ -46,7 +46,6 @@ class StatementsController < ApplicationController
       render json: @statement.errors, status: :internal_server_error
     end
   end
-  
 
   def show
     render json: @statement.as_json(
@@ -71,7 +70,7 @@ class StatementsController < ApplicationController
       render json: { error: "No autorizado" }, status: :forbidden
     else
       @statement = current_user.statements.build(statement_params)
-      
+
       unless process_account_ids(@statement)
         @statement.solutions.each do |solution|
           solution.entries.each do |entry|
@@ -125,7 +124,7 @@ class StatementsController < ApplicationController
         params[:solution][:entries_attributes].each do |entry_attr|
           # Verificamos si ya existe una entrada con el mismo número
           existing_entry = @solution.entries.find_by(entry_number: entry_attr[:entry_number])
-          
+
           if existing_entry
             # Si existe, actualizamos sus datos
             existing_entry.update(
@@ -146,7 +145,7 @@ class StatementsController < ApplicationController
             entry_attr[:annotations_attributes].each do |annotation_attr|
               # Verificamos si ya existe una anotación con el mismo número
               existing_annotation = entry.annotations.find_by(number: annotation_attr[:number])
-              
+
               if existing_annotation
                 # Si existe, actualizamos sus datos
                 existing_annotation.update(
@@ -264,8 +263,8 @@ class StatementsController < ApplicationController
   def statement_params
     Rails.logger.debug "Params received: #{params[:statement].inspect}"
     params.require(:statement).permit(
-      :definition, 
-      :explanation, 
+      :definition,
+      :explanation,
       :is_public,
       solutions_attributes: [
         :id,
