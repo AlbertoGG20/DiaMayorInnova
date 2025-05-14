@@ -71,7 +71,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_14_160839) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "account_id", null: false
-    t.integer "account_number"
     t.index ["account_id"], name: "index_annotations_on_account_id"
     t.index ["entry_id"], name: "index_annotations_on_entry_id"
     t.index ["number"], name: "index_annotations_on_number"
@@ -118,7 +117,10 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_14_160839) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "description"
+    t.integer "solution"
+    t.bigint "solution_id"
     t.index ["account_id"], name: "index_help_examples_on_account_id"
+    t.index ["solution_id"], name: "index_help_examples_on_solution_id"
   end
 
   create_table "marks", force: :cascade do |t|
@@ -147,6 +149,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_14_160839) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "statement_id", null: false
+    t.boolean "is_example", default: false, null: false
     t.index ["statement_id"], name: "index_solutions_on_statement_id"
   end
 
@@ -251,6 +254,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_14_160839) do
   add_foreign_key "exercises", "tasks"
   add_foreign_key "exercises", "users"
   add_foreign_key "help_examples", "accounts"
+  add_foreign_key "help_examples", "solutions"
   add_foreign_key "marks", "exercises"
   add_foreign_key "solutions", "statements"
   add_foreign_key "statements", "users"

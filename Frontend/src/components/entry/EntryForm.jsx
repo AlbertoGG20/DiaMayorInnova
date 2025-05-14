@@ -25,7 +25,7 @@ const EntryForm = ({ solutionIndex, entry, entryIndex, solutions, setSolutions }
     const updatedSolutions = [...solutions];
     updatedSolutions[solutionIndex].entries[entryIndex].annotations.push({
       number: updatedSolutions[solutionIndex].entries[entryIndex].annotations.length + 1,
-      account_number: 0,
+      account_id: "",
       credit: "",
       debit: "",
     });
