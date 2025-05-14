@@ -93,7 +93,7 @@ const StatementCreateForm = () => {
           number: 1,
           credit: "",
           debit: "",
-          account_number: 0,
+          account_id: "",
         }],
       }],
     };
@@ -165,7 +165,7 @@ const StatementCreateForm = () => {
         annotations: entry.annotations.map(annotation => ({
           ...annotation,
           account_name: annotation.account_name || "",
-          account_number: annotation.account_number || 0
+          account_id: annotation.account_id
         })),
       })) || [],
     };

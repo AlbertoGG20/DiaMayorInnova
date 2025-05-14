@@ -26,7 +26,7 @@ const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
     updatedSolutions[solutionIndex].entries.push({
       entry_number: updatedSolutions[solutionIndex].entries.length + 1,
       entry_date: "",
-      annotations: [{ number: 1, account_number: 0, credit: "", debit: "" }],
+      annotations: [{ number: 1, account_id: "", credit: "", debit: "" }],
     });
     setSolutions(updatedSolutions);
   };

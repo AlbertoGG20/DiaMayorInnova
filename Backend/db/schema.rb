@@ -71,7 +71,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_14_160839) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "account_id", null: false
-    t.integer "account_number"
     t.index ["account_id"], name: "index_annotations_on_account_id"
     t.index ["entry_id"], name: "index_annotations_on_entry_id"
     t.index ["number"], name: "index_annotations_on_number"

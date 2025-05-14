@@ -8,89 +8,75 @@ const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions,
   const [accounts, setAccounts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const accountIdInputRef = useRef(null);
   const accountNumberInputRef = useRef(null);
   const modalRef = useRef(null);
 
   useEffect(() => {
     if (annotation.account_id) {
-      const fetchAccountData = async () => {
+      const fetchAccountDataById = async () => {
         try {
           const response = await http.get(`/accounts/${annotation.account_id}`);
           const accountData = response.data;
           const updatedSolutions = [...solutions];
-          updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_number = accountData.account_number;
+          updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_id = accountData.id;
           updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_name = accountData.name;
+          accountNumberInputRef.current.value = accountData.account_number;
           setSolutions(updatedSolutions);
         } catch (error) {
           console.error("Error al cargar los datos de la cuenta:", error);
         }
       };
-      fetchAccountData();
+      fetchAccountDataById();
     }
   }, [annotation.account_id]);
 
-  useEffect(() => {
-    const loadAccounts = async () => {
-      try {
-        const response = await http.get(`/accounts?page=${currentPage}&limit=${5}`);
-        setAccounts(response.data.accounts);
-        setTotalPages(response.data.meta.total_pages || 1);
-      } catch (error) {
-        console.error("Error al cargar las cuentas:", error);
-      }
-    };
-    loadAccounts();
-  }, [currentPage]);
-  const debounceTimeout = useRef(null);
-
-  const retrieveAccounts = async (page = 1) => {
+  const loadAccounts = async () => {
     try {
-      const response = await http.get("/accounts", {
-        params: {
-          page,
-          per_page: 10
-        }
-      });
+      const response = await http.get(`/accounts?page=${currentPage}&limit=${5}`);
       setAccounts(response.data.accounts);
-      setTotalPages(response.data.meta.total_pages);
-      setCurrentPage(response.data.meta.current_page);
+      setTotalPages(response.data.meta.total_pages || 1);
     } catch (error) {
       console.error("Error al cargar las cuentas:", error);
     }
   };
 
+  useEffect(() => {
+    loadAccounts();
+  }, [currentPage]);
+  const debounceTimeout = useRef(null);
+
+  let account_id;
+  let account_name;
   const searchAccount = async (accountNumber) => {
     try {
       const response = await http.get(`/accounts/find_by_account_number?account_number=${accountNumber}`);
       if (response.data) {
-        const updatedSolutions = [...solutions];
-        updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex] = {
-          ...updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex],
-          account_number: response.data.account_number,
-          account_name: response.data.name
-        };
-        setSolutions(updatedSolutions);
+        account_id = response.data.id;
+        account_name = response.data.name;
       }
     } catch (error) {
+      account_id = null;
+      account_name = "";
       console.error("Error al buscar la cuenta:", error);
     }
+    const updatedSolutions = [...solutions];
+    updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex] = {
+      ...updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex],
+      account_id: account_id,
+      account_name: account_name
+    };
+    setSolutions(updatedSolutions);
   };
 
   const openAccountModal = async () => {
-    await retrieveAccounts(1);
+    await loadAccounts();
     modalRef.current?.showModal();
-  };
-
-  const handlePageChange = async (newPage) => {
-    if (newPage > 0 && newPage <= totalPages) {
-      await retrieveAccounts(newPage);
-    }
   };
 
   const handleAccountSelect = (account) => {
     const updatedSolutions = [...solutions];
     updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_id = account.id;
-    updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_number = account.account_number;
     updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_name = account.name;
     setSolutions(updatedSolutions);
     modalRef.current?.close();
@@ -101,12 +87,31 @@ const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions,
     const updatedSolutions = [...solutions];
     updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex][name] = value;
 
-    if (name === "account_number") {
-      updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_number = Number(value);
-      updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_id = null;
+    if (name === "account_id") {
+      updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_id = Number(value);
       updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_name = "";
     }
     setSolutions(updatedSolutions);
+
+    if (name === "account_id" && value) {
+      // Limpiar el timeout anterior si existe
+      if (debounceTimeout.current) {
+        clearTimeout(debounceTimeout.current);
+      }
+
+      // Buscar primero en las cuentas cargadas
+      const foundAccount = accounts.find(acc => acc.id === value);
+      if (foundAccount) {
+        updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_name = foundAccount.name;
+        setSolutions(updatedSolutions);
+        return;
+      }
+
+      // Si no se encuentra, usar debounce para buscar en la API
+      debounceTimeout.current = setTimeout(() => {
+        searchAccount(value);
+      }, 500); // 500ms de debounce
+    }
 
     if (name === "account_number" && value) {
       // Limpiar el timeout anterior si existe
@@ -114,16 +119,10 @@ const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions,
         clearTimeout(debounceTimeout.current);
       }
 
-      // Si el valor está vacío, limpiar los campos
-      if (!value) {
-        updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_name = "";
-        setSolutions(updatedSolutions);
-        return;
-      }
-
       // Buscar primero en las cuentas cargadas
       const foundAccount = accounts.find(acc => acc.account_number === value);
       if (foundAccount) {
+        updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_id = foundAccount.id;
         updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_name = foundAccount.name;
         setSolutions(updatedSolutions);
         return;
@@ -168,8 +167,18 @@ const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions,
       />
       <input
         type="number"
+        name="account_id"
+        value={annotation.account_id || ""}
+        onChange={handleAnnotationChange}
+        id="account_id"
+        className="statement-page__input--edit-solution"
+        placeholder="Nº Cuenta"
+        style={{ display: "none" }}
+        ref={accountIdInputRef}
+      />
+      <input
+        type="number"
         name="account_number"
-        value={annotation.account_number || ""}
         onChange={handleAnnotationChange}
         id="account_number"
         className="statement-page__input--edit-solution"

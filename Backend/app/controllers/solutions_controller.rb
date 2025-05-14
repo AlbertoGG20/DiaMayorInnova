@@ -74,51 +74,24 @@ class SolutionsController < ApplicationController
   end
 
   def update
-    unless process_account_ids(@solution)
-      render json: @solution.errors, status: :unprocessable_entity
-      return
-    end
+    if @solution.update(solution_params)
 
-    ActiveRecord::Base.transaction do
-      if @solution.update(solution_params)
-        # Actualizar entradas y anotaciones
-        if solution_params[:entries_attributes].present?
-          solution_params[:entries_attributes].each do |entry_attr|
-            entry = @solution.entries.find_by(id: entry_attr[:id])
-            if entry
-              entry.update!(entry_attr.permit(:entry_number, :entry_date))
-              
-              if entry_attr[:annotations_attributes].present?
-                entry_attr[:annotations_attributes].each do |annotation_attr|
-                  annotation = entry.annotations.find_by(id: annotation_attr[:id])
-                  if annotation
-                    annotation.update!(annotation_attr.permit(:number, :credit, :debit, :account_number))
-                  end
-                end
-              end
-            end
-          end
-        end
-
-        render json: @solution.as_json(
-          include: {
-            entries: {
-              include: {
-                annotations: {
-                  include: { account: { only: [:account_number, :name] } },
-                  methods: [:account_name],
-                  order: :number
-                }
+      render json: @solution.as_json(
+        include: {
+          entries: {
+            include: {
+              annotations: {
+                include: { account: { only: [:account_number, :name] } },
+                methods: [:account_name],
+                order: :number
               }
             }
           }
-        ), status: :ok
-      else
-        render json: @solution.errors, status: :unprocessable_entity
-      end
+        }
+      ), status: :ok
+    else
+      render json: @solution.errors, status: :unprocessable_entity
     end
-  rescue ActiveRecord::RecordInvalid => e
-    render json: { error: e.message }, status: :unprocessable_entity
   end
 
   def destroy
@@ -285,7 +258,7 @@ class SolutionsController < ApplicationController
           :number,
           :credit,
           :debit,
-          :account_number,
+          :account_id,
           :_destroy
         ]
       ]
@@ -300,7 +273,6 @@ class SolutionsController < ApplicationController
       (solution.entries || []).each do |entry|
         (entry.annotations || []).each do |annotation|
           Rails.logger.debug "Account number: #{annotation.account_number}"
-          
           if annotation.account_number.present?
             account = Account.find_by(account_number: annotation.account_number)
             

@@ -159,15 +159,15 @@ textarea {
   display: flex;
 }
 
-.statement-page__input--edit-solution:nth-child(2) {
-  width: 100px;
-}
-
-.statement-page__input--edit-solution:nth-child(4) {
+.statement-page__input--edit-solution:nth-child(3) {
   width: 100px;
 }
 
 .statement-page__input--edit-solution:nth-child(5) {
+  width: 100px;
+}
+
+.statement-page__input--edit-solution:nth-child(6) {
   width: 100px;
 }
 
