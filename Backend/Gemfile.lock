@@ -80,14 +80,6 @@ GEM
     airbrussh (1.5.3)
       sshkit (>= 1.6.1, != 1.7.0)
     ast (2.4.3)
-    axlsx (3.0.0.pre)
-      htmlentities (~> 4.3, >= 4.3.4)
-      mimemagic (~> 0.3)
-      nokogiri (~> 1.8, >= 1.8.2)
-      rubyzip (~> 1.2, >= 1.2.1)
-    axlsx_rails (0.5.2)
-      actionpack (>= 3.1)
-      axlsx (>= 2.0.1)
     base64 (0.2.0)
     bcrypt (3.1.20)
     benchmark (0.4.0)
@@ -185,9 +177,6 @@ GEM
       net-pop
       net-smtp
     marcel (1.0.4)
-    mimemagic (0.4.3)
-      nokogiri (~> 1)
-      rake
     mini_mime (1.1.5)
     minitest (5.25.5)
     msgpack (1.8.0)
@@ -385,7 +374,6 @@ PLATFORMS
 
 DEPENDENCIES
   active_model_serializers
-  axlsx_rails (~> 0.5.2)
   bootsnap
   brakeman
   cancancan
@@ -394,7 +382,7 @@ DEPENDENCIES
   capistrano-rails (~> 1.0)
   capistrano-rbenv (~> 2.0)
   capistrano-yarn
-  caxlsx (~> 4.2)
+  caxlsx (~> 4.1)
   caxlsx_rails (~> 0.6.4)
   debug
   devise (~> 4.2)

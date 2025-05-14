@@ -30,7 +30,7 @@ const SolutionList = ({ solutions, onEditSolution, onDeleteSolution, solutionToD
               number: annotation.number,
               credit: annotation.credit,
               debit: annotation.debit,
-              account_number: annotation.account_number
+              account_id: annotation.account_id
             }))
           }))
         };

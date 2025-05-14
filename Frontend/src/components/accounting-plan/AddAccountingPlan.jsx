@@ -15,6 +15,7 @@ const AddAccountingPlan = ({ setNewPGC }) => {
   const [error, setError] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploadMessage, setUploadMessage] = useState("");
+  const [fileName, setFileName] = useState("Nada seleccionado");
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;

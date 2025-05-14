@@ -204,12 +204,6 @@ class StatementsController < ApplicationController
     Rails.logger.debug "Params received in update: #{params[:statement].inspect}"
     if @statement.user_id == current_user.id || current_user.admin?
       if @statement.update(statement_params)
-        unless process_account_ids(@statement)
-          render json: @statement.errors, status: :unprocessable_entity
-          return
-        end
-
-        update_solutions_and_entries
         render json: @statement, status: :ok
       else
         render json: @statement.errors, status: :unprocessable_entity
@@ -287,7 +281,7 @@ class StatementsController < ApplicationController
             :number,
             :credit,
             :debit,
-            :account_number,
+            :account_id,
             :_destroy
           ]
         ]

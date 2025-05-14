@@ -37,13 +37,13 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
           annotations: [
             {
               number: 1,
-              account_number: 0,
+              account_id: "",
               credit: "",
               debit: "",
             },
             {
               number: 2,
-              account_number: 0,
+              account_id: "",
               credit: "",
               debit: "",
             },
@@ -100,7 +100,7 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
           let credit = Number(annotation.credit) || 0;
           let debit = Number(annotation.debit) || 0;
 
-          if (!annotation.account_number) {
+          if (!annotation.account_id) {
             errors += `El número de cuenta de la anotación ${annotationIndex + 1} en la solución ${solutionIndex + 1} es obligatorio.\n`;
           }
 
@@ -152,7 +152,7 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
           annotations_attributes: (entry.annotations || []).map((annotation) => ({
             ...(annotation.id && { id: annotation.id }),
             number: annotation.number,
-            account_number: annotation.account_number,
+            account_id: annotation.account_id,
             credit: parseFloat(annotation.credit) || 0,
             debit: parseFloat(annotation.debit) || 0,
             ...(annotation._destroy === true ? { _destroy: true } : {}),
