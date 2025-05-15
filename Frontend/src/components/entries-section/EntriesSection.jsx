@@ -67,7 +67,7 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
             uid: anno.uid || `anno-${anno.id || Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             number: anno.number,
             student_entry_id: entry.entry_number,
-            account_number: anno.account_number || "",
+            account_number: anno.account?.account_number || "",
             account_name: anno.account_name || anno.account?.name || "",
             account_id: anno.account_id || "",
             debit: anno.debit || "",
