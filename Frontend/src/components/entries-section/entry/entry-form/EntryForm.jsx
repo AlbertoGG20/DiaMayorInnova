@@ -4,32 +4,34 @@ import AccountService from "../../../../services/AccountService";
 import PaginationMenu from "../../../pagination-menu/PaginationMenu";
 import "./EntryForm.css";
 
-const EntryForm = ({ aptNumber, annotation, updateAnnotation, onDelete, exercise }) => {
+const EntryForm = ({ annotation, updateAnnotation, onDelete, exercise }) => {
   const [accounts, setAccounts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const accountIdInputRef = useRef(null);
   const accountNumberInputRef = useRef(null);
   const modalRef = useRef(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const debounceTimeout = useRef(null);
 
+  const loadAccounts = async () => {
+    try {
+      const response = await http.get(`/accounts?page=${currentPage}&limit=${5}`);
+      setAccounts(response.data.accounts);
+      setTotalPages(response.data.meta.total_pages || 1);
+    } catch (error) {
+      console.error("Error al cargar las cuentas:", error);
+    }
+  };
+
   useEffect(() => {
-    const loadAccounts = async () => {
-      try {
-        const isNumber = /^\d+$/.test(searchQuery);
-        const response = await AccountService.getAll(currentPage, 5, isNumber ? "" : searchQuery, isNumber ? searchQuery : "");
-        setAccounts(response.accounts || []);
-        setTotalPages(response.meta?.total_pages || 1);
-      } catch (error) {
-        console.error("Error loading accounts:", error);
-      }
-    };
     loadAccounts();
   }, [searchQuery, currentPage]);
 
-  const openAccountModal = () => {
+  const openAccountModal = async () => {
     setSearchQuery("");
     setCurrentPage(1);
+    loadAccounts();
     modalRef.current?.showModal();
   };
 
@@ -47,7 +49,8 @@ const EntryForm = ({ aptNumber, annotation, updateAnnotation, onDelete, exercise
   const handleAccountSelect = (account) => {
     const updated = {
       ...annotation,
-      number: aptNumber,
+      id: annotation.id,
+      number: annotation.number,
       account_number: account.account_number,
       account_name: account.name,
       account_id: account.id,
@@ -102,7 +105,8 @@ const EntryForm = ({ aptNumber, annotation, updateAnnotation, onDelete, exercise
         return;
       }
 
-      const foundAccount = accounts.find(acc => acc.account_number === value);
+      // Buscar primero en las cuentas cargadas
+      const foundAccount = accounts.find(acc => acc.account_number === Number(value));
       if (foundAccount) {
         updateAnnotation({
           ...updatedAnnotation,
@@ -162,15 +166,26 @@ const EntryForm = ({ aptNumber, annotation, updateAnnotation, onDelete, exercise
   }, []);
 
   return (
-    <div className="entry_form_wrapper">
-      <p className="entry_apt">{aptNumber}</p>
-      <form className="entry_form">
+    <div className='entry_form_wrapper'>
+      <p className='entry_apt'> {annotation.number}</p>
+      <form action="" className='entry_form'>
         <div className="entry_form_inputs__wrapper">
           <div className="form_group">
             <input
               type="number"
-              name="account_number"
-              placeholder="477"
+              name="account_id"
+              value={annotation.account_id || ""}
+              onChange={handleChange}
+              id="account_id"
+              style={{ display: "none" }}
+              ref={accountIdInputRef}
+            />
+            <input
+              type="number"
+              id='account_number'
+              aria-labelledby="tittle_account-number"
+              name='account_number'
+              placeholder='477'
               onChange={handleChange}
               value={annotation.account_number || ""}
               min={0}
