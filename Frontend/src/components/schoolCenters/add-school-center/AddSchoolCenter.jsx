@@ -9,7 +9,8 @@ const AddSchoolCenter = ({ setSchools, selectedSchool, setSelectedSchool, setHan
     phone: "",
     email: "",
     website: "",
-    province: ""
+    province: "",
+    code: ""
   };
 
   const [input, setInput] = useState(initialSchoolState);
@@ -25,6 +26,7 @@ const AddSchoolCenter = ({ setSchools, selectedSchool, setSelectedSchool, setHan
         email: selectedSchool.email,
         website: selectedSchool.website || "",
         province: selectedSchool.province || "",
+        code: selectedSchool.code || "",
       });
     } else {
       setInput(initialSchoolState)
@@ -42,7 +44,7 @@ const AddSchoolCenter = ({ setSchools, selectedSchool, setSelectedSchool, setHan
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!input.school_name || !input.address || !input.phone || !input.email || !input.website || !input.province) {
+    if (!input.school_name || !input.address || !input.phone || !input.email || !input.website || !input.province || !input.code) {
       setError("Por favor, complete todos los campos obligatorios");
       return;
     }
@@ -54,13 +56,13 @@ const AddSchoolCenter = ({ setSchools, selectedSchool, setSelectedSchool, setHan
         setSuccessMessage("Centro escolar actualizado con éxito");
         setSchools((prevSchools) => 
           prevSchools.map(school => 
-            school.id === selectedSchool.id ? response.data : school
+            school.id === selectedSchool.id ? response : school
           )
         );
       } else {
         response = await SchoolsServices.create(input);
         setSuccessMessage("Centro escolar creado con éxito");
-        setSchools((prevSchools) => [...prevSchools, response.data]);
+        setSchools((prevSchools) => [...prevSchools, response]);
       }
       setSelectedSchool(null);
       setInput(initialSchoolState);
@@ -69,7 +71,19 @@ const AddSchoolCenter = ({ setSchools, selectedSchool, setSelectedSchool, setHan
       }, 5000);
 
     } catch (err) {
-      setError(err.response?.data?.message || "Hubo un problema al procesar la solicitud.");
+      if (err.response?.status === 422) {
+        if (err.response.data?.code?.includes("has already been taken")) {
+          setError("El código del centro ya está en uso. Por favor, utilice un código diferente.");
+        } else {
+          setError("Por favor, verifique que todos los campos sean válidos.");
+        }
+      } else {
+        setError(err.response?.data?.message || "Hubo un problema al procesar la solicitud.");
+      }
+      console.error("Error en la actualización:", err);
+      setTimeout(() => {
+        setError("");
+      }, 5000);
     }
   };
   
@@ -89,6 +103,18 @@ const AddSchoolCenter = ({ setSchools, selectedSchool, setSelectedSchool, setHan
                 onChange={handleInput}
                 placeholder="Nombre del centro" />
             </label>
+            <label className='school_label'>Código
+              <input
+                type="text"
+                name="code"
+                id="schoolCode_input"
+                className="school-center_item"
+                value={input.code}
+                onChange={handleInput}
+                placeholder="Código del centro" />
+            </label>
+          </fieldset>
+          <fieldset className='create-schools_fieldset'>
             <label className='school_label'>Provincia
               <input
                 type="text"

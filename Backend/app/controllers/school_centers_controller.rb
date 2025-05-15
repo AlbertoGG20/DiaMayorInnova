@@ -57,6 +57,6 @@ class SchoolCentersController < ApplicationController
   end
 
   def school_center_params
-    params.require(:school_center).permit(:school_name, :address, :phone, :email, :website, :province)
+    params.require(:school_center).permit(:school_name, :address, :phone, :email, :website, :province, :code)
   end
 end
