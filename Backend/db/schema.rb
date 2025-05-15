@@ -29,6 +29,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_14_160839) do
     t.bigint "accounting_plan_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "charge"
+    t.string "credit"
     t.index ["account_number"], name: "index_accounts_on_account_number", unique: true
     t.index ["accounting_plan_id"], name: "index_accounts_on_accounting_plan_id"
   end
@@ -115,7 +117,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_14_160839) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "description"
-    t.integer "solution"
     t.bigint "solution_id"
     t.index ["account_id"], name: "index_help_examples_on_account_id"
     t.index ["solution_id"], name: "index_help_examples_on_solution_id"
