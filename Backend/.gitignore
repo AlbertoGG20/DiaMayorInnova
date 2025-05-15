@@ -34,3 +34,5 @@
 
 # Ignore SimpleCov coverage files
 /coverage/*
+
+/config/master.key

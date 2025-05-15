@@ -24,13 +24,11 @@ Devise.setup do |config|
   # Configure the e-mail address which will be shown in Devise::Mailer,
   # note that it will be overwritten if you use your own mailer class
   # with default "from" parameter.
-  config.mailer_sender = 'please-change-me-at-config-initializers-devise@example.com'
+  config.mailer_sender = ENV['SMTP_USERNAME'] || 'noreply@diamayorinnova.com'
 
   # Configure the class responsible to send e-mails.
-  # config.mailer = 'Devise::Mailer'
-
-  # Configure the parent class responsible to send e-mails.
-  # config.parent_mailer = 'ActionMailer::Base'
+  config.mailer = 'Devise::Mailer'
+  config.parent_mailer = 'ActionMailer::Base'
 
   # ==> ORM configuration
   # Load and configure the ORM. Supports :active_record (default) and
@@ -114,19 +112,16 @@ Devise.setup do |config|
   # ==> Configuration for :database_authenticatable
   # For bcrypt, this is the cost for hashing the password and defaults to 12. If
   # using other algorithms, it sets how many times you want the password to be hashed.
-  # The number of stretches used for generating the hashed password are stored
-  # with the hashed password. This allows you to change the stretches without
-  # invalidating existing passwords.
-  #
-  # Limiting the stretches to just one in testing will increase the performance of
-  # your test suite dramatically. However, it is STRONGLY RECOMMENDED to not use
-  # a value less than 10 in other environments. Note that, for bcrypt (the default
-  # algorithm), the cost increases exponentially with the number of stretches (e.g.
-  # a value of 20 is already extremely slow: approx. 60 seconds for 1 calculation).
-  config.stretches = Rails.env.test? ? 1 : 12
+  # The number of stretches used for generating the token has a lower
+  # limitation than the bcrypt (the default for Devise). This currently
+  # requires a lower stretch value. A recommended value would be 10 in most
+  # cases. Note that this also affects the cost of the token generation
+  # (e.g. +1% overhead for each value in the range). Removing the `:stretches`
+  # option lets you use the default value for the algorithm you're using.
+  # config.stretches = Rails.env.test? ? 1 : 12
 
   # Set up a pepper to generate the hashed password.
-  # config.pepper = '0d13850ef31ef8ee7a038cb9971b00c64c51bc0401a6fb9f1cdccc5befe3e5933cf765181b778b47061589c4f8d34069da25567ef3c846f8b9cfbded10281135'
+  ## config.pepper = '0d13850ef31ef8ee7a038cb9971b00c64c51bc0401a6fb9f1cdccc5befe3e5933cf765181b778b47061589c4f8d34069da25567ef3c846f8b9cfbded10281135'
 
   # Send a notification to the original email when the user's email is changed.
   # config.send_email_changed_notification = false
@@ -228,7 +223,7 @@ Devise.setup do |config|
 
   # When set to false, does not sign a user in automatically after their password is
   # reset. Defaults to true, so a user is signed in automatically after a reset.
-  # config.sign_in_after_reset_password = true
+  config.sign_in_after_reset_password = true
 
   # ==> Configuration for :encryptable
   # Allow you to use another hashing or encryption algorithm besides bcrypt (default).
@@ -302,8 +297,8 @@ Devise.setup do |config|
   # apps is `200 OK` and `302 Found` respectively, but new apps are generated with
   # these new defaults that match Hotwire/Turbo behavior.
   # Note: These might become the new default in future versions of Devise.
-  config.responder.error_status = :unprocessable_entity
-  config.responder.redirect_status = :see_other
+  # config.responder.error_status = :unprocessable_entity
+  # config.responder.redirect_status = :see_other
 
   # ==> Configuration for :registerable
 
@@ -311,6 +306,13 @@ Devise.setup do |config|
   # changed. Defaults to true, so a user is signed in automatically after changing a password.
   # config.sign_in_after_change_password = true
 
+  # ==> Routes configuration
+  # Configure the default URL for Devise mailer
+
+  # Configure the path for password reset
+  config.reset_password_within = 6.hours
+  config.sign_in_after_reset_password = true
+  config.reset_password_keys = [:email]
 
   config.warden do |warden|
     warden.scope_defaults :user, store: false
