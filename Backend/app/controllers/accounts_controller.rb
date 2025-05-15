@@ -73,14 +73,12 @@ class AccountsController < ApplicationController
 
   def account_params
     params.require(:account).permit(
-      :accountNumber, 
-      :account_number, 
-      :description, 
-      :name, 
-      :accounting_plan_id, 
-      :charge, 
+      :account_number,
+      :description,
+      :name,
+      :accounting_plan_id,
+      :charge,
       :credit
     )
-  end  
-  
+  end
 end

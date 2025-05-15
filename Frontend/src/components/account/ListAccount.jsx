@@ -116,7 +116,7 @@ const AccountsList = ({ newAcc }) => {
               <p>No hay cuentas disponibles</p>
             ) : (
               <Table
-                titles={["Nº Cuenta", "Nombre", "Descripción", "PGC", "Acciones"]}
+                titles={["Nº Cuenta", "Nombre", "Descripción", "PGC", "Cargo", "Abono", "Acciones"]}
                 data={accounts}
                 actions={true}
                 openModal={openEditModal}
