@@ -4,8 +4,10 @@ import userExerciseDataService from "../../../services/userExerciseDataService";
 import EntriesSection from '../../../components/entries-section/EntriesSection'
 import { AuxSection } from '../../../components/aux-section/AuxSection'
 import "./TaskPage.css"
+import { useNavigate } from 'react-router-dom'
 
 const TaskPage = () => {
+  const navigate = useNavigate();
   const { exerciseId } = useParams();
   const [exercise, setExercise] = useState({
     marks: [],
@@ -218,8 +220,16 @@ const TaskPage = () => {
             }
           });
 
+          setSaveStatus(null);
           return newState;
         });
+        if(!exercise?.task?.is_exam){
+          setHandleSave(true);
+          navigate('/');
+        }
+      } else {
+        console.error("Error al guardar:", response.error);
+        setSaveStatus(`Error al guardar el progreso: ${response.error}`);
       }
     } catch (error) {
       console.error("Error al guardar:", error);
@@ -229,7 +239,7 @@ const TaskPage = () => {
 
   return (
     <div className='modes_page_container task-color'>
-      {saveStatus && <div className="save-status">{saveStatus}</div>}
+      {saveStatus && <div className="error-message">{saveStatus}</div>}
       {!taskStarted && (
         <div className='modes_page_container--button'>
           <button className="btn" onClick={startTask} disabled={!canStartTask}>
