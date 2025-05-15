@@ -8,3 +8,29 @@
   font-size: var(--text-desktop-tiny);
   font-weight: 400;
 }
+
+.modes-entries-container--buttons {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: var(--gap-s) var(--gap-xxl) var(--gap-s) var(--gap-l);
+  gap: var(--gap-s);
+  border-top: 1px solid var(--Color-grey-200);
+  margin-top: auto;
+}
+
+.modes-entries-container--buttons .btn-secondary {
+  background-color: var(--Color-red-600);
+  color: var(--Color-White);
+  padding: var(--gap-xs) var(--gap-m);
+  border-radius: var(--r-xxs);
+  transition: background-color 0.2s ease;
+}
+
+.modes-entries-container--buttons .btn-secondary:hover {
+  background-color: var(--Color-red-300);
+}
+
+.modes-entries-container--buttons .btn-secondary:active {
+  background-color: var(--Color-red-400);
+}
