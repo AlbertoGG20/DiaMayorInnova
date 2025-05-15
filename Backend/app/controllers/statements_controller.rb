@@ -15,7 +15,7 @@ class StatementsController < ApplicationController
   
       if params[:search].present?
         search_term = "%#{params[:search]}%"
-        statements = statements.where("definition ILIKE ? OR explanation ILIKE ?", search_term, search_term)
+        statements = statements.where("definition ILIKE ?", search_term)
       end     
 
       paginated_statements = statements.page(params[:page]).per(params[:per_page] || 10)
@@ -205,7 +205,6 @@ def update
     Rails.logger.debug "Params received: #{params[:statement].inspect}"
     params.require(:statement).permit(
       :definition, 
-      :explanation, 
       :is_public,
       solutions_attributes: [
         :id,
