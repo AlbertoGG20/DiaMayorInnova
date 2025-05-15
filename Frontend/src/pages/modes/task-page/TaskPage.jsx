@@ -85,7 +85,8 @@ const TaskPage = () => {
               annotations: mark.student_entries?.flatMap(entry =>
                 entry.student_annotations?.map(anno => ({
                   ...anno,
-                  student_entry_id: entry.entry_number
+                  student_entry_id: entry.entry_number,
+                  account_number: anno.account?.account_number
                 })) || []
               )
             };
