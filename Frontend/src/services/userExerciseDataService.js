@@ -98,7 +98,8 @@ const updateTask = async (exerciseId, data) => {
     console.error("Error en la actualización:", error);
     return {
       data: { exercise: { marks: [] } },
-      status: error.response?.status || 500
+      status: error.response?.status || 500,
+      error: error.response.data.errors
     };
   }
 };

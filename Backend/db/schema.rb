@@ -164,7 +164,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_14_160839) do
   create_table "student_annotations", force: :cascade do |t|
     t.bigint "account_id"
     t.integer "number"
-    t.integer "account_number"
     t.decimal "credit"
     t.decimal "debit"
     t.datetime "created_at", null: false

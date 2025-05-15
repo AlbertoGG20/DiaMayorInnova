@@ -6,7 +6,7 @@ import Modal from '../modal/Modal';
 import { useNavigate } from 'react-router-dom'
 import "./EntriesSection.css"
 
-const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComplete, exercise, examStarted, handleSave, onEntriesChange }) => {
+const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComplete, exercise, examStarted, onEntriesChange }) => {
   const [statementData, setStatementData] = useState({});
   const [allStatementsData, setAllStatementsData] = useState({});
   const accounts = exercise?.chartOfAccounts || [];
@@ -21,7 +21,7 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
   useEffect(() => {
     if (savedMarks && savedMarks.length > 0) {
       const newStatementData = {};
-      
+
       savedMarks.forEach((mark) => {
         const entriesMap = {};
         const entries = mark.student_entries?.map(entry => {
@@ -32,19 +32,19 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
             entry_date: entry.entry_date
           };
         }) || [];
-        
+
         const annotations = mark.student_entries?.flatMap(entry => 
           entry.student_annotations?.map(anno => ({
             ...anno,
             id: anno.id,
             uid: anno.uid || `anno-${anno.id || Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            student_entry_id: entriesMap[entry.id]
+            student_entry_id: entriesMap[entry.id],
           })) || []
         );
-        
+
         newStatementData[mark.statement_id] = { entries, annotations };
       });
-      
+
       setStatementData(newStatementData);
       setAllStatementsData(newStatementData);
     }
@@ -53,14 +53,14 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
   useEffect(() => {
     if (exercise?.marks) {
       const newStatementData = {};
-      
+
       exercise.marks.forEach((mark) => {
         const entries = mark.student_entries?.map(entry => ({
           id: entry.id,
           entry_number: entry.entry_number,
           entry_date: entry.entry_date
         })) || [];
-  
+
         const annotations = mark.student_entries?.flatMap(entry => 
           entry.student_annotations?.map(anno => ({
             id: anno.id,
@@ -74,13 +74,13 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
             credit: anno.credit || ""
           })) || []
         );
-  
+
         newStatementData[mark.statement_id] = {
           entries,
           annotations
         };
       });
-  
+
       setStatementData(newStatementData);
     }
   }, [exercise?.marks]);
@@ -234,12 +234,8 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
         onStatementComplete(selectedStatement.id, currentData);
       }
     }
-    
-    if(!exercise?.task?.is_exam){
-      handleSave(true);
-      navigate('/');
-    }
-  }, [selectedStatement, exercise?.task?.is_exam, handleSave, entries, annotations, onStatementComplete, allStatementsData]);
+
+  }, [selectedStatement, exercise?.task?.is_exam, entries, annotations, onStatementComplete, allStatementsData]);
 
   const handleFinalSubmit = useCallback(() => {
     if (!exercise || !exercise.id) {
