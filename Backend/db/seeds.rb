@@ -345,9 +345,9 @@ task2.statements << statement2
   student_entry3 = StudentEntry.find_or_create_by!(entry_number: 3, entry_date: Date.new(2024, 11, 25), mark: mark3) 
   student_entry3 = StudentEntry.find_or_create_by!(entry_number: 2, entry_date: Date.new(2022, 10, 25), mark: mark1) 
 
-  student_annotation1 = StudentAnnotation.find_or_create_by!(number: 1, account_number: 1234, credit: 100, debit: 0, student_entry: student_entry1, account: account1) 
-  student_annotation2 = StudentAnnotation.find_or_create_by!(number: 2, account_number: 1334, credit: 0, debit: 1000, student_entry: student_entry2, account: account2) 
-  student_annotation3 = StudentAnnotation.find_or_create_by!(number: 3, account_number: 2234, credit: 100, debit: 0, student_entry: student_entry3, account: account3)
+  student_annotation1 = StudentAnnotation.find_or_create_by!(number: 1, account_id: Account.find_by(account_number: 1234), credit: 100, debit: 0, student_entry: student_entry1, account: account1) 
+  student_annotation2 = StudentAnnotation.find_or_create_by!(number: 2, account_id: Account.find_by(account_number: 1334), credit: 0, debit: 1000, student_entry: student_entry2, account: account2) 
+  student_annotation3 = StudentAnnotation.find_or_create_by!(number: 3, account_id: Account.find_by(account_number: 2234), credit: 100, debit: 0, student_entry: student_entry3, account: account3)
   
   teacher_class_group1 = TeacherClassGroup.find_or_create_by!(user: user2, class_group: class_group1)
   teacher_class_group3 = TeacherClassGroup.find_or_create_by!(user: user3, class_group: class_group1)
@@ -740,13 +740,13 @@ task2.statements << statement2
   student_entry_example2 = StudentEntry.find_or_create_by!(entry_number: 2, entry_date: Date.new(2024,8,3), mark: mark_example2) 
   student_entry_example3 = StudentEntry.find_or_create_by!(entry_number: 3, entry_date: Date.new(2024,8,7), mark: mark_example3) 
 
-  student_annotation_example1 = StudentAnnotation.find_or_create_by!(number: 1, account_number: 407, credit: 0, debit: 1200.00, student_entry: student_entry_example1, account: account407) 
-  student_annotation_example2 = StudentAnnotation.find_or_create_by!(number: 2, account_number: 4727, credit: 100, debit: 84.00, student_entry: student_entry_example1, account: account4727) 
-  student_annotation_example3 = StudentAnnotation.find_or_create_by!(number: 3, account_number: 572, credit: 1284.00, debit: 0, student_entry: student_entry_example1, account: account572) 
+  student_annotation_example1 = StudentAnnotation.find_or_create_by!(number: 1, account_id: Account.find_by(account_number: 407), credit: 0, debit: 1200.00, student_entry: student_entry_example1, account: account407) 
+  student_annotation_example2 = StudentAnnotation.find_or_create_by!(number: 2, account_id: Account.find_by(account_number: 4727), credit: 100, debit: 84.00, student_entry: student_entry_example1, account: account4727) 
+  student_annotation_example3 = StudentAnnotation.find_or_create_by!(number: 3, account_id: Account.find_by(account_number: 572), credit: 1284.00, debit: 0, student_entry: student_entry_example1, account: account572) 
 
-  student_annotation_example4 = StudentAnnotation.find_or_create_by!(number: 1, account_number: 600, credit: 0, debit: 2940.00, student_entry: student_entry_example2, account: account600) 
-  student_annotation_example5 = StudentAnnotation.find_or_create_by!(number: 2, account_number: 602, credit: 0, debit: 50.00, student_entry: student_entry_example2, account: account602) 
-  student_annotation_example6 = StudentAnnotation.find_or_create_by!(number: 3, account_number: 4727, credit: 0, debit: 125.30, student_entry: student_entry_example2, account: account4727) 
+  student_annotation_example4 = StudentAnnotation.find_or_create_by!(number: 1, account_id: Account.find_by(account_number: 600), credit: 0, debit: 2940.00, student_entry: student_entry_example2, account: account600) 
+  student_annotation_example5 = StudentAnnotation.find_or_create_by!(number: 2, account_id: Account.find_by(account_number: 602), credit: 0, debit: 50.00, student_entry: student_entry_example2, account: account602) 
+  student_annotation_example6 = StudentAnnotation.find_or_create_by!(number: 3, account_id: Account.find_by(account_number: 4727), credit: 0, debit: 125.30, student_entry: student_entry_example2, account: account4727) 
   
-  student_annotation_example7 = StudentAnnotation.find_or_create_by!(number: 1, account_number: 400, credit:0.0, debit: 419.71, student_entry: student_entry_example3, account: account400) 
-  student_annotation_example8 = StudentAnnotation.find_or_create_by!(number: 2, account_number: 608, credit:392.25, debit: 0.0, student_entry: student_entry_example3, account: account608) 
+  student_annotation_example7 = StudentAnnotation.find_or_create_by!(number: 1, account_id: Account.find_by(account_number: 400), credit:0.0, debit: 419.71, student_entry: student_entry_example3, account: account400) 
+  student_annotation_example8 = StudentAnnotation.find_or_create_by!(number: 2, account_id: Account.find_by(account_number: 608), credit:392.25, debit: 0.0, student_entry: student_entry_example3, account: account608) 
