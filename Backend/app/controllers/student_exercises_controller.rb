@@ -3,24 +3,24 @@ class StudentExercisesController < ApplicationController
 
   def index
     return render json: { error: "No autorizado" }, status: :unauthorized unless current_user.student? || current_user.teacher?
-  
+
     exercises = Exercise.includes(:task, marks: { student_entries: :student_annotations })
-  
+
     if current_user.student?
       exercises = exercises.where(user_id: current_user.id)
     end
-  
+
     if params[:only_active].present? && params[:only_active] == "true"
       now = Time.zone.now
       exercises = exercises.joins(:task).where("tasks.opening_date <= ? AND tasks.closing_date >= ?", now, now)
     end
-  
+
     paginated_exercises = exercises.page(params[:page]).per(params[:per_page] || 5)
-  
+
     render json: {
       exercises: paginated_exercises.as_json(
         include: {
-          task: { only: [:id, :title, :opening_date, :closing_date, :is_exam] },
+          task: { only: [ :id, :title, :opening_date, :closing_date, :is_exam ] },
           marks: {
             include: {
               student_entries: {
@@ -37,7 +37,7 @@ class StudentExercisesController < ApplicationController
       }
     }
   end
-  
+
 
   def show
     @exercise = Exercise.includes(:task, marks: { student_entries: :student_annotations }).find(params[:id])
@@ -54,19 +54,19 @@ class StudentExercisesController < ApplicationController
                      else
                        nil
                      end
-  
+
     render json: {
       exercise: @exercise.as_json(
         include: {
-          task: { 
-            only: [:id, :title, :opening_date, :closing_date, :is_exam, :help_available],
+          task: {
+            only: [ :id, :title, :opening_date, :closing_date, :is_exam, :help_available ],
             include: :statements
           },
           marks: {
             include: {
               student_entries: {
                 include: {
-                  student_annotations: { include: {account: {only: [:name, :account_number]}}}
+                  student_annotations: { include: { account: { only: [ :name, :account_number ] } } }
                 }
               }
             }
