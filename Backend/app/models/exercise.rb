@@ -3,6 +3,7 @@ class Exercise < ApplicationRecord
   belongs_to :task
   has_many :marks, dependent: :destroy
   validates :started, inclusion: { in: [true, false] }
+  validates :published, inclusion: { in: [true, false] }
 
   def total_mark
     marks_count = marks.count

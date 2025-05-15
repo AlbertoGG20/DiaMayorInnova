@@ -46,6 +46,7 @@ Rails.application.routes.draw do
       put 'finish'
       put 'update_student_exercise'
       put 'update_student_task'
+      put 'toggle_publish'
     end
     collection do
       get 'students_mark_list'

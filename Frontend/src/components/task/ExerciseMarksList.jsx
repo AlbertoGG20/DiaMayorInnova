@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { getStudentsMarkList, exportMarksToXlsx } from "../../services/exerciseMarksList";
+import { getStudentsMarkList, exportMarksToXlsx, togglePublishExercise } from "../../services/exerciseMarksList";
 import "./MarkList.css";
 import DataTable from 'datatables.net-react';
 import DT from 'datatables.net-dt';
@@ -49,7 +49,24 @@ const ExerciseMarksList = () => {
         }
     };
 
-    const titles = ['Fecha', 'Nombre', '% Correcto', 'Nota', 'Estado', 'Acciones'];
+    const handleTogglePublish = async (exerciseId, currentPublished) => {
+        try {
+            const response = await togglePublishExercise(exerciseId, !currentPublished);
+            if (response && response.data) {
+                // Actualizar la lista después de cambiar el estado
+                const updatedList = exerciseMarksList.map(exercise => 
+                    exercise.exercise_id === exerciseId 
+                        ? { ...exercise, published: !currentPublished }
+                        : exercise
+                );
+                setExerciseMarksList(updatedList);
+            }
+        } catch (error) {
+            console.error("Error al cambiar el estado de publicación:", error);
+        }
+    };
+
+    const titles = ['Fecha', 'Nombre', '% Correcto', 'Nota', 'Estado', 'Publicar', 'Acciones'];
 
     const handleViewResult = (exerciseId) => {
         navigate(`/notas-estudiantes/${id}/examen/${exerciseId}`);
@@ -66,7 +83,6 @@ const ExerciseMarksList = () => {
                 </button>
             </div>
             <div className="mark_list__table-container">
-
                 {
                     exerciseMarksList.length > 0 && (
                         <h2 className="mark_list__page--task">{exerciseMarksList[0].task_tittle}</h2>
@@ -112,6 +128,17 @@ const ExerciseMarksList = () => {
                                 }
                             },
                             {
+                                field: 'published',
+                                render: (row) => (
+                                    <button
+                                        className={`btn__table ${row.published ? 'published' : 'unpublished'}`}
+                                        onClick={() => handleTogglePublish(row.exercise_id, row.published)}
+                                    >
+                                        <i className={`fi ${row.published ? 'fi-rr-eye' : 'fi-rr-eye-crossed'}`}></i>
+                                    </button>
+                                )
+                            },
+                            {
                                 field: 'exercise_id',
                                 render: (row) => (
                                     <button
@@ -133,7 +160,6 @@ const ExerciseMarksList = () => {
                     onPageChange={handlePageChange}
                 />
             </div>
-
         </div>
     );
 }
