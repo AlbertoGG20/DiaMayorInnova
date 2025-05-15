@@ -22,7 +22,7 @@ export const AuxSection = ({ statements, examStarted, onSelectStatement, helpAva
     if (helpAvailable && !isExam) {
       setAuxSection("help_example");
     } else {
-      setAuxSection("balance");
+      setAuxSection("statements");
     }
   }, [helpAvailable, isExam]);
 
@@ -32,7 +32,7 @@ export const AuxSection = ({ statements, examStarted, onSelectStatement, helpAva
         return (
           <AuxSectionTwo
             statements={statements}
-            examStarted={isExam ? examStarted : true}
+            examStarted={examStarted}
             onSelectStatement={onSelectStatement}
           />
         );
