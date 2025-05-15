@@ -3,7 +3,6 @@ import statementService from "../../services/statementService";
 
 const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSolutions, onSaveSolution, statement, onDeleteSolution }) => {
   const [definition, setDefinition] = useState(statement?.definition || "");
-  const [explanation, setExplanation] = useState(statement?.explanation || "");
   const [isPublic, setIsPublic] = useState(statement?.is_public || false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -14,7 +13,6 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
   useEffect(() => {
     if (statement?.id && (JSON.stringify(prevStatementRef.current) !== JSON.stringify(statement))) {
       setDefinition(statement?.definition || "");
-      setExplanation(statement?.explanation || "");
       setIsPublic(statement?.is_public || false);
       setSolutions(statement?.solutions?.map(s => ({ ...s, entries: s.entries || [] })) || []);
     }
@@ -138,7 +136,6 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
 
     const statementData = {
       definition,
-      explanation,
       is_public: isPublic,
       solutions_attributes: (solutions || []).map((solution) => ({
         ...(solution.id && { id: solution.id }),
@@ -173,6 +170,9 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
       setSuccessMessage(statement?.id ? "Enunciado actualizado correctamente." : "Enunciado creado correctamente.");
       clearSuccessMessage();
 
+      setDefinition("");
+      setIsPublic(false);
+      setSolutions([]);
       setFieldErrors({});
     } catch (error) {
       if (error.response) {
@@ -208,16 +208,6 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
             onChange={(e) => setDefinition(e.target.value)}
           />
           {fieldErrors.definition && <div className="error-message">{fieldErrors.definition}</div>}
-        </div>
-        <div className="statement-page__form--content">
-          <label className="statement-page__label--explanation" htmlFor="explanation">Explicación:</label>
-          <textarea
-            id="explanation"
-            className="statement-page__input--explanation"
-            value={explanation}
-            onChange={(e) => setExplanation(e.target.value)}
-          />
-          {fieldErrors.explanation && <div className="error-message">{fieldErrors.explanation}</div>}
         </div>
 
         <div className="statement-page__buttons-container">

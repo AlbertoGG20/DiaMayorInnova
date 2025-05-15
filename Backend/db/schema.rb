@@ -156,7 +156,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_15_125450) do
 
   create_table "statements", force: :cascade do |t|
     t.text "definition"
-    t.text "explanation"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
