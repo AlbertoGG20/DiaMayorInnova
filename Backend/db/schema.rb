@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_05_14_160839) do
+ActiveRecord::Schema[7.2].define(version: 2025_05_15_125450) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -118,10 +118,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_14_160839) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "description"
-    t.integer "solution"
-    t.bigint "solution_id"
     t.index ["account_id"], name: "index_help_examples_on_account_id"
-    t.index ["solution_id"], name: "index_help_examples_on_solution_id"
   end
 
   create_table "marks", force: :cascade do |t|
@@ -143,6 +140,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_14_160839) do
     t.string "province"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "code"
   end
 
   create_table "solutions", force: :cascade do |t|
@@ -150,13 +148,11 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_14_160839) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "statement_id", null: false
-    t.boolean "is_example", default: false, null: false
     t.index ["statement_id"], name: "index_solutions_on_statement_id"
   end
 
   create_table "statements", force: :cascade do |t|
     t.text "definition"
-    t.text "explanation"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
@@ -255,7 +251,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_14_160839) do
   add_foreign_key "exercises", "tasks"
   add_foreign_key "exercises", "users"
   add_foreign_key "help_examples", "accounts"
-  add_foreign_key "help_examples", "solutions"
   add_foreign_key "marks", "exercises"
   add_foreign_key "solutions", "statements"
   add_foreign_key "statements", "users"

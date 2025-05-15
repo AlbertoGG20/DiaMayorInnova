@@ -9,51 +9,67 @@ const getAll = async (page=1, perPage = 10, school_name = "") => {
     return response.data;
   } catch (error) {
     console.error("Error en la petición getAll: ", error);
-    return null;
+    throw error;
   }
 };
 
 const get = async (id) => {
   try {
     const response = await http.get(`/school_centers/${id}`);
-    return response;
+    return response.data;
   } catch (error) {
     console.error("Error en la petición get:", error);
-    return null;
+    throw error;
   }
 };
 
-const create = (data) =>  http.post("/school_centers",{ school_center: data });
+const create = async (data) => {
+  try {
+    const response = await http.post("/school_centers", { school_center: data });
+    return response.data;
+  } catch (error) {
+    console.error("Error en la creación:", error);
+    throw error;
+  }
+};
 
 const update = async (id, data) => {
   try {
-    const response = await http.put(`/school_centers/${id}`, data);
-    return response;
+    const response = await http.put(`/school_centers/${id}`, { school_center: data });
+    return response.data;
   } catch (error) {
     console.error("Error en la actualización:", error);
-    return null;
+    throw error;
   }
 };
 
-const remove = (schoolId) => http.delete(`/school_centers/${schoolId}`);
+const remove = async (schoolId) => {
+  try {
+    const response = await http.delete(`/school_centers/${schoolId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error en la eliminación:", error);
+    throw error;
+  }
+};
 
 const removeAll = async () => {
   try {
     const response = await http.delete(`/school_centers`);
-    return response;
+    return response.data;
   } catch (error) {
     console.error("Error en la eliminación de todos:", error);
-    return null;
+    throw error;
   }
 };
 
 const findByName = async (name) => {
   try {
     const response = await http.get(`/school_centers?school_name=${name}`);
-    return response;
+    return response.data;
   } catch (error) {
-    console.error("Error en la búsqueda por módulo:", error);
-    return null;
+    console.error("Error en la búsqueda por nombre:", error);
+    throw error;
   }
 };
 
