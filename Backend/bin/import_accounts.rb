@@ -8,7 +8,7 @@ def import_accounts
 
   file = File.expand_path('../CUENTAS CONTABLES - PGC PYMES.csv', __dir__)
   CSV.foreach(file, col_sep: ';') do |row|
-    account_number = row[2].strip
+    account_number = row[2].strip.tr('.', '')
     name = (row[3] || '<sin nombre>').strip
     description = row[4]&.strip
     charge = row[5]&.strip
