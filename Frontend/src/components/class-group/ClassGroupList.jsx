@@ -34,25 +34,10 @@ const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange }) => {
 
   const totalLocalPages = Math.ceil(filteredGroups.length / itemsPerPage);
 
-  useEffect(() => {
-    setLocalPage(1);
-  }, [searchTerm]);
-
-  useEffect(() => {
-    if (localPage > totalLocalPages) {
-      setLocalPage(1);
-    }
-  }, [totalLocalPages]);
-
-  const paginatedGroups = filteredGroups.slice(
-    (isSearching ? (localPage - 1) : (currentPage - 1)) * itemsPerPage,
-    (isSearching ? localPage : currentPage) * itemsPerPage
-  );
-
-  const fetchClassGroups = async () => {
+  const fetchClassGroups = async (page, name) => {
     setLoading(true);
     try {
-      const response = await ClassGroupService.getAll();
+      const response = await ClassGroupService.getAll(page, 10, name);
       if (response?.data?.data?.class_groups) {
         setClassGroups(response?.data?.data?.class_groups);
         setTotalPages(response?.data?.data?.meta?.total_pages || 1);
@@ -80,9 +65,9 @@ const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange }) => {
   };
 
   useEffect(() => {
-    fetchClassGroups();
+    fetchClassGroups(currentPage, searchTerm);
     fetchCurrentUser();
-  }, [refreshTrigger, currentPage]);
+  }, [refreshTrigger, currentPage, searchTerm]);
 
   const isButtonDisabled = (group) => {
     if (!currentUser) return true;
@@ -127,6 +112,23 @@ const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange }) => {
     onEdit(group);
   };
 
+  const handleSearchChange = (value) => {
+    setSearchTerm(value);
+    setCurrentPage(1);
+
+    if (!value) {
+      fetchClassGroups();
+      return;
+    }
+
+    setClassGroups((prevClassGroups) =>
+      prevClassGroups.filter((classGroup) => {
+        classGroup.course_module.toLowerCase().includes(value);
+        setCurrentPage(1);
+      })
+    );
+  };
+
   return (
     <div className="class-group-page__list">
       <div className="class-group-row">
@@ -135,7 +137,7 @@ const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange }) => {
 
       <SearchBar
         value={searchTerm}
-        handleSearchChange={setSearchTerm}
+        handleSearchChange={handleSearchChange}
       />
 
       {filteredGroups.length === 0 ? (
@@ -148,7 +150,7 @@ const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange }) => {
             ) : (
               <Table
                 titles={["Curso", "Módulo", "Modalidad", "Nº Estudiantes", "Máx. Estudiantes", "Aula", "Horas semanales", "Centro", "Acciones"]}
-                data={paginatedGroups}
+                data={classGroups}
                 actions={true}
                 openModal={handleEdit}
                 deleteItem={handleDeleteClick}
