@@ -36,6 +36,11 @@
     cursor: pointer;
 }
 
+.modal-table--container {
+    max-height: 630px;
+    overflow-y: auto;
+}
+
 /* Table dans la modale */
 .modal-table {
     width: 100%;
