@@ -1,26 +1,31 @@
-import React, { useEffect, useRef, useState } from "react";
-import Modal from "../../../modal/Modal";
-import AccountService from "../../../../services/AccountService";
-import PaginationMenu from "../../../pagination-menu/PaginationMenu";
-import "./EntryForm.css";
+import { useEffect, useRef, useState } from 'react';
+import http from '../../../../../src/http-common';
+import AccountService from '../../../../services/AccountService';
+import Modal from '../../../modal/Modal';
+import PaginationMenu from '../../../pagination-menu/PaginationMenu';
+import './EntryForm.css';
 
 const EntryForm = ({ annotation, updateAnnotation, onDelete, exercise }) => {
   const [accounts, setAccounts] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const accountIdInputRef = useRef(null);
   const accountNumberInputRef = useRef(null);
   const modalRef = useRef(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const debounceTimeout = useRef(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const loadAccounts = async () => {
     try {
-      const response = await http.get(`/accounts?page=${currentPage}&limit=${5}`);
+      const response = await http.get(`/accounts?page=${currentPage}&per_page=${5}&search=${searchQuery}`);
       setAccounts(response.data.accounts);
       setTotalPages(response.data.meta.total_pages || 1);
     } catch (error) {
-      console.error("Error al cargar las cuentas:", error);
+      console.error('Error al cargar las cuentas: ', error);
+    }
+    finally {
+      setIsLoading(false);
     }
   };
 
@@ -29,7 +34,10 @@ const EntryForm = ({ annotation, updateAnnotation, onDelete, exercise }) => {
   }, [searchQuery, currentPage]);
 
   const openAccountModal = async () => {
-    setSearchQuery("");
+    // we want to put the spinner only in the openning of the modal
+    // and not when the user is searching
+    setIsLoading(true);
+    setSearchQuery('');
     setCurrentPage(1);
     loadAccounts();
     modalRef.current?.showModal();
@@ -37,13 +45,14 @@ const EntryForm = ({ annotation, updateAnnotation, onDelete, exercise }) => {
 
   useEffect(() => {
     const handleKeyDown = (event) => {
-      if (event.key === "F1" && document.activeElement === accountNumberInputRef.current) {
+      if (event.key === 'F1' && document.activeElement === accountNumberInputRef.current) {
         event.preventDefault();
         openAccountModal();
       }
     };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   const handleAccountSelect = (account) => {
@@ -77,7 +86,7 @@ const EntryForm = ({ annotation, updateAnnotation, onDelete, exercise }) => {
       }
       return null;
     } catch (error) {
-      console.error("Error al buscar la cuenta:", error);
+      console.error('Error al buscar la cuenta: ', error);
       return null;
     }
   };
@@ -86,22 +95,22 @@ const EntryForm = ({ annotation, updateAnnotation, onDelete, exercise }) => {
     const { name, value } = event.target;
     let processedValue = value;
 
-    if (name === "debit" || name === "credit") {
-      processedValue = value.replace(",", ".");
-      const parts = processedValue.split(".");
+    if (name === 'debit' || name === 'credit') {
+      processedValue = value.replace(',', '.');
+      const parts = processedValue.split('.');
       if (parts.length > 2) {
-        processedValue = parts[0] + "." + parts.slice(1).join("");
+        processedValue = parts[0] + '.' + parts.slice(1).join('');
       }
     }
 
     const updatedAnnotation = { ...annotation, [name]: processedValue };
 
-    if (name === "account_number") {
+    if (name === 'account_number') {
       if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
       updateAnnotation(updatedAnnotation);
 
       if (!value) {
-        updateAnnotation({ ...updatedAnnotation, account_id: "", account_name: "" });
+        updateAnnotation({ ...updatedAnnotation, account_id: '', account_name: '' });
         return;
       }
 
@@ -122,22 +131,22 @@ const EntryForm = ({ annotation, updateAnnotation, onDelete, exercise }) => {
           updateAnnotation({
             ...updatedAnnotation,
             account_id: account.id,
-            account_name: account.name || ""
+            account_name: account.name || ''
           });
         } else {
           updateAnnotation({
             ...updatedAnnotation,
-            account_id: "",
-            account_name: "",
+            account_id: '',
+            account_name: '',
             account_number: value
           });
         }
       }, 500);
-    } else if (name === "debit" && processedValue) {
-      updatedAnnotation.credit = "";
+    } else if (name === 'debit' && processedValue) {
+      updatedAnnotation.credit = '';
       updateAnnotation(updatedAnnotation);
-    } else if (name === "credit" && processedValue) {
-      updatedAnnotation.debit = "";
+    } else if (name === 'credit' && processedValue) {
+      updatedAnnotation.debit = '';
       updateAnnotation(updatedAnnotation);
     } else {
       updateAnnotation(updatedAnnotation);
@@ -149,7 +158,7 @@ const EntryForm = ({ annotation, updateAnnotation, onDelete, exercise }) => {
     onDelete();
   };
 
-  const changePage = (newPage) => {
+  const safeSetCurrentPage = (newPage) => {
     if (newPage < 1 || newPage > totalPages) return;
     setCurrentPage(newPage);
   };
@@ -168,110 +177,111 @@ const EntryForm = ({ annotation, updateAnnotation, onDelete, exercise }) => {
   return (
     <div className='entry_form_wrapper'>
       <p className='entry_apt'> {annotation.number}</p>
-      <form action="" className='entry_form'>
-        <div className="entry_form_inputs__wrapper">
-          <div className="form_group">
+      <form action='' className='entry_form'>
+        <div className='entry_form_inputs__wrapper'>
+          <div className='form_group'>
             <input
-              type="number"
-              name="account_id"
-              value={annotation.account_id || ""}
+              type='number'
+              name='account_id'
+              value={annotation.account_id || ''}
               onChange={handleChange}
-              id="account_id"
-              style={{ display: "none" }}
+              id='account_id'
+              style={{ display: 'none' }}
               ref={accountIdInputRef}
             />
             <input
-              type="number"
+              type='number'
               id='account_number'
-              aria-labelledby="tittle_account-number"
+              aria-labelledby='tittle_account-number'
               name='account_number'
               placeholder='477'
               onChange={handleChange}
-              value={annotation.account_number || ""}
+              value={annotation.account_number || ''}
               min={0}
               ref={accountNumberInputRef}
               disabled={exercise?.finished}
             />
           </div>
-          <div className="form_group tittle_account-name--no-visible">
+          <div className='form_group tittle_account-name--no-visible'>
             <input
-              type="text"
-              name="account_name"
-              placeholder="Hacienda Pública, IGIC soportado"
+              type='text'
+              name='account_name'
+              placeholder='Hacienda Pública, IGIC soportado'
               onChange={handleChange}
-              value={annotation.account_name || ""}
+              value={annotation.account_name || ''}
               disabled={exercise?.finished}
               readOnly
             />
           </div>
-          <div className="form_group">
+          <div className='form_group'>
             <input
-              type="text"
-              name="debit"
-              placeholder="1000.00"
+              type='text'
+              name='debit'
+              placeholder='1000.00'
               onChange={handleChange}
-              value={annotation.debit || ""}
+              value={annotation.debit || ''}
               disabled={annotation.credit || exercise?.finished}
-              pattern="[0-9]*[.,]?[0-9]*"
-              inputMode="decimal"
+              pattern='[0-9]*[.,]?[0-9]*'
+              inputMode='decimal'
             />
           </div>
-          <div className="form_group">
+          <div className='form_group'>
             <input
-              type="text"
-              name="credit"
-              placeholder="1000.00"
+              type='text'
+              name='credit'
+              placeholder='1000.00'
               onChange={handleChange}
-              value={annotation.credit || ""}
+              value={annotation.credit || ''}
               disabled={annotation.debit || exercise?.finished}
-              pattern="[0-9]*[.,]?[0-9]*"
-              inputMode="decimal"
+              pattern='[0-9]*[.,]?[0-9]*'
+              inputMode='decimal'
             />
           </div>
         </div>
         <button
-          className="btn-trash"
+          className='btn-trash'
           onClick={handleDelete}
           disabled={exercise?.finished}
         >
-          <i className="fi fi-rr-trash"></i>
+          <i className='fi fi-rr-trash'></i>
         </button>
       </form>
 
-      <Modal ref={modalRef} modalTitle="Seleccionar Cuenta" showButton={false}>
-        <div className="search-bar">
+      <Modal ref={modalRef} modalTitle='Seleccionar Cuenta' showButton={false}>
+        <div className='search-bar'>
           <input
-            type="text"
+            type='text'
             value={searchQuery}
             onChange={handleSearchChange}
-            placeholder="Search by number or name..."
-            className="search-input"
+            placeholder='Search by number or name...'
+            className='search-input'
           />
         </div>
-        <div className="account-list">
-          {accounts.length > 0 ? (
-            accounts.map((account) => (
-              <div
-                key={`${account.account_number}-${account.id}`}
-                className="account-item"
-                onClick={() => handleAccountSelect(account)}
-              >
-                <span className="account-item_account">{account.account_number}</span>
-                <span className="account-item_account">{account.name}</span>
-              </div>
-            ))
-          ) : (
-            <p>No accounts found.</p>
+        <div className='account-list'>
+          {isLoading && <p>Loading...</p>}
+          {!isLoading && (
+            accounts.length > 0 ? (
+              accounts.map((account) => (
+                <div
+                  key={`${account.account_number}-${account.id}`}
+                  className='account-item'
+                  onClick={() => handleAccountSelect(account)}
+                >
+                  <span className='account-item_account'>{account.account_number}</span>
+                  <span className='account-item_account'>{account.name}</span>
+                </div>
+              ))
+            ) : (
+              <p>No accounts found.</p>
+            )
           )}
         </div>
 
-        {!searchQuery && (
-          <PaginationMenu
-            currentPage={currentPage}
-            setCurrentPage={changePage}
-            totalPages={totalPages}
-          />
-        )}
+        <PaginationMenu
+          currentPage={currentPage}
+          setCurrentPage={safeSetCurrentPage}
+          totalPages={totalPages}
+        />
       </Modal>
     </div>
   );
