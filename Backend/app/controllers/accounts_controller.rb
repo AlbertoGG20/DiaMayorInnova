@@ -9,12 +9,20 @@ class AccountsController < ApplicationController
       name = params[:name].to_s.downcase
       accounts = accounts.where("LOWER(name) LIKE ?", "%#{name}%")
     end
-  
+
     if params[:account_number].present?
       number = params[:account_number].to_s
       accounts = accounts.where("CAST(account_number AS TEXT) LIKE ?", "%#{number}%")
     end
-  
+
+    if params[:search].present?
+      search = params[:search].to_s.downcase
+      accounts = accounts.where(
+        "LOWER(name) LIKE :q OR CAST(account_number AS TEXT) LIKE :q",
+        q: "%#{search}%"
+      )
+    end
+
     paginated_accounts = accounts.page(params[:page]).per(params[:per_page] || 10)
 
     render json: {
@@ -26,8 +34,6 @@ class AccountsController < ApplicationController
       }
     }
   end
-  
-  
 
   def show
     @account = Account.find(params[:id])
@@ -76,6 +82,7 @@ class AccountsController < ApplicationController
       :account_number,
       :description,
       :name,
+      :search,
       :accounting_plan_id,
       :charge,
       :credit

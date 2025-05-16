@@ -27,7 +27,7 @@ const create = async (data) => {
   try {
     const response = await http.post("/accounts", data);
     return response;
-    
+
   } catch (error) {
     console.error("Error en la creación:", error);
     return null;
@@ -64,10 +64,7 @@ const removeAll = async () => {
   }
 };
 
-const findByNumber = (account_number) => {
-  const response = http.get(`/accounts/find_by_account_number?account_number=${account_number}`);
-  return response;
-};
+const findByNumber = (account_number) => http.get(`/accounts/find_by_account_number?account_number=${account_number}`);
 
 const  findByName =  async (name) => {
   try {

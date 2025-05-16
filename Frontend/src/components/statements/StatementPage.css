@@ -64,10 +64,6 @@
   & .statement-page__solutions:first-child {
     box-shadow: none;
   }
-
-  & div {
-    border-left: 0;
-  }
 }
 
 .statement-page__solutions-header {

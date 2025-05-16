@@ -54,6 +54,8 @@
   display: grid;
   grid-template-columns: 80px auto;
   gap: 10px;
+  cursor: pointer;
+  margin-bottom: 5px;;
 }
 
 .account-item_account {
