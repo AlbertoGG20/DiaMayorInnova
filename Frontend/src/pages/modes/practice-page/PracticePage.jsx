@@ -22,7 +22,7 @@ const PracticePage = () => {
 
   return (
     <div className='modes_page_container practice_color'>
-      <h1 className='head_task'>Modo Tarea</h1>
+      <h1 className='head_task'>Modo Práctica</h1>
 
       <div className="entry__container">
         <EntryHeader
