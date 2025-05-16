@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../../config";
 import "./Sign.css";
 
@@ -93,6 +92,15 @@ const SignIn = () => {
             <button className="btn light">Iniciar Sesión</button>
           </form>
         </div>
+      </div>
+      <div className="logos_section">
+        <img src="/images/logo_gobcan_edu.png" alt="Logo de la Consejería de Educación del Gobierno de Canarias" />
+        <div className="logos_section__group">
+          <img src="/images/logo_ies_sb.png" alt="Logo del IES Santa Brígida" />
+          <img src="/images/logo_ies_er.png" alt="Logo del IES El Rincón" />
+        </div>
+        <img src="/images/logo_usabi.png" alt="Logo de Usabi" />
+        <img src="/images/logo_ulpgc.png" alt="Logo de la Universidad de Las Palmas de Gran Canaria" />
       </div>
     </main>
   );
