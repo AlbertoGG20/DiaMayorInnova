@@ -282,14 +282,17 @@ class AccountingPlansController < ApplicationController
 
       sheet_name = "Plantilla PGC"[0, 31]
       wb.add_worksheet(name: sheet_name) do |sheet|
-        # Encabezado del plan
-        sheet.add_row ['Nombre', 'Acronimo', 'Descripcion']
+        # Encabezado del plan contable
+        sheet.add_row ["Nombre", "Acronimo", "Descripcion"]
         # Fila de ejemplo vacía para el plan
-        sheet.add_row ['', '', '']
-        # Encabezado de cuentas (debe coincidir con el importador)
-        sheet.add_row ['NombreC', 'NumeroC', 'DescripcionC']
+        sheet.add_row ["", "", ""]
+
+        sheet.add_row [] # Espacio
+
+        # Encabezado de cuentas
+        sheet.add_row ["Numero cuenta", "Nombre", "Descripcion", "Cargo", "Abono"]
         # Fila de ejemplo vacía para cuentas
-        sheet.add_row ['', '', '']
+        sheet.add_row ["", "", "", "", ""]
       end
 
       send_data p.to_stream.read,
