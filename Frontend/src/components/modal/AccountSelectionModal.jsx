@@ -10,7 +10,7 @@ export default function AccountSelectorModal({
   loadAccounts,
   searchQuery,
   setSearchQuery,
-  handleSearchChange,
+  onSearchChange,
   currentPage,
   setCurrentPage,
   totalPages,
@@ -32,8 +32,8 @@ export default function AccountSelectorModal({
   }, []);
 
   const openAccountModal = async () => {
-    // we want to put the spinner only in the openning of the modal
-    // and not when the user is searching
+    // we want to put the loading message only in the openning
+    // of the modal and not when the user is searching
     setIsLoading(true);
     setSearchQuery('');
     setCurrentPage(1);
@@ -47,7 +47,7 @@ export default function AccountSelectorModal({
         <input
           type='text'
           value={searchQuery}
-          onChange={handleSearchChange}
+          onChange={onSearchChange}
           placeholder='Search by number or name...'
           className='search-input'
         />

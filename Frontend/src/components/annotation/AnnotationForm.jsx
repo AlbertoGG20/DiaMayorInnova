@@ -1,5 +1,6 @@
 import { useRef, useEffect } from 'react';
 import http from '../../http-common';
+import AccountService from '../../services/AccountService';
 import useAccountSelector from '../../hooks/useAccountSelector';
 import AccountSelectorModal from '../modal/AccountSelectionModal';
 
@@ -35,7 +36,7 @@ const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions,
   let account_name;
   const searchAccount = async (accountNumber) => {
     try {
-      const response = await http.get(`/accounts/find_by_account_number?account_number=${accountNumber}`);
+      const response = await AccountService.findByNumber(accountNumber);
       if (response.data) {
         account_id = response.data.id;
         account_name = response.data.name;
@@ -196,7 +197,7 @@ const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions,
         modalRef={modalRef}
         searchQuery={accountSelector.searchQuery}
         setSearchQuery={accountSelector.setSearchQuery}
-        handleSearchChange={accountSelector.handleSearchChange}
+        onSearchChange={accountSelector.handleSearchChange}
         accountNumberInputRef={accountNumberInputRef}
         accounts={accountSelector.accounts}
         loadAccounts={accountSelector.loadAccounts}
