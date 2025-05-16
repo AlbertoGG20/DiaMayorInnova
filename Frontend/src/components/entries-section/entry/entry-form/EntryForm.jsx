@@ -197,7 +197,7 @@ const EntryForm = ({ annotation, updateAnnotation, onDelete, exercise }) => {
         modalRef={modalRef}
         searchQuery={accountSelector.searchQuery}
         setSearchQuery={accountSelector.setSearchQuery}
-        handleSearchChange={accountSelector.handleSearchChange}
+        onSearchChange={accountSelector.handleSearchChange}
         accountNumberInputRef={accountNumberInputRef}
         accounts={accountSelector.accounts}
         loadAccounts={accountSelector.loadAccounts}
