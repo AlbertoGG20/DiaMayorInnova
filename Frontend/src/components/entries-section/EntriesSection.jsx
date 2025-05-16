@@ -5,6 +5,7 @@ import Entry from './entry/Entry'
 import Modal from '../modal/Modal';
 import { useNavigate } from 'react-router-dom'
 import "./EntriesSection.css"
+import { getCurrentDate } from '../../utils/dateUtils'
 
 const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComplete, exercise, examStarted, onEntriesChange }) => {
   const [statementData, setStatementData] = useState({});
@@ -108,7 +109,7 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
   
     const newEntry = {
       entry_number: newEntryNumber,
-      entry_date: "2024-10-10",
+      entry_date: getCurrentDate(),
     };
   
     setStatementData(prev => ({

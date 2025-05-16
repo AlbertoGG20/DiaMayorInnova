@@ -1,5 +1,6 @@
 import React from "react";
 import AnnotationForm from "../annotation/AnnotationForm.jsx";
+import { getCurrentDate } from "../../utils/dateUtils";
 
 const EntryForm = ({ solutionIndex, entry, entryIndex, solutions, setSolutions }) => {
   const handleEntryChange = (event) => {
@@ -40,7 +41,7 @@ const EntryForm = ({ solutionIndex, entry, entryIndex, solutions, setSolutions }
           id="entry_date"
           type="date"
           name="entry_date"
-          value={entry.entry_date}
+          value={entry.entry_date || getCurrentDate()}
           onChange={handleEntryChange}
           className="statement-page__date-input"
         />

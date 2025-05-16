@@ -1,10 +1,10 @@
 import { useEffect, useState, useMemo } from 'react'
 import "./Entry.css"
 import EntryForm from './entry-form/EntryForm'
-
+import { getCurrentDate } from '../../../utils/dateUtils'
 const Entry = ({ number, updateEntryDate, annotations, updateAnnotation, deleteAnnotation, addAnnotation, deleteEntry, entryIndex, selectedStatement, date, exercise }) => {
   const [entryStatus, setEntryStatus] = useState(exercise?.finished);
-  const [entryDate, setDate] = useState(date || "2024-10-10");
+  const [entryDate, setDate] = useState(date || getCurrentDate());
   const formattedDate = new Date(`${entryDate}T00:00:00`).toLocaleDateString("es-ES");
 
   const total = useMemo(() => {
