@@ -203,24 +203,26 @@ const AccountingPlansList = ({ newPGC }) => {
 
       <Modal ref={accountsModalRef} modalTitle="Cuentas del PGC" showButton={false}>
         {accounts.length > 0 ? (
-          <table className="modal-table">
-            <thead>
-              <tr>
-                <th>Nº Cuenta</th>
-                <th>Nombre</th>
-                <th>Descripción</th>
-              </tr>
-            </thead>
-            <tbody>
-              {accounts.map((account) => (
-                <tr key={account.id}>
-                  <td>{account.account_number}</td>
-                  <td>{account.name}</td>
-                  <td>{account.description}</td>
+          <div className="modal-table--container">
+            <table className="modal-table">
+              <thead>
+                <tr>
+                  <th>Nº Cuenta</th>
+                  <th>Nombre</th>
+                  <th>Descripción</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {accounts.map((account) => (
+                  <tr key={account.id}>
+                    <td>{account.account_number}</td>
+                    <td>{account.name}</td>
+                    <td>{account.description}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : (
           <p>No hay cuentas disponibles.</p>
         )}
