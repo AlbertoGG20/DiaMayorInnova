@@ -1,18 +1,14 @@
-import React, { useState, useRef, useEffect } from 'react';
-import Modal from '../modal/Modal';
+import { useRef, useEffect } from 'react';
 import http from '../../http-common';
-import PaginationMenu from '../pagination-menu/PaginationMenu';
+import useAccountSelector from '../../hooks/useAccountSelector';
+import AccountSelectorModal from '../modal/AccountSelectionModal';
 
 const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions, setSolutions }) => {
   const annotation = solutions[solutionIndex].entries[entryIndex].annotations[annotationIndex];
-  const [accounts, setAccounts] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const accountIdInputRef = useRef(null);
   const accountNumberInputRef = useRef(null);
   const modalRef = useRef(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const accountSelector = useAccountSelector();
 
   useEffect(() => {
     if (annotation.account_id) {
@@ -32,23 +28,6 @@ const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions,
       fetchAccountDataById();
     }
   }, [annotation.account_id]);
-
-  const loadAccounts = async () => {
-    try {
-      const response = await http.get(`/accounts?page=${currentPage}&per_page=${5}&search=${searchQuery}`);
-      setAccounts(response.data.accounts);
-      setTotalPages(response.data.meta.total_pages || 1);
-    } catch (error) {
-      console.error('Error al cargar las cuentas: ', error);
-    }
-    finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadAccounts();
-  }, [searchQuery, currentPage]);
 
   const debounceTimeout = useRef(null);
 
@@ -73,11 +52,6 @@ const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions,
       account_name: account_name
     };
     setSolutions(updatedSolutions);
-  };
-
-  const openAccountModal = async () => {
-    await loadAccounts();
-    modalRef.current?.showModal();
   };
 
   const handleAccountSelect = (account) => {
@@ -106,7 +80,7 @@ const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions,
       }
 
       // Buscar primero en las cuentas cargadas
-      const foundAccount = accounts.find(acc => acc.id === value);
+      const foundAccount = accountSelector.accounts.find(acc => acc.id === value);
       if (foundAccount) {
         updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_name = foundAccount.name;
         setSolutions(updatedSolutions);
@@ -126,7 +100,7 @@ const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions,
       }
 
       // Buscar primero en las cuentas cargadas
-      const foundAccount = accounts.find(acc => acc.account_number === value);
+      const foundAccount = accountSelector.accounts.find(acc => acc.account_number === value);
       if (foundAccount) {
         updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_id = foundAccount.id;
         updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_name = foundAccount.name;
@@ -147,28 +121,6 @@ const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions,
       (_, i) => i !== annotationIndex
     );
     setSolutions(updatedSolutions);
-  };
-
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.key === 'F1' && document.activeElement === accountNumberInputRef.current) {
-        event.preventDefault();
-        openAccountModal();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-  const handleSearchChange = (event) => {
-    setSearchQuery(event.target.value);
-    setCurrentPage(1);
-  };
-
-  const safeSetCurrentPage = (newPage) => {
-    if (newPage < 1 || newPage > totalPages) return;
-    setCurrentPage(newPage);
   };
 
   return (
@@ -240,42 +192,21 @@ const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions,
         <i className='fi fi-rr-trash'></i>
       </button>
 
-      <Modal ref={modalRef} modalTitle='Seleccionar Cuenta' showButton={false}>
-        <div className='account-list'>
-          <input
-            type='text'
-            value={searchQuery}
-            onChange={handleSearchChange}
-            placeholder='Search by number or name...'
-            className='search-input'
-          />
-        </div>
-        <div className='account-list'>
-          {isLoading && <p>Loading...</p>}
-          {!isLoading && (
-            accounts.length > 0 ? (
-              accounts.map((account) => (
-                <div
-                  key={`${account.account_number}-${account.id}`}
-                  className='account-item'
-                  onClick={() => handleAccountSelect(account)}
-                >
-                  <span className='account-item_account'>{account.account_number}</span>
-                  <span className='account-item_account'>{account.name}</span>
-                </div>
-              ))
-            ) : (
-              <p>No accounts found.</p>
-            )
-          )}
-        </div>
-
-        <PaginationMenu
-          currentPage={currentPage}
-          setCurrentPage={safeSetCurrentPage}
-          totalPages={totalPages}
-        />
-      </Modal>
+      <AccountSelectorModal
+        modalRef={modalRef}
+        searchQuery={accountSelector.searchQuery}
+        setSearchQuery={accountSelector.setSearchQuery}
+        handleSearchChange={accountSelector.handleSearchChange}
+        accountNumberInputRef={accountNumberInputRef}
+        accounts={accountSelector.accounts}
+        loadAccounts={accountSelector.loadAccounts}
+        currentPage={accountSelector.currentPage}
+        setCurrentPage={accountSelector.setCurrentPage}
+        totalPages={accountSelector.totalPages}
+        isLoading={accountSelector.isLoading}
+        setIsLoading={accountSelector.setIsLoading}
+        onAccountSelect={handleAccountSelect}
+      />
     </div>
   );
 };

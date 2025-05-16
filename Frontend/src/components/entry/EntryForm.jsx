@@ -1,4 +1,3 @@
-import React from "react";
 import AnnotationForm from "../annotation/AnnotationForm.jsx";
 
 const EntryForm = ({ solutionIndex, entry, entryIndex, solutions, setSolutions }) => {
