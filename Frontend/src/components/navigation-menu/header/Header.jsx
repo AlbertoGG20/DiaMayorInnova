@@ -36,10 +36,7 @@ const Header = () => {
     <nav className="header">
       <i className='fi fi-rr-menu-burger' onClick={changeMenu}></i>
       <NavLink to={"/home"}><img src={logo} className="logo" alt="Innova logo" /></NavLink>
-      <div className="header_userZone">
-        <ul className='header_menu'>
-          <li className='header_item' tabIndex={0}><i className='fi fi-rr-bell'></i></li>
-        </ul>
+      <div className="header_userZone"> 
         <Dropdown />
       </div>
     </nav>
