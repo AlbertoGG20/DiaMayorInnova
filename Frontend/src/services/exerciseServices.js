@@ -1,10 +1,9 @@
-import http from "../http-common";
+import http from '../http-common';
 
 const getAll = async () => {
-  const response = await http.get(`/student_exercises`);
+  const response = await http.get('/student_exercises');
   return response;
 };
-
 
 const getByTaskId = async (id) => {
   try {
@@ -26,25 +25,32 @@ const getByExerciseId = async (id) => {
 
 const create = async (data) => {
   try {
-    const response = await http.post("/exercises", data);
+    const response = await http.post('/exercises', data);
     return response;
   } catch (error) {
-    console.error("Error en la creación de la tarea del usuario:", error);
+    console.error('Error en la creación de la tarea del usuario: ', error);
     return null;
   }
 };
-
 
 const deleteOnGroup = async (data) => {
   try {
-    const response = await http.delete(`/exercises/destroy_on_group`, { data });
+    const response = await http.delete('/exercises/destroy_on_group', { data });
     return response;
   } catch (error) {
-    console.error("Error en la eliminación:", error);
+    console.error('Error en la eliminación: ', error);
     return null;
   }
 };
 
+const update = async (id, data) => {
+  try {
+    return await http.patch(`/exercises/${id}`, { exercise: data });
+  } catch (error) {
+    console.error('Error en la actualización: ', error);
+    throw error;
+  }
+};
 
 export default {
   getAll,
@@ -52,4 +58,5 @@ export default {
   getByTaskId,
   getByExerciseId,
   deleteOnGroup,
+  update,
 };
