@@ -103,7 +103,7 @@ const StudentMark = () => {
                                     {
                                       entry.student_annotations.map((annotation, index) => (
                                         <tr key={index + annotation.account_number}>
-                                          <td>{index + 1}</td>
+                                          <td>{annotation.number}</td>
                                           <td>{annotation.account_number}</td>
                                           <td>{annotation.debit}</td>
                                           <td>{annotation.credit}</td>

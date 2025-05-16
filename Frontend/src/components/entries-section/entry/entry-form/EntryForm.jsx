@@ -3,6 +3,7 @@ import Modal from "../../../modal/Modal";
 import AccountService from "../../../../services/AccountService";
 import PaginationMenu from "../../../pagination-menu/PaginationMenu";
 import "./EntryForm.css";
+import http from "../../../../http-common";
 
 const EntryForm = ({ annotation, updateAnnotation, onDelete, exercise }) => {
   const [accounts, setAccounts] = useState([]);

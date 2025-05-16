@@ -1,5 +1,6 @@
 class StudentExercisesController < ApplicationController
   before_action :authenticate_user!
+  before_action :set_exercise, only: [:start, :finish, :update, :update_student_exercise, :update_student_task]
 
   def index
     return render json: { error: "No autorizado" }, status: :unauthorized unless current_user.student? || current_user.teacher?
@@ -172,7 +173,11 @@ class StudentExercisesController < ApplicationController
           marks: {
             include: {
               student_entries: {
-                include: :student_annotations
+                include: {
+                  student_annotations: {
+                    methods:  [:account_number]
+                  }
+                }
               }
             }
           }
@@ -189,7 +194,6 @@ class StudentExercisesController < ApplicationController
   
 
   def start
-    @exercise = Exercise.find(params[:id])
     task = @exercise.task
 
     if task.is_exam?
@@ -213,8 +217,7 @@ class StudentExercisesController < ApplicationController
   end
 
   def update
-    @exercise = Exercise.find(params[:id])
-
+    debugger
     if @exercise.update(exercise_params)
       render json: @exercise, status: :ok
     else
@@ -223,8 +226,7 @@ class StudentExercisesController < ApplicationController
   end
 
   def finish
-    @exercise = Exercise.find(params[:id])
-    
+    debugger  
     if @exercise.update(finished: true)
       render json: { success: true }
     else
@@ -232,54 +234,16 @@ class StudentExercisesController < ApplicationController
              status: :unprocessable_entity
     end
   end
-
+  
   def update_student_exercise
-    @exercise = Exercise.find(params[:id])
-
-    if @exercise.finished
+    debugger
+    if @exercise.finished?
       render json: { error: "El examen ya ha sido enviado y no puede ser modificado" }, 
              status: :unprocessable_entity
       return
     end
     
-    if @exercise.update(exercise_params)
-      # Obtener todos los enunciados del ejercicio
-      all_statements = @exercise.task.statements
-      marks_params = exercise_params[:marks_attributes] || []
-      
-      # Para cada enunciado del ejercicio
-      all_statements.each do |statement|
-        # Buscar si hay una marca para este enunciado
-        mark_param = marks_params.find { |mp| mp[:statement_id].to_i == statement.id }
-        
-        if mark_param
-          # Si hay una marca, procesarla normalmente
-          @exercise.marks.where(statement_id: statement.id).destroy_all
-          mark = @exercise.marks.create!(mark_param.except(:student_entries_attributes).merge(mark: 0, statement_id: statement.id))
-          
-          param_entries = mark_param[:student_entries_attributes] || []
-          mark_value = compute_grade(statement, param_entries)
-          mark.update!(mark: mark_value)
-          
-        student_entries_params = mark_param[:student_entries_attributes] || []
-        student_entries_params.each do |entry_param|
-          entry = mark.student_entries.create!(entry_param.except(:student_annotations_attributes))
-    
-            student_annotations_params = entry_param[:student_annotations_attributes] || []
-            student_annotations_params.each do |annotation_param|
-              entry.student_annotations.create!(annotation_param)
-            end
-          end
-        else
-          # Si no hay una marca para este enunciado, crear una con nota 0
-          @exercise.marks.where(statement_id: statement.id).destroy_all
-          mark = @exercise.marks.create!(
-            statement_id: statement.id,
-            mark: 0
-          )
-        end
-      end
-      
+    if @exercise.update(exercise_params)      
       render json: @exercise, status: :ok
     else
       render json: { errors: @exercise.errors.full_messages }, status: :unprocessable_entity
@@ -287,8 +251,6 @@ class StudentExercisesController < ApplicationController
   end
 
   def update_student_task
-    @exercise = Exercise.find(params[:id])
-
     params[:exercise][:marks_attributes].each do |mark|
       mark[:student_entries_attributes].each do |entry|
         entry[:student_annotations_attributes] ||= []
@@ -315,7 +277,7 @@ class StudentExercisesController < ApplicationController
         }
       }
     ), status: :ok
-  else
+    else
       render json: { errors: @exercise.errors.full_messages }, status: :unprocessable_entity
     end
   end
@@ -325,6 +287,7 @@ class StudentExercisesController < ApplicationController
   def exercise_params
     params.require(:exercise).permit(
       :task_id,
+      :finished,
       marks_attributes: [
         :id,
         :statement_id,
@@ -339,7 +302,6 @@ class StudentExercisesController < ApplicationController
             :id,
             :account_id,
             :number,
-            :account_number,
             :credit,
             :debit,
             :_destroy,
@@ -347,6 +309,10 @@ class StudentExercisesController < ApplicationController
         ]
       ]
     )
+  end
+
+  def set_exercise
+    @exercise = Exercise.find(params[:id])
   end
 
   def compute_grade(statement, param_entries)

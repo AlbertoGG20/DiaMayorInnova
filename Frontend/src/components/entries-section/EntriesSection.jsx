@@ -250,16 +250,8 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
       return;
     }
 
-    const filteredStatementsData = Object.entries(updatedStatementsData).reduce((acc, [statementId, data]) => {
-      acc[statementId] = {
-        entries: data.entries,
-        annotations: data.annotations.filter(anno => !anno._destroy)
-      };
-      return acc;
-    }, {});
-
     const dataToSubmit = {
-      statementsData: filteredStatementsData,
+      statementsData: updatedStatementsData,
       taskId: exercise.task.id,
       exerciseId: exercise.id,
     };

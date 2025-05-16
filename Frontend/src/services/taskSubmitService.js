@@ -18,10 +18,9 @@ const taskSubmitService = async (data, navigate) => {
       entry_date: entry.entry_date,
       student_annotations_attributes: (data.annotations || [])
         .filter((annotation) => annotation.student_entry_id === entry.entry_number)
-        .map(({ number, account_id, account_number, credit, debit }) => ({
+        .map(({ number, account_id, credit, debit }) => ({
           number,
           account_id: account_id || 9999,
-          account_number,
           credit: credit || 0,
           debit: debit || 0,
         })),
@@ -32,12 +31,13 @@ const taskSubmitService = async (data, navigate) => {
     exercise: {
       task_id: taskId,
       marks_attributes: marksAttributes,
+      finished: true
     },
   };
 
   try {
     await userExerciseDataService.update_student_exercise(exerciseId, exerciseData);
-    await userExerciseDataService.finish(exerciseId);
+    // await userExerciseDataService.finish(exerciseId);
     navigate("/home");
   } catch (err) {
     console.error("Error al enviar los datos:", err);
