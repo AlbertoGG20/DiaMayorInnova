@@ -37,7 +37,10 @@ export const AuxSection = ({ statements, examStarted, onSelectStatement, helpAva
           />
         );
       case "help_example":
-        return <HelpSection statementId={selectedStatement?.id} />;
+        if (!selectedStatement) {
+          return <div>Selecciona un enunciado para ver la ayuda</div>;
+        }
+        return <HelpSection statementId={selectedStatement.id} />;
       case "balance":
         return <RealTimeTrialBalance entries={entries} />;
       case "mayor":
@@ -45,7 +48,7 @@ export const AuxSection = ({ statements, examStarted, onSelectStatement, helpAva
       default:
         return null;
     }
-  }, [auxSection, statements, examStarted, onSelectStatement, entries, isExam]);
+  }, [auxSection, statements, examStarted, onSelectStatement, entries, isExam, selectedStatement]);
 
   const changeAuxSection = (section) => {
     setAuxSection(section);
