@@ -1,16 +1,16 @@
 class AccountingPlansController < ApplicationController
     before_action :authenticate_user!
     load_and_authorize_resource
-    
+
     def index
         accountingPlans = AccountingPlan.all
-      
+
         if params[:name].present?
           accountingPlans = accountingPlans.where("LOWER(name) LIKE ?", "%#{params[:name].downcase}%")
         end
-      
+
         accountingPlans = accountingPlans.page(params[:page]).per(params[:per_page] || 10)
-      
+
         render json: {
           accountingPlans: ActiveModelSerializers::SerializableResource.new(accountingPlans, each_serializer: AccountingPlanSerializer),
           meta: {
@@ -20,8 +20,8 @@ class AccountingPlansController < ApplicationController
           }
         }
     end
-      
-      
+
+
 
     def show
         @accountingPlan = AccountingPlan.find(params[:id])
@@ -42,7 +42,7 @@ class AccountingPlansController < ApplicationController
         end
     end
 
-    def update 
+    def update
         @accountingPlan = AccountingPlan.find(params[:id])
         if @accountingPlan.update(accounting_plan_params)
             render json: @accountingPlan
@@ -69,19 +69,18 @@ class AccountingPlansController < ApplicationController
         end
 
         begin
-            temp_file = Tempfile.new(["pgc_#{accounting_plan.acronym}", ".csv"])
+            temp_file = Tempfile.new([ "pgc_#{accounting_plan.acronym}", ".csv" ])
 
             CSV.open(temp_file.path, "w", col_sep: ";") do |csv|
-                csv << ["Nombre", "Acronimo", "Descripcion"] # PGC headers
-                csv << [accounting_plan.name, accounting_plan.acronym, accounting_plan.description]
+                csv << [ "Nombre", "Acronimo", "Descripcion" ] # PGC headers
+                csv << [ accounting_plan.name, accounting_plan.acronym, accounting_plan.description ]
 
                 csv << [] # Space
 
-                csv << ["Numero cuenta", "Nombre", "Descripcion", "Cargo", "Abono"]
+                csv << [ "Numero cuenta", "Nombre", "Descripcion", "Cargo", "Abono" ]
                 accounting_plan.accounts.each do |account|
-                  csv << [account.account_number, account.name, account.description, account.charge, account.credit]
+                  csv << [ account.account_number, account.name, account.description, account.charge, account.credit ]
                 end
-
             end
 
             # Avoid redirection
@@ -138,9 +137,9 @@ class AccountingPlansController < ApplicationController
               accounting_plan_id: accounting_plan.id
             )
           end
-    
+
           render json: { success: true, accounting_plan: accounting_plan, accounts: accounts }, status: :ok
-    
+
         rescue => e
           Rails.logger.error "CSV import failed: #{e.message}"
           render json: { error: "Error al importar el CSV: #{e.message}" }, status: :unprocessable_entity
@@ -148,8 +147,8 @@ class AccountingPlansController < ApplicationController
       else
         render json: { error: "Archivo no proporcionado" }, status: :bad_request
       end
-    end    
-     
+    end
+
 
 
     # xlsx files methods
@@ -161,16 +160,16 @@ class AccountingPlansController < ApplicationController
       if accounting_plan
         p = Axlsx::Package.new
         wb = p.workbook
-    
+
         wb.add_worksheet(name: "PGC - #{accounting_plan.acronym}") do |sheet|
           # PGC data
-          sheet.add_row ["Nombre", "Acronimo", "Descripcion"]
-          sheet.add_row [accounting_plan.name, accounting_plan.acronym, accounting_plan.description]
-    
+          sheet.add_row [ "Nombre", "Acronimo", "Descripcion" ]
+          sheet.add_row [ accounting_plan.name, accounting_plan.acronym, accounting_plan.description ]
+
           sheet.add_row [] # space
-    
+
           # Accounts data
-          sheet.add_row ["Numero cuenta", "Nombre", "Descripcion", "Cargo", "Abono"]
+          sheet.add_row [ "Numero cuenta", "Nombre", "Descripcion", "Cargo", "Abono" ]
           accounting_plan.accounts.each do |account|
             sheet.add_row [
               account.account_number,
@@ -181,7 +180,7 @@ class AccountingPlansController < ApplicationController
             ]
           end
         end
-    
+
         send_data p.to_stream.read,
                   type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                   disposition: "attachment",
@@ -190,62 +189,62 @@ class AccountingPlansController < ApplicationController
         render json: { error: "PGC no encontrado" }, status: :not_found
       end
     end
-    
+
 
     def import_xlsx
       authorize! :import_xlsx, AccountingPlan
-    
+
       if params[:file].blank?
         return render json: { error: "No se proporcionó ningún archivo" }, status: :bad_request
       end
-    
+
       file = params[:file]
       xlsx = Roo::Spreadsheet.open(file.tempfile.path)
-    
+
       begin
         sheet = xlsx.sheet(0)
-    
+
         # Buscar fila del encabezado de PGC
         pgc_header_index = sheet.first_row
         while pgc_header_index <= sheet.last_row
           row = sheet.row(pgc_header_index).map(&:to_s).map(&:strip)
           normalized_row = row.map { |cell| cell.to_s.downcase.strip }
-          if normalized_row.take(3) == ['nombre', 'acronimo', 'descripcion']
+          if normalized_row.take(3) == [ 'nombre', 'acronimo', 'descripcion' ]
             break
           end
           pgc_header_index += 1
         end
-    
+
         raise "Encabezado del PGC no encontrado" if pgc_header_index > sheet.last_row
-    
+
         pgc_data_row = sheet.row(pgc_header_index + 1).map(&:to_s).map(&:strip)
         raise "Datos del PGC incompletos" if pgc_data_row.size < 3
-    
+
         accounting_plan = AccountingPlan.create!(
           name: pgc_data_row[0],
           acronym: pgc_data_row[1],
           description: pgc_data_row[2]
         )
-    
+
         # Buscar fila del encabezado de cuentas
         accounts_header_index = pgc_header_index + 3
         while accounts_header_index <= sheet.last_row
           row = sheet.row(accounts_header_index).map(&:to_s).map(&:strip)
           normalized_row = row.map(&:downcase)
-          if normalized_row.take(5) == ['numero cuenta', 'nombre', 'descripcion', 'cargo', 'abono']
+          if normalized_row.take(5) == [ 'numero cuenta', 'nombre', 'descripcion', 'cargo', 'abono' ]
             break
           end
           accounts_header_index += 1
         end
-        
-    
+
+
         raise "Encabezado de cuentas no encontrado" if accounts_header_index > sheet.last_row
-    
+
         # Leer cuentas
         (accounts_header_index + 1).upto(sheet.last_row) do |i|
           row = sheet.row(i).map(&:to_s)
           next if row.compact.empty? || row[0].strip == ""
-    
+
           Account.create!(
             account_number: row[0]&.strip,
             name: row[1]&.strip,
@@ -255,20 +254,20 @@ class AccountingPlansController < ApplicationController
             accounting_plan_id: accounting_plan.id
           )
         end
-    
+
         render json: { success: true, accounting_plan: accounting_plan }, status: :ok
-    
+
       rescue => e
         Rails.logger.error "Error al importar XLSX: #{e.message}"
         render json: { error: "Error al importar el Excel: #{e.message}" }, status: :unprocessable_entity
       end
-    end    
+    end
 
 
     # Filter accounts by Accounting Plan
     def accounts_by_PGC
         accounting_plan = AccountingPlan.find_by(id: params[:id])
-      
+
         if accounting_plan
           render json: accounting_plan.accounts, status: :ok
         else
@@ -283,16 +282,16 @@ class AccountingPlansController < ApplicationController
       sheet_name = "Plantilla PGC"[0, 31]
       wb.add_worksheet(name: sheet_name) do |sheet|
         # Encabezado del plan contable
-        sheet.add_row ["Nombre", "Acronimo", "Descripcion"]
+        sheet.add_row [ "Nombre", "Acronimo", "Descripcion" ]
         # Fila de ejemplo vacía para el plan
-        sheet.add_row ["", "", ""]
+        sheet.add_row [ "", "", "" ]
 
         sheet.add_row [] # Espacio
 
         # Encabezado de cuentas
-        sheet.add_row ["Numero cuenta", "Nombre", "Descripcion", "Cargo", "Abono"]
+        sheet.add_row [ "Numero cuenta", "Nombre", "Descripcion", "Cargo", "Abono" ]
         # Fila de ejemplo vacía para cuentas
-        sheet.add_row ["", "", "", "", ""]
+        sheet.add_row [ "", "", "", "", "" ]
       end
 
       send_data p.to_stream.read,
