@@ -345,7 +345,6 @@ class StudentExercisesController < ApplicationController
             :id,
             :account_id,
             :number,
-            :account_number,
             :credit,
             :debit,
             :_destroy
