@@ -106,6 +106,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_15_125450) do
     t.datetime "updated_at", null: false
     t.boolean "started", default: false, null: false
     t.boolean "finished", default: false, null: false
+    t.boolean "is_public", default: false
     t.index ["task_id"], name: "index_exercises_on_task_id"
     t.index ["user_id"], name: "index_exercises_on_user_id"
   end
