@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, useImperativeHandle, forwardRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import statementService from "../../services/statementService";
@@ -7,7 +7,7 @@ import Table from "../table/Table";
 import PaginationMenu from "../pagination-menu/PaginationMenu";
 import { SearchBar } from "../search-bar/SearchBar";
 
-const StatementsList = ({ onSelectStatement }) => {
+const StatementsList = forwardRef(({ onSelectStatement }, ref) => {
   const { user, loading: authLoading } = useAuth();
   const [statements, setStatements] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -19,31 +19,39 @@ const StatementsList = ({ onSelectStatement }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   const itemsPerPage = 10;
 
-  useEffect(() => {
-    const fetchStatements = async () => {
-      try {
-        setLoading(true);
-        const response = await statementService.getAllStatements(currentPage, itemsPerPage, searchTerm);
+  const fetchStatements = async () => {
+    try {
+      setLoading(true);
+      const response = await statementService.getAllStatements(currentPage, itemsPerPage, searchTerm);
 
-        if (Array.isArray(response.data.statements)) {
-          const filteredStatements = response.data.statements.filter(
-            (statement) => statement.is_public || statement.user_id === user?.id
-          );
-          setStatements(filteredStatements);
-          setTotalPages(response.data.meta.total_pages || 1);
-        } else {
-          console.error("Error: La respuesta no es un arreglo válido.");
-        }
-      } catch (error) {
-        console.error("Error al cargar los enunciados:", error);
-      } finally {
-        setLoading(false);
+      if (Array.isArray(response.data.statements)) {
+        const filteredStatements = response.data.statements.filter(
+          (statement) => statement.is_public || statement.user_id === user?.id
+        );
+        setStatements(filteredStatements);
+        setTotalPages(response.data.meta.total_pages || 1);
+      } else {
+        console.error("Error: La respuesta no es un arreglo válido.");
       }
-    };
+    } catch (error) {
+      console.error("Error al cargar los enunciados:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchStatements();
   }, [user, currentPage, searchTerm]);
+
+  useImperativeHandle(ref, () => ({
+    refreshList: () => {
+      fetchStatements();
+    }
+  }));
 
   const handleDelete = async (id) => {
     try {
@@ -114,7 +122,7 @@ const StatementsList = ({ onSelectStatement }) => {
   }
 
   const handleStatementCreated = (newStatement) => {
-    setStatements((prevStatements) => [...prevStatements, newStatement]);
+    setRefreshTrigger(prev => prev + 1);
     setFormVisible(false);
   };
 
@@ -170,6 +178,6 @@ const StatementsList = ({ onSelectStatement }) => {
       />
     </div>
   );
-};
+});
 
 export default StatementsList;

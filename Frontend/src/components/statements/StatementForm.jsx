@@ -164,16 +164,15 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
         : await statementService.createStatement(statementData);
 
       if (onStatementCreated) {
-        onStatementCreated(response.data);
+        onStatementCreated(response);
       }
 
-      setSuccessMessage(statement?.id ? "Enunciado actualizado correctamente." : "Enunciado creado correctamente.");
-      clearSuccessMessage();
-
+      // Resetear el formulario
       setDefinition("");
       setIsPublic(false);
-      setSolutions([]);
       setFieldErrors({});
+      setSuccessMessage(statement?.id ? "Enunciado actualizado correctamente." : "Enunciado creado correctamente.");
+      clearSuccessMessage();
     } catch (error) {
       if (error.response) {
         if (error.response.status === 403) {

@@ -18,6 +18,7 @@ class StatementsController < ApplicationController
         statements = statements.where("definition ILIKE ?", search_term)
       end     
 
+      statements = statements.order(created_at: :desc)
       paginated_statements = statements.page(params[:page]).per(params[:per_page] || 10)
 
       render json: {
