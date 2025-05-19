@@ -162,7 +162,7 @@ class StudentExercisesController < ApplicationController
 
   def find_mark_exercise_by_user
     @exercises = Exercise
-      .includes(:task, marks: { student_entries: :student_annotations })
+      .includes(:task, marks: { student_entries: { student_annotations: :account } })
       .where(user_id: current_user.id)
       .where(is_public: true)
       .page(params[:page])
@@ -175,7 +175,11 @@ class StudentExercisesController < ApplicationController
           marks: {
             include: {
               student_entries: {
-                include: :student_annotations
+                include: {
+                  student_annotations: {
+                    include: { account: { only: [:name] } }
+                  }
+                }
               }
             }
           }

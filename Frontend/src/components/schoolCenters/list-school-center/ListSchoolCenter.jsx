@@ -64,13 +64,14 @@ const ListSchoolCenter = ({ schools, setSchools, setSelectedSchool, searchSchool
           handleSearchChange={setSeachSchoolName}
         />
         <Table
-          titles={["Nombre", "Teléfono", "Provincia", "Dirección", "Web", "Acciones"]}
+          titles={["Código", "Nombre", "Teléfono", "Provincia", "Dirección", "Web", "Acciones"]}
           data={schools}
           actions={true}
           openModal={handleEditClick}
           deleteItem={handleDeleteClick}
           columnConfig={[
-            { field: "school_name", sortable: true },
+            { field: "code", sortable: true },
+            { field: "school_name", sortable: true },            
             { field: "phone", sortable: false },
             { field: "province", sortable: true },
             { field: "address", sortable: true },

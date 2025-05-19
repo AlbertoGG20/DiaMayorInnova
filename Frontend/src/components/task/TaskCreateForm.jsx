@@ -10,15 +10,17 @@ import "./TaskPage.css";
 import exerciseServices from "../../services/exerciseServices.js";
 import ButtonBack from "../button-back/ButtonBack.jsx";
 import Breadcrumbs from "../breadcrumbs/Breadcrumbs.jsx";
+import { getCurrentDateTime } from "../../utils/dateUtils";
 
 const TaskCreateForm = ({ onTaskCreated }) => {
   const { state } = useLocation();
   const navigate = useNavigate();
   const task = state?.task || state?.newTask || null;
   const { user } = useAuth();
+  
   const [title, setTitle] = useState(task?.title || "");
-  const [openingDate, setOpeningDate] = useState(task?.opening_date || "");
-  const [closingDate, setClosingDate] = useState(task?.closing_date || "");
+  const [openingDate, setOpeningDate] = useState(task?.opening_date || getCurrentDateTime());
+  const [closingDate, setClosingDate] = useState(task?.closing_date || getCurrentDateTime());
   const [statements, setStatements] = useState([]);
   const [selectedStatements, setSelectedStatements] = useState(task?.statements ? task.statements.map(s => s.id ?? s) : []);
   const [solutions, setSolutions] = useState({});

@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { getCurrentDate } from "../utils/dateUtils";
 
 const useEntry = () => {
   const generateUid = () => `id-${Math.random().toString(32).substr(2, 9)}`;
+  
   const [entries, setEntries] = useState([{
     entry_number: 1,
-    entry_date: "2024-10-10",
+    entry_date: getCurrentDate(),
     entry_uid: generateUid(),
   }]);
 
@@ -12,7 +14,7 @@ const useEntry = () => {
   const addEntry = () => {
     const defaultEntry = {
       entry_number: entries.length + 1,
-      entry_date: "2024-10-10",
+      entry_date: getCurrentDate(),
       entry_uid: generateUid(),
     }
     setEntries([...entries, defaultEntry])

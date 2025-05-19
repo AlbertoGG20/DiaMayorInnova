@@ -31,7 +31,7 @@ scRoutes.push({
 scRoutes.push({
   to: "/home/escuelas",
   icon: "fi fi-rr-school",
-  name: "Colegios",
+  name: "Centro Educativo",
   rol: ["admin"],
 })
 

@@ -18,17 +18,18 @@ const HelpSection = ({statementId}) => {
         return;
       }
 
+      setIsLoading(true);
       try {
-        setIsLoading(true);
         const response = await solutionService.getExampleSolution(statementId);
-        console.log("Solución de ejemplo:", response.data);
         if (response && response.data) {
           setSolution(response.data);
+        } else {
+          setIsError(true);
         }
-        setIsLoading(false);
       } catch (error) {
         console.error("Error al obtener la solución de ejemplo:", error);
         setIsError(true);
+      } finally {
         setIsLoading(false);
       }
     };
@@ -56,9 +57,12 @@ const HelpSection = ({statementId}) => {
     solution.entries.forEach(entry => {
       entry.annotations?.forEach(annotation => {
         if (annotation.account) {
-          accounts.set(annotation.account_number, {
+          accounts.set(annotation.account.account_number, {
             ...annotation.account,
-            account_number: annotation.account_number
+            account_number: annotation.account.account_number,
+            description: annotation.account.description,
+            charge: annotation.account.charge,
+            credit: annotation.account.credit
           });
         }
       });
@@ -155,7 +159,7 @@ const HelpSection = ({statementId}) => {
                           <div className="help_section__entry_form">
                             <div className="help_section__entry_form_inputs__wrapper">
                               <div className="help_section__form_group help_section__account_number_group">
-                                <span className="help_section__account_number">{annotation.account_number}</span>
+                                <span className="help_section__account_number">{annotation.account?.account_number}</span>
                               </div>
                               <div className="help_section__form_group help_section__account_name_group">
                                 <span className="help_section__account_name">{annotation.account?.name || ''}</span>

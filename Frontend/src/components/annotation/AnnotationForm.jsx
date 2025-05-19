@@ -1,16 +1,15 @@
-import React, { useState, useRef, useEffect } from "react";
-import Modal from "../modal/Modal";
-import http from "../../http-common";
-import PaginationMenu from "../pagination-menu/PaginationMenu";
+import { useRef, useEffect } from 'react';
+import http from '../../http-common';
+import AccountService from '../../services/AccountService';
+import useAccountSelector from '../../hooks/useAccountSelector';
+import AccountSelectorModal from '../modal/AccountSelectionModal';
 
 const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions, setSolutions }) => {
   const annotation = solutions[solutionIndex].entries[entryIndex].annotations[annotationIndex];
-  const [accounts, setAccounts] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const accountIdInputRef = useRef(null);
   const accountNumberInputRef = useRef(null);
   const modalRef = useRef(null);
+  const accountSelector = useAccountSelector();
 
   useEffect(() => {
     if (annotation.account_id) {
@@ -24,41 +23,28 @@ const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions,
           accountNumberInputRef.current.value = accountData.account_number;
           setSolutions(updatedSolutions);
         } catch (error) {
-          console.error("Error al cargar los datos de la cuenta:", error);
+          console.error('Error al cargar los datos de la cuenta: ', error);
         }
       };
       fetchAccountDataById();
     }
   }, [annotation.account_id]);
 
-  const loadAccounts = async () => {
-    try {
-      const response = await http.get(`/accounts?page=${currentPage}&limit=${5}`);
-      setAccounts(response.data.accounts);
-      setTotalPages(response.data.meta.total_pages || 1);
-    } catch (error) {
-      console.error("Error al cargar las cuentas:", error);
-    }
-  };
-
-  useEffect(() => {
-    loadAccounts();
-  }, [currentPage]);
   const debounceTimeout = useRef(null);
 
   let account_id;
   let account_name;
   const searchAccount = async (accountNumber) => {
     try {
-      const response = await http.get(`/accounts/find_by_account_number?account_number=${accountNumber}`);
+      const response = await AccountService.findByNumber(accountNumber);
       if (response.data) {
         account_id = response.data.id;
         account_name = response.data.name;
       }
     } catch (error) {
       account_id = null;
-      account_name = "";
-      console.error("Error al buscar la cuenta:", error);
+      account_name = '';
+      console.error('Error al buscar la cuenta: ', error);
     }
     const updatedSolutions = [...solutions];
     updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex] = {
@@ -67,11 +53,6 @@ const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions,
       account_name: account_name
     };
     setSolutions(updatedSolutions);
-  };
-
-  const openAccountModal = async () => {
-    await loadAccounts();
-    modalRef.current?.showModal();
   };
 
   const handleAccountSelect = (account) => {
@@ -87,20 +68,20 @@ const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions,
     const updatedSolutions = [...solutions];
     updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex][name] = value;
 
-    if (name === "account_id") {
+    if (name === 'account_id') {
       updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_id = Number(value);
-      updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_name = "";
+      updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_name = '';
     }
     setSolutions(updatedSolutions);
 
-    if (name === "account_id" && value) {
+    if (name === 'account_id' && value) {
       // Limpiar el timeout anterior si existe
       if (debounceTimeout.current) {
         clearTimeout(debounceTimeout.current);
       }
 
       // Buscar primero en las cuentas cargadas
-      const foundAccount = accounts.find(acc => acc.id === value);
+      const foundAccount = accountSelector.accounts.find(acc => acc.id === value);
       if (foundAccount) {
         updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_name = foundAccount.name;
         setSolutions(updatedSolutions);
@@ -113,14 +94,14 @@ const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions,
       }, 500); // 500ms de debounce
     }
 
-    if (name === "account_number" && value) {
+    if (name === 'account_number' && value) {
       // Limpiar el timeout anterior si existe
       if (debounceTimeout.current) {
         clearTimeout(debounceTimeout.current);
       }
 
       // Buscar primero en las cuentas cargadas
-      const foundAccount = accounts.find(acc => acc.account_number === value);
+      const foundAccount = accountSelector.accounts.find(acc => acc.account_number === value);
       if (foundAccount) {
         updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_id = foundAccount.id;
         updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex].account_name = foundAccount.name;
@@ -143,107 +124,90 @@ const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions,
     setSolutions(updatedSolutions);
   };
 
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.key === "F1" && document.activeElement === accountNumberInputRef.current) {
-        event.preventDefault();
-        openAccountModal();
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
-
   return (
-    <div className="statement-page__annotation-row">
+    <div className='statement-page__annotation-row'>
       <input
-        type="number"
-        name="number"
-        value={annotation.number || ""}
+        type='number'
+        name='number'
+        value={annotation.number || ''}
         onChange={handleAnnotationChange}
-        id="number"
-        className="statement-page__input--edit-solution"
-        placeholder="Apunte"
+        id='number'
+        className='statement-page__input--edit-solution'
+        placeholder='Apunte'
       />
       <input
-        type="number"
-        name="account_id"
-        value={annotation.account_id || ""}
+        type='number'
+        name='account_id'
+        value={annotation.account_id || ''}
         onChange={handleAnnotationChange}
-        id="account_id"
-        className="statement-page__input--edit-solution"
-        placeholder="Nº Cuenta"
-        style={{ display: "none" }}
+        id='account_id'
+        className='statement-page__input--edit-solution'
+        placeholder='Nº Cuenta'
+        style={{ display: 'none' }}
         ref={accountIdInputRef}
       />
       <input
-        type="number"
-        name="account_number"
+        type='number'
+        name='account_number'
         onChange={handleAnnotationChange}
-        id="account_number"
-        className="statement-page__input--edit-solution"
-        placeholder="Nº Cuenta"
+        id='account_number'
+        className='statement-page__input--edit-solution'
+        placeholder='Nº Cuenta'
         ref={accountNumberInputRef}
       />
       <input
-        type="text"
-        name="account_name"
-        value={annotation.account_name || ""}
+        type='text'
+        name='account_name'
+        value={annotation.account_name || ''}
         readOnly
-        id="account_name"
-        className="statement-page__input--edit-solution"
-        placeholder="Nombre Cuenta"
+        id='account_name'
+        className='statement-page__input--edit-solution'
+        placeholder='Nombre Cuenta'
       />
       <input
-        type="number"
-        name="debit"
-        value={annotation.debit || ""}
+        type='number'
+        name='debit'
+        value={annotation.debit || ''}
         disabled={!!annotation.credit}
         onChange={handleAnnotationChange}
-        id="debit"
-        className="statement-page__input--edit-solution"
-        placeholder="Debe"
+        id='debit'
+        className='statement-page__input--edit-solution'
+        placeholder='Debe'
       />
       <input
-        type="number"
-        name="credit"
-        value={annotation.credit || ""}
+        type='number'
+        name='credit'
+        value={annotation.credit || ''}
         disabled={!!annotation.debit}
         onChange={handleAnnotationChange}
-        id="credit"
-        className="statement-page__input--edit-solution"
-        placeholder="Haber"
+        id='credit'
+        className='statement-page__input--edit-solution'
+        placeholder='Haber'
       />
       <button
-        type="button"
+        type='button'
         onClick={removeAnnotation}
-        className="statement-page__button statement-page__button-delete btn__icon"
-        aria-label="Eliminar apunte"
+        className='statement-page__button statement-page__button-delete btn__icon'
+        aria-label='Eliminar apunte'
       >
-        <i className="fi fi-rr-trash"></i>
+        <i className='fi fi-rr-trash'></i>
       </button>
 
-      <Modal ref={modalRef} modalTitle="Seleccionar Cuenta" showButton={false}>
-        <div className="account-list">
-          {accounts && accounts.map((account) => (
-            <div
-              key={account.id}
-              className="account-item"
-              onClick={() => handleAccountSelect(account)}
-            >
-              <span className="account-item_account">{account.account_number}</span>
-              <span className="account-item_account">{account.name}</span>
-            </div>
-          ))}
-        </div>
-        <div className="account-pagination">
-          <PaginationMenu
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-            totalPages={totalPages}
-          />
-        </div>
-      </Modal>
+      <AccountSelectorModal
+        modalRef={modalRef}
+        searchQuery={accountSelector.searchQuery}
+        setSearchQuery={accountSelector.setSearchQuery}
+        onSearchChange={accountSelector.handleSearchChange}
+        accountNumberInputRef={accountNumberInputRef}
+        accounts={accountSelector.accounts}
+        loadAccounts={accountSelector.loadAccounts}
+        currentPage={accountSelector.currentPage}
+        setCurrentPage={accountSelector.setCurrentPage}
+        totalPages={accountSelector.totalPages}
+        isLoading={accountSelector.isLoading}
+        setIsLoading={accountSelector.setIsLoading}
+        onAccountSelect={handleAccountSelect}
+      />
     </div>
   );
 };

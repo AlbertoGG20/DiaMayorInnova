@@ -1,9 +1,9 @@
 import http from "../http-common";
 
-const getAll = async (page = 1, perPage = 10) => {
+const getAll = async (page = 1, perPage = 10, name = "") => {
     try {
         const response = await http.get("/class_groups", {
-            params: { page, per_page: perPage }
+            params: { page, per_page:perPage, course_module: name }
         });
         return response;
     } catch (error) {

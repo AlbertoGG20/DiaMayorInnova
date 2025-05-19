@@ -95,10 +95,6 @@ th {
   }
 }
 
-
-
-
-
 .accountingPlan__button--remove {
   display: flex;
   align-items: center;
@@ -115,8 +111,6 @@ th {
 .accountingPlan__button--remove:hover {
   color: var(--Color-red-400);
 }
-
-
 
 .accountingPlan__form--row {
   display: flex;
@@ -163,7 +157,6 @@ th {
   align-items: center;
   margin: 0;
 
-
   & .fi {
     align-items: center;
     display: flex;
@@ -192,7 +185,6 @@ th {
 /* Ocultar el input file */
 .accountingPlan__file--input {
   display: none;
-
 }
 
 /* Estilo del botón personalizado */
@@ -202,7 +194,6 @@ th {
 
   p {
     border-right: 1px solid var(--Color-grey-200);
-
     width: 34px;
     font-size: var(--text-desktop-small)
   }
@@ -235,7 +226,6 @@ th {
   margin-bottom: 0;
 }
 
-
 .accountingPlan__pagination {
   padding-left: var(--gap-m);
 
@@ -254,8 +244,6 @@ th {
   text-align: start;
   margin-top: var(--gap-xxs);
 }
-
-
 
 .accountingPlan__table--container::-webkit-scrollbar {
   width: 0px;
@@ -297,6 +285,40 @@ th {
     font-size: var(--text-mobile-body-small);
   }
 
+  .accountingPlan__form--upload {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--gap-xs);
+    width: 100%;
+
+    & .btn {
+      width: 100% !important;
+      justify-content: center;
+    }
+
+    & .accountingPlan__file--label {
+      width: 100%;
+      justify-content: center;
+    }
+
+    & .accountingPlan__file--name {
+      max-width: none;
+    }
+  }
+
+  .accountingPlan__form--row {
+    flex-direction: column;
+    gap: var(--gap-xs);
+  }
+
+  .accountingPlan__form--add {
+    width: 100%;
+    
+    & .btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
 }
 
 /* Para móviles (hasta 360px) */
@@ -305,7 +327,6 @@ th {
     margin-bottom: var(--gap-s);
     font-size: var(--text-mobile-lead);
   }
-
 
   .accountingPlan__form {
     padding: var(--gap-xs);

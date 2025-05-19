@@ -20,8 +20,18 @@ const ListUsers = ({
   const [userToDelete, setUserToDelete] = useState(null);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const itemsPerPage = 10;
   const [localPage, setLocalPage] = useState(1);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -86,6 +96,27 @@ const ListUsers = ({
     )
     : users;
 
+  const getColumnConfig = () => {
+    if (isMobile) {
+      return [
+        { field: "name", sortable: true },
+        { field: "role", sortable: true }
+      ];
+    }
+    return [
+      { field: "name", sortable: true },
+      { field: "email", sortable: true },
+      { field: "role", sortable: true }
+    ];
+  };
+
+  const getTitles = () => {
+    if (isMobile) {
+      return ["Nombre", "Role", "Acciones"];
+    }
+    return ["Nombre", "Correo", "Role", "Acciones"];
+  };
+
   return (
     <>
       <section className='user-list__container'>
@@ -96,16 +127,12 @@ const ListUsers = ({
         />
 
         <Table
-          titles={["Nombre", "Correo", "Role", "Acciones"]}
+          titles={getTitles()}
           data={paginatedUsers}
           actions={true}
           openModal={selectedUserById}
           deleteItem={handleDeleteClick}
-          columnConfig={[
-            { field: "name", sortable: true },
-            { field: "email", sortable: true },
-            { field: "role", sortable: true }
-          ]}
+          columnConfig={getColumnConfig()}
         />
 
         <PaginationMenu

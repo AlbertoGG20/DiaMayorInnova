@@ -1,7 +1,16 @@
 import { useRef, forwardRef, useImperativeHandle } from "react";
 import "./Modal.css";
 
-const Modal = forwardRef(({ children, btnText = "Abrir Modal", modalTitle = "Modal", showButton = true, needOpen = true, saveBtn = false, btnNoBg = false, auxFunction }, ref) => {
+const Modal = forwardRef(({
+  children,
+  btnText = "Abrir Modal",
+  modalTitle = "Modal",
+  showButton = true,
+  needOpen = true,
+  saveBtn = false,
+  btnNoBg = false,
+  auxFunction
+}, ref) => {
   const modalRef = useRef(null);
 
   useImperativeHandle(ref, () => ({
