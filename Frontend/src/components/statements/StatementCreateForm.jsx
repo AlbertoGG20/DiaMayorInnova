@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import StatementForm from "./StatementForm";
 import StatementList from "./StatementList";
@@ -13,8 +13,9 @@ import Modal from "../modal/Modal";
 
 const StatementCreateForm = () => {
   const navigate = useNavigate();
+  const statementListRef = useRef();
   const [solutions, setSolutions] = useState([]);
-  const [prevSolutions, setPrevSolutions] = useState([]); // Ajout de prevSolutions
+  const [prevSolutions, setPrevSolutions] = useState([]);
   const [isModalOpen, setModalOpen] = useState(false);
   const [selectedSolutionIndex, setSelectedSolutionIndex] = useState(null);
   const [selectedStatement, setSelectedStatement] = useState(null);
@@ -75,11 +76,19 @@ const StatementCreateForm = () => {
   };
 
   const handleStatementCreated = (updatedStatement) => {
-    // console.log("Enunciado actualizado/creado:", updatedStatement);
-    setSelectedStatement(updatedStatement);
-    setSolutions(updatedStatement.solutions || []);
-    setMessage("Enunciado guardado. Ahora puedes añadir soluciones directamente.");
+    // Resetear todos los estados
+    setSelectedStatement(null);
+    setSolutions([]);
+    setPrevSolutions([]);
+    setMessage("Enunciado guardado correctamente.");
     setTimeout(() => setMessage(""), 5000);
+    
+    // Forzar la actualización de la lista de enunciados
+    if (statementListRef.current) {
+      statementListRef.current.refreshList();
+    }
+    
+    // Navegar a la página de enunciados
     navigate("/add-statements");
   };
 
@@ -235,7 +244,11 @@ const StatementCreateForm = () => {
       </aside>
 
       <section className="statement-page__selection">
-        <StatementList onSelectStatement={handleSelectStatement} />
+        <StatementList 
+          ref={statementListRef}
+          onSelectStatement={handleSelectStatement} 
+          onStatementCreated={handleStatementCreated}
+        />
       </section>
     </main>
   );
