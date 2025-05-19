@@ -104,31 +104,31 @@ class AccountingPlansController < ApplicationController
       if params[:file].present?
         begin
           csv_data = CSV.read(params[:file].path, col_sep: ";")
-    
-          pgc_index = csv_data.index { |row| row.map(&:strip) == ["Nombre", "Acronimo", "Descripcion"] }
-          accounts_index = csv_data.index { |row| row.map(&:strip) == ["Numero cuenta", "Nombre", "Descripcion", "Cargo", "Abono"] }
-    
+
+          pgc_index = csv_data.index { |row| row.compact.map(&:strip) == [ "Nombre", "Acronimo", "Descripcion" ] }
+          accounts_index = csv_data.index { |row| row.compact.map(&:strip) == [ "Numero cuenta", "Nombre", "Descripcion", "Cargo", "Abono" ] }
+
           if pgc_index.nil? || accounts_index.nil?
             return render json: { error: "Formato de archivo inválido" }, status: :unprocessable_entity
           end
-    
+
           pgc_row = csv_data[pgc_index + 1]
           if pgc_row.nil? || pgc_row.compact.empty?
             return render json: { error: "Datos del plan contable no encontrados" }, status: :unprocessable_entity
           end
-    
+
           # Create PGC
           accounting_plan = AccountingPlan.create!(
             name: pgc_row[0].strip,
             acronym: pgc_row[1].strip,
             description: pgc_row[2].strip
           )
-    
+
           # Create accounts
           accounts = []
           csv_data[(accounts_index + 1)..].each do |row|
             next if row.compact.empty?
-    
+
             accounts << Account.create!(
               account_number: row[0]&.strip,
               name: row[1]&.strip,
