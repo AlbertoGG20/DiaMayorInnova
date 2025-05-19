@@ -95,9 +95,10 @@ const TaskPage = () => {
           });
           setStatementData(newStatementData);
 
-          const targetStatement = response.exercise.marks?.[0]?.statement_id;
-
-          setSelectedStatement(targetStatement);
+          const firstStatement = response.exercise.task.statements?.[0];
+          if (firstStatement) {
+            setSelectedStatement(firstStatement);
+          }
         }
       } catch (error) {
         console.error("Error fetching exercise:", error);
@@ -274,6 +275,7 @@ const TaskPage = () => {
           onSelectStatement={handleSelectStatement}
           examStarted={taskStarted}
           helpAvailable={exercise.task.help_available}
+          selectedStatement={selectedStatement}
           entries={Object.values(statementData).flatMap(data =>
             data.entries?.map(entry => ({
               ...entry,
