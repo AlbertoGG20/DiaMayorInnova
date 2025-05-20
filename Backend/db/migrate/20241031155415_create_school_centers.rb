@@ -9,5 +9,8 @@ class CreateSchoolCenters < ActiveRecord::Migration[7.2]
       t.string :province
       t.timestamps
     end
+
+    add_index :school_centers, :school_name, unique: true
+    add_index :school_centers, :email, unique: true
   end
 end
