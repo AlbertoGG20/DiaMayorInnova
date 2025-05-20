@@ -123,8 +123,8 @@ const StatementsList = ({ onSelectStatement }) => {
     setCurrentPage(newPage);
   };
 
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
+  const handleSearchChange = (term) => {
+    setSearchTerm(term);
     setCurrentPage(1);
   };
 
