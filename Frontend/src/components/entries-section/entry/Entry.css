@@ -9,6 +9,7 @@
   align-items: start;
   gap: var(--gap-xl);
   margin: 0;
+  border: solid 2px var(--background-color);
 
   container-type: inline-size;
   container-name: entry_head;
@@ -117,6 +118,10 @@
     align-items: start;
     gap: var(--gap-s);
   }
+}
+
+.entry-active {
+  border: solid 2px var(--Color-grey-200);
 }
 
 .entry_add_annotation {
