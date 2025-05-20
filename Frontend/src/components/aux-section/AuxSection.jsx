@@ -11,6 +11,7 @@ import { useLocation } from 'react-router-dom'
 export const AuxSection = ({ statements, examStarted, onSelectStatement, helpAvailable = false, entries = [], selectedStatement }) => {
   const route = useLocation().pathname
   const isExam = route.includes("/modes/examen/");
+  const isTask = route.includes("/modes/tarea/")
   const [auxSection, setAuxSection] = useState(() => {
     if (helpAvailable && !isExam) {
       return "help_example"
@@ -19,7 +20,7 @@ export const AuxSection = ({ statements, examStarted, onSelectStatement, helpAva
   });
 
   useEffect(() => {
-    if (helpAvailable && !isExam) {
+    if (helpAvailable && !isExam && !isTask) {
       setAuxSection("help_example");
     } else {
       setAuxSection("statements");

@@ -10,6 +10,8 @@ const EntryForm = ({ annotation, updateAnnotation, onDelete, exercise }) => {
   const modalRef = useRef(null);
   const debounceTimeout = useRef(null);
   const accountSelector = useAccountSelector();
+  const debitInputRef = useRef(null);
+  const creditInputRef = useRef(null);
 
   const handleAccountSelect = (account) => {
     const updated = {
@@ -120,6 +122,30 @@ const EntryForm = ({ annotation, updateAnnotation, onDelete, exercise }) => {
     };
   }, []);
 
+  const handleKeyDown = (event) => {
+    if ((event.ctrlKey || event.metaKey) && event.key === 'd') {
+      event.preventDefault();
+      if (!exercise?.finished && !annotation.credit) {
+        debitInputRef.current?.focus();
+      }
+    }
+
+    if ((event.ctrlKey || event.metaKey) && event.key === 'h') {
+      event.preventDefault();
+      if (!exercise?.finished && !annotation.debit) {
+        creditInputRef.current?.focus();
+      }
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [annotation, exercise]);
+
   return (
     <div className='entry_form_wrapper'>
       <p className='entry_apt'> {annotation.number}</p>
@@ -169,6 +195,7 @@ const EntryForm = ({ annotation, updateAnnotation, onDelete, exercise }) => {
               disabled={annotation.credit || exercise?.finished}
               pattern='[0-9]*[.,]?[0-9]*'
               inputMode='decimal'
+              ref={debitInputRef}
             />
           </div>
           <div className='form_group'>
@@ -181,6 +208,7 @@ const EntryForm = ({ annotation, updateAnnotation, onDelete, exercise }) => {
               disabled={annotation.debit || exercise?.finished}
               pattern='[0-9]*[.,]?[0-9]*'
               inputMode='decimal'
+              ref={creditInputRef}
             />
           </div>
         </div>

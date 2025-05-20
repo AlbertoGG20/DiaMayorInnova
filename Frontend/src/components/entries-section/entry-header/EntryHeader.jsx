@@ -1,10 +1,32 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Modal from "../../modal/Modal";
 import "./EntryHeader.css"
 
 const EntryHeader = ({ addEntry, selectedStatement, examStarted, exercise }) => {
 
   const modalRef = useRef(null);
+
+  const handleKeyDown = (event) => {
+    if (event.ctrlKey && event.key === 'm') {
+      event.preventDefault();
+
+      if (examStarted && !exercise?.finished) {
+        if (selectedStatement) {
+          addEntry(selectedStatement?.id ?? 0);
+        } else {
+          modalRef.current?.showModal();
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [addEntry, selectedStatement, examStarted, exercise?.finished]);
 
   return (
     <div className='entry_header'>
