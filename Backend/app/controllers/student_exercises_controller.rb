@@ -177,7 +177,7 @@ class StudentExercisesController < ApplicationController
               student_entries: {
                 include: {
                   student_annotations: {
-                    include: { account: { only: [:name] } }
+                    include: { account: { only: [:name, :account_number] } }
                   }
                 }
               }
