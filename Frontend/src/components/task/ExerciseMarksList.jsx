@@ -16,6 +16,8 @@ const ExerciseMarksList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [errorMessage, setErrorMessage] = useState('');
+  const [allNotesVisible, setAllNotesVisible] = useState(false);
+  const [hasMixedVisibility, setHasMixedVisibility] = useState(false);
 
   const taskId = location.state?.task_id;
 
@@ -27,6 +29,7 @@ const ExerciseMarksList = () => {
         const response = await getStudentsMarkList(taskId, currentPage, 10);
         setExerciseMarksList(response.data.students);
         setTotalPages(response.data.meta.total_pages);
+        updateVisibilityStates(response.data.students);
       } catch (error) {
         console.error('Error devolviendo la lista', error);
       }
@@ -34,6 +37,13 @@ const ExerciseMarksList = () => {
 
     fetchMarkList();
   }, [taskId, currentPage]);
+
+  const updateVisibilityStates = (students) => {
+    const allVisible = students.every(student => student.is_public);
+    const allHidden = students.every(student => !student.is_public);
+    setAllNotesVisible(allVisible);
+    setHasMixedVisibility(!allVisible && !allHidden);
+  };
 
   const handlePageChange = (newPage) => {
     if (newPage > 0 && newPage <= totalPages) {
@@ -59,19 +69,49 @@ const ExerciseMarksList = () => {
   const handleToggleVisibility = async (exercise_id, newVisibility) => {
     try {
       await exerciseServices.update(exercise_id, { is_public: newVisibility });
-      setExerciseMarksList((prevExerciseMarksList) =>
-        prevExerciseMarksList.map((exerciseMark) =>
+      setExerciseMarksList((prevExerciseMarksList) => {
+        const updatedList = prevExerciseMarksList.map((exerciseMark) =>
           exerciseMark.exercise_id === exercise_id
             ? { ...exerciseMark, is_public: newVisibility }
             : exerciseMark
-        )
-      );
+        );
+        updateVisibilityStates(updatedList);
+        return updatedList;
+      });
     } catch (error) {
       const errorMessage = error.response && error.response.status === 403
-        ? 'No puedes cambiar la visibilidad de notas ajenas.'
-        : 'Error al cambiar visibilidad.';
+        ? 'No se puede cambiar la visibilidad de las notas'
+        : 'Error al cambiar la visibilidad de las notas';
 
-      setErrorMessage(errorMessage)
+      setErrorMessage(errorMessage);
+      setTimeout(() => {
+        setErrorMessage('');
+      }, 5000);
+    }
+  };
+
+  const handleToggleAllVisibility = async (newVisibility) => {
+    try {
+      const updatePromises = exerciseMarksList.map(exerciseMark =>
+        exerciseServices.update(exerciseMark.exercise_id, { is_public: newVisibility })
+      );
+      
+      await Promise.all(updatePromises);
+      
+      setExerciseMarksList(prevExerciseMarksList =>
+        prevExerciseMarksList.map(exerciseMark => ({
+          ...exerciseMark,
+          is_public: newVisibility
+        }))
+      );
+      setAllNotesVisible(newVisibility);
+      setHasMixedVisibility(false);
+    } catch (error) {
+      const errorMessage = error.response && error.response.status === 403
+        ? 'No se puede cambiar la visibilidad de las notas'
+        : 'Error al cambiar la visibilidad de las notas';
+
+      setErrorMessage(errorMessage);
       setTimeout(() => {
         setErrorMessage('');
       }, 5000);
@@ -83,9 +123,27 @@ const ExerciseMarksList = () => {
       <div className="mark_list__header">
         <ButtonBack />
         <Breadcrumbs />
-        <button className="btn light" onClick={handleExportToXlsx}>
-          <i className="fi fi-rr-download" /> Exportar en XLSX
-        </button>
+        <div className="mark_list__header-buttons">
+          <button className="btn light" onClick={handleExportToXlsx}>
+            <i className="fi fi-rr-download" /> Exportar en XLSX
+          </button>
+          <div className="visibility-buttons">
+            <button 
+              className="btn light" 
+              onClick={() => handleToggleAllVisibility(true)}
+              disabled={allNotesVisible && !hasMixedVisibility}
+            >
+              <i className="fi fi-rr-eye" /> Publicar todas las notas
+            </button>
+            <button 
+              className="btn light" 
+              onClick={() => handleToggleAllVisibility(false)}
+              disabled={!allNotesVisible && !hasMixedVisibility}
+            >
+              <i className="fi fi-rr-eye-crossed" /> Ocultar todas las notas
+            </button>
+          </div>
+        </div>
       </div>
 
       {errorMessage && <div className="error-message">{errorMessage}</div>}
