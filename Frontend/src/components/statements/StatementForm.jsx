@@ -1,28 +1,23 @@
 import React, { useState, useEffect, useRef } from "react";
 import statementService from "../../services/statementService";
 
-
 const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSolutions, onSaveSolution, statement, onDeleteSolution }) => {
   const [definition, setDefinition] = useState(statement?.definition || "");
-  const [explanation, setExplanation] = useState(statement?.explanation || "");
   const [isPublic, setIsPublic] = useState(statement?.is_public || false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [fieldErrors, setFieldErrors] = useState({});
-  const [isUpdated, setIsUpdated] = useState(false);
 
   const prevStatementRef = useRef();
 
   useEffect(() => {
-    if (!isUpdated && statement?.id && (JSON.stringify(prevStatementRef.current) !== JSON.stringify(statement))) {
+    if (statement?.id && (JSON.stringify(prevStatementRef.current) !== JSON.stringify(statement))) {
       setDefinition(statement?.definition || "");
-      setExplanation(statement?.explanation || "");
       setIsPublic(statement?.is_public || false);
-      setSolutions(statement?.solutions || []);
+      setSolutions(statement?.solutions?.map(s => ({ ...s, entries: s.entries || [] })) || []);
     }
-
     prevStatementRef.current = statement;
-  }, [statement, isUpdated]);
+  }, [statement, setSolutions]);
 
   const clearSuccessMessage = () => {
     setTimeout(() => {
@@ -40,13 +35,13 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
           annotations: [
             {
               number: 1,
-              account_number: 0,
+              account_id: "",
               credit: "",
               debit: "",
             },
             {
               number: 2,
-              account_number: 0,
+              account_id: "",
               credit: "",
               debit: "",
             },
@@ -79,13 +74,13 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
       errors += "La definición es obligatoria.\n";
     }
 
-    solutions.forEach((solution, solutionIndex) => {
-      if (!solution.description.trim()) {
+    (solutions || []).forEach((solution, solutionIndex) => {
+      if (!solution.description?.trim()) {
         errors += `La descripción de la solución ${solutionIndex + 1} es obligatoria.\n`;
       }
 
-      solution.entries.forEach((entry, entryIndex) => {
-        if (entry.annotations.length < 2) {
+      (solution.entries || []).forEach((entry, entryIndex) => {
+        if ((entry.annotations || []).length < 2) {
           errors += `El asiento ${entryIndex + 1} de la solución ${solutionIndex + 1} debe tener al menos dos anotaciones.\n`;
         }
 
@@ -99,12 +94,11 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
           errors += `La fecha del asiento de la solución ${solutionIndex + 1} es obligatoria.\n`;
         }
 
-        entry.annotations.forEach((annotation, annotationIndex) => {
-
+        (entry.annotations || []).forEach((annotation, annotationIndex) => {      
           let credit = Number(annotation.credit) || 0;
           let debit = Number(annotation.debit) || 0;
 
-          if (!annotation.account_number) {
+          if (!annotation.account_id) {
             errors += `El número de cuenta de la anotación ${annotationIndex + 1} en la solución ${solutionIndex + 1} es obligatorio.\n`;
           }
 
@@ -118,7 +112,6 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
           totalDebit += debit;
           totalCredit += credit;
         });
-
         if (totalDebit !== totalCredit) {
           errors += `El asiento ${entryIndex + 1} de la solución ${solutionIndex + 1} no está balanceado. La suma de débitos (${totalDebit}) no es igual a la suma de créditos (${totalCredit}).\n`;
         }
@@ -143,23 +136,22 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
 
     const statementData = {
       definition,
-      explanation,
       is_public: isPublic,
-      solutions_attributes: solutions.map((solution) => ({
+      solutions_attributes: (solutions || []).map((solution) => ({
         ...(solution.id && { id: solution.id }),
         description: solution.description,
         ...(solution._destroy === true ? { _destroy: true } : {}),
-        entries_attributes: solution.entries.map((entry) => ({
+        entries_attributes: (solution.entries || []).map((entry) => ({
           ...(entry.id && { id: entry.id }),
           entry_number: entry.entry_number,
           entry_date: entry.entry_date,
           ...(entry._destroy === true ? { _destroy: true } : {}),
-          annotations_attributes: entry.annotations.map((annotation) => ({
+          annotations_attributes: (entry.annotations || []).map((annotation) => ({
             ...(annotation.id && { id: annotation.id }),
             number: annotation.number,
-            account_number: annotation.account_number,
-            credit: parseFloat(annotation.credit),
-            debit: parseFloat(annotation.debit),
+            account_id: annotation.account_id,
+            credit: parseFloat(annotation.credit) || 0,
+            debit: parseFloat(annotation.debit) || 0,
             ...(annotation._destroy === true ? { _destroy: true } : {}),
           })),
         })),
@@ -172,18 +164,15 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
         : await statementService.createStatement(statementData);
 
       if (onStatementCreated) {
-        onStatementCreated(response.data);
+        onStatementCreated(response);
       }
 
+      // Resetear el formulario
+      setDefinition("");
+      setIsPublic(false);
+      setFieldErrors({});
       setSuccessMessage(statement?.id ? "Enunciado actualizado correctamente." : "Enunciado creado correctamente.");
       clearSuccessMessage();
-
-      setDefinition("");
-      setExplanation("");
-      setIsPublic(false);
-      setSolutions([]);
-      setFieldErrors({});
-      setIsUpdated(true);
     } catch (error) {
       if (error.response) {
         if (error.response.status === 403) {
@@ -218,16 +207,6 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
             onChange={(e) => setDefinition(e.target.value)}
           />
           {fieldErrors.definition && <div className="error-message">{fieldErrors.definition}</div>}
-        </div>
-        <div className="statement-page__form--content">
-          <label className="statement-page__label--explanation" htmlFor="explanation">Explicación:</label>
-          <textarea
-            id="explanation"
-            className="statement-page__input--explanation"
-            value={explanation}
-            onChange={(e) => setExplanation(e.target.value)}
-          />
-          {fieldErrors.explanation && <div className="error-message">{fieldErrors.explanation}</div>}
         </div>
 
         <div className="statement-page__buttons-container">

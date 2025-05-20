@@ -99,11 +99,39 @@
 
   .ledger-book-table {
     font-size: 0.85rem;
+    min-width: 400px;
   }
 
   .ledger-book-table th,
   .ledger-book-table td {
-    padding: 0.4rem 0.6rem;
+    padding: 0.4rem 0.3rem;
+    text-align: center;
+  }
+
+  /* Ocultar iconos de ordenamiento en móvil */
+  .sort-icon {
+    display: none !important;
+  }
+
+  .sortable-header {
+    padding-right: 0.3rem !important;
+  }
+
+  /* Ajustes específicos para las columnas en móvil */
+  .ledger-book-table th:nth-child(1),
+  .ledger-book-table td:nth-child(1) {
+    max-width: 60px;
+    min-width: 60px;
+    padding-left: 0.2rem;
+    padding-right: 0.2rem;
+  }
+
+  .ledger-book-table th:nth-child(2),
+  .ledger-book-table td:nth-child(2) {
+    max-width: 50px;
+    min-width: 50px;
+    padding-left: 0.2rem;
+    padding-right: 0.2rem;
   }
 
   .ledger-book {

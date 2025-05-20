@@ -1,23 +1,27 @@
 class AccountingPlansController < ApplicationController
     before_action :authenticate_user!
     load_and_authorize_resource
-    
+
     def index
+        accountingPlans = AccountingPlan.all
+
         if params[:name].present?
-            accountingPlans = AccountingPlan.where("LOWER(name) LIKE ?", "%#{params[:name].downcase}%")
-        else
-            accountingPlans = AccountingPlan.all.page(params[:page]).per(params[:per_page] || 10)
+          accountingPlans = accountingPlans.where("LOWER(name) LIKE ?", "%#{params[:name].downcase}%")
         end
 
+        accountingPlans = accountingPlans.page(params[:page]).per(params[:per_page] || 10)
+
         render json: {
-            accountingPlans: accountingPlans,
-            meta: {
-                current_page: accountingPlans.try(:current_page) || 1,
-                total_pages: accountingPlans.try(:total_pages) || 1,
-                total_count: accountingPlans.size
-            }
+          accountingPlans: ActiveModelSerializers::SerializableResource.new(accountingPlans, each_serializer: AccountingPlanSerializer),
+          meta: {
+            current_page: accountingPlans.current_page,
+            total_pages: accountingPlans.total_pages,
+            total_count: accountingPlans.total_count
+          }
         }
     end
+
+
 
     def show
         @accountingPlan = AccountingPlan.find(params[:id])
@@ -38,7 +42,7 @@ class AccountingPlansController < ApplicationController
         end
     end
 
-    def update 
+    def update
         @accountingPlan = AccountingPlan.find(params[:id])
         if @accountingPlan.update(accounting_plan_params)
             render json: @accountingPlan
@@ -65,17 +69,17 @@ class AccountingPlansController < ApplicationController
         end
 
         begin
-            temp_file = Tempfile.new(["pgc_#{accounting_plan.acronym}", ".csv"])
+            temp_file = Tempfile.new([ "pgc_#{accounting_plan.acronym}", ".csv" ])
 
             CSV.open(temp_file.path, "w", col_sep: ";") do |csv|
-                csv << ["ID", "Nombre", "Acronimo", "Descripcion"] # PGC headers
-                csv << [accounting_plan.id, accounting_plan.name, accounting_plan.acronym, accounting_plan.description]
+                csv << [ "Nombre", "Acronimo", "Descripcion" ] # PGC headers
+                csv << [ accounting_plan.name, accounting_plan.acronym, accounting_plan.description ]
 
                 csv << [] # Space
 
-                csv << ["Numero cuenta", "Nombre", "Descripcion"] # Accounts headers
+                csv << [ "Numero cuenta", "Nombre", "Descripcion", "Cargo", "Abono" ]
                 accounting_plan.accounts.each do |account|
-                    csv << [account.account_number, account.name, account.description]
+                  csv << [ account.account_number, account.name, account.description, account.charge, account.credit ]
                 end
             end
 
@@ -96,59 +100,174 @@ class AccountingPlansController < ApplicationController
 
 
     def import_csv
-        if params[:file].present?
-            begin
-                csv_data = CSV.read(params[:file].path).map(&:to_a)
-                last_id = (AccountingPlan.maximum(:id) || 0).to_i # Get last ID
+      if params[:file].present?
+        begin
+          csv_data = CSV.read(params[:file].path, col_sep: ";")
 
-                pgc_index = csv_data.index { |row| row[0] == "Nombre" } # Find PGC
-                accounts_index = csv_data.index { |row| row[0] == "NombreC" } # Find Accounts
+          pgc_index = csv_data.index { |row| row.compact.map(&:strip) == [ "Nombre", "Acronimo", "Descripcion" ] }
+          accounts_index = csv_data.index { |row| row.compact.map(&:strip) == [ "Numero cuenta", "Nombre", "Descripcion", "Cargo", "Abono" ] }
 
-                if pgc_index.nil? || accounts_index.nil?
-                    return render json: @accountingPlan.errors, status: :unprocessable_entity
-                end
-            
-                pgc_row = csv_data[pgc_index + 1]
-                return render json: @accountingPlan.errors, status: :unprocessable_entity if pgc_row.nil?
+          if pgc_index.nil? || accounts_index.nil?
+            return render json: { error: "Formato de archivo inválido" }, status: :unprocessable_entity
+          end
 
-                # Create PGC
-                accounting_plan = AccountingPlan.create!(
-                    id: last_id + 1, # Assign Id
-                    name: pgc_row[0].strip,
-                    acronym: pgc_row[1].strip,
-                    description: pgc_row[2].strip
-                )
-        
-                # Create Accounts
-                accounts = []
-                csv_data[(accounts_index + 1)..].each do |row| # Ignore accounts headers
-                    next if row[1].nil? || row[1].strip.empty? # skip empty lines
+          pgc_row = csv_data[pgc_index + 1]
+          if pgc_row.nil? || pgc_row.compact.empty?
+            return render json: { error: "Datos del plan contable no encontrados" }, status: :unprocessable_entity
+          end
 
-                    account = Account.create!(
-                        name: row[0].strip,
-                        account_number: row[1].strip,
-                        description: row[2].strip,
-                        accounting_plan_id: accounting_plan.id
-                    )
+          # Create PGC
+          accounting_plan = AccountingPlan.create!(
+            name: pgc_row[0].strip,
+            acronym: pgc_row[1].strip,
+            description: pgc_row[2].strip
+          )
 
-                    accounts << account
-                end
+          # Create accounts
+          accounts = []
+          csv_data[(accounts_index + 1)..].each do |row|
+            next if row.compact.empty?
 
-                render json: { success: true, accounting_plan: accounting_plan, accounts: accounts }, status: :ok
-      
-            rescue => e
-                render json: @accountingPlan.errors, status: :unprocessable_entity
-            end
-        else
-            render json: @accountingPlan.errors, status: :bad_request
+            accounts << Account.create!(
+              account_number: row[0]&.strip,
+              name: row[1]&.strip,
+              description: row[2]&.strip,
+              charge: row[3]&.strip,
+              credit: row[4]&.strip,
+              accounting_plan_id: accounting_plan.id
+            )
+          end
+
+          render json: { success: true, accounting_plan: accounting_plan, accounts: accounts }, status: :ok
+
+        rescue => e
+          Rails.logger.error "CSV import failed: #{e.message}"
+          render json: { error: "Error al importar el CSV: #{e.message}" }, status: :unprocessable_entity
         end
-      end  
+      else
+        render json: { error: "Archivo no proporcionado" }, status: :bad_request
+      end
+    end
+
+
+
+    # xlsx files methods
+    require 'caxlsx'
+    require 'roo'
+
+    def export_xlsx_by_pgc
+      accounting_plan = AccountingPlan.find_by(id: params[:id])
+      if accounting_plan
+        p = Axlsx::Package.new
+        wb = p.workbook
+
+        wb.add_worksheet(name: "PGC - #{accounting_plan.acronym}") do |sheet|
+          # PGC data
+          sheet.add_row [ "Nombre", "Acronimo", "Descripcion" ]
+          sheet.add_row [ accounting_plan.name, accounting_plan.acronym, accounting_plan.description ]
+
+          sheet.add_row [] # space
+
+          # Accounts data
+          sheet.add_row [ "Numero cuenta", "Nombre", "Descripcion", "Cargo", "Abono" ]
+          accounting_plan.accounts.each do |account|
+            sheet.add_row [
+              account.account_number,
+              account.name,
+              account.description,
+              account.charge,
+              account.credit
+            ]
+          end
+        end
+
+        send_data p.to_stream.read,
+                  type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                  disposition: "attachment",
+                  filename: "PGC_#{accounting_plan.acronym}.xlsx"
+      else
+        render json: { error: "PGC no encontrado" }, status: :not_found
+      end
+    end
+
+
+    def import_xlsx
+      authorize! :import_xlsx, AccountingPlan
+
+      if params[:file].blank?
+        return render json: { error: "No se proporcionó ningún archivo" }, status: :bad_request
+      end
+
+      file = params[:file]
+      xlsx = Roo::Spreadsheet.open(file.tempfile.path)
+
+      begin
+        sheet = xlsx.sheet(0)
+
+        # Buscar fila del encabezado de PGC
+        pgc_header_index = sheet.first_row
+        while pgc_header_index <= sheet.last_row
+          row = sheet.row(pgc_header_index).map(&:to_s).map(&:strip)
+          normalized_row = row.map { |cell| cell.to_s.downcase.strip }
+          if normalized_row.take(3) == [ 'nombre', 'acronimo', 'descripcion' ]
+            break
+          end
+          pgc_header_index += 1
+        end
+
+        raise "Encabezado del PGC no encontrado" if pgc_header_index > sheet.last_row
+
+        pgc_data_row = sheet.row(pgc_header_index + 1).map(&:to_s).map(&:strip)
+        raise "Datos del PGC incompletos" if pgc_data_row.size < 3
+
+        accounting_plan = AccountingPlan.create!(
+          name: pgc_data_row[0],
+          acronym: pgc_data_row[1],
+          description: pgc_data_row[2]
+        )
+
+        # Buscar fila del encabezado de cuentas
+        accounts_header_index = pgc_header_index + 3
+        while accounts_header_index <= sheet.last_row
+          row = sheet.row(accounts_header_index).map(&:to_s).map(&:strip)
+          normalized_row = row.map(&:downcase)
+          if normalized_row.take(5) == [ 'numero cuenta', 'nombre', 'descripcion', 'cargo', 'abono' ]
+            break
+          end
+          accounts_header_index += 1
+        end
+
+
+        raise "Encabezado de cuentas no encontrado" if accounts_header_index > sheet.last_row
+
+        # Leer cuentas
+        (accounts_header_index + 1).upto(sheet.last_row) do |i|
+          row = sheet.row(i).map(&:to_s)
+          next if row.compact.empty? || row[0].strip == ""
+
+          Account.create!(
+            account_number: row[0]&.strip,
+            name: row[1]&.strip,
+            description: row[2]&.strip,
+            charge: row[3]&.strip,
+            credit: row[4]&.strip,
+            accounting_plan_id: accounting_plan.id
+          )
+        end
+
+        render json: { success: true, accounting_plan: accounting_plan }, status: :ok
+
+      rescue => e
+        Rails.logger.error "Error al importar XLSX: #{e.message}"
+        render json: { error: "Error al importar el Excel: #{e.message}" }, status: :unprocessable_entity
+      end
+    end
 
 
     # Filter accounts by Accounting Plan
     def accounts_by_PGC
         accounting_plan = AccountingPlan.find_by(id: params[:id])
-      
+
         if accounting_plan
           render json: accounting_plan.accounts, status: :ok
         else
@@ -156,10 +275,34 @@ class AccountingPlansController < ApplicationController
         end
     end
 
+    def download_template_xlsx
+      p = Axlsx::Package.new
+      wb = p.workbook
+
+      sheet_name = "Plantilla PGC"[0, 31]
+      wb.add_worksheet(name: sheet_name) do |sheet|
+        # Encabezado del plan contable
+        sheet.add_row [ "Nombre", "Acronimo", "Descripcion" ]
+        # Fila de ejemplo vacía para el plan
+        sheet.add_row [ "", "", "" ]
+
+        sheet.add_row [] # Espacio
+
+        # Encabezado de cuentas
+        sheet.add_row [ "Numero cuenta", "Nombre", "Descripcion", "Cargo", "Abono" ]
+        # Fila de ejemplo vacía para cuentas
+        sheet.add_row [ "", "", "", "", "" ]
+      end
+
+      send_data p.to_stream.read,
+                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                disposition: "attachment",
+                filename: "Plantilla_PGC.xlsx"
+    end
+
     private
 
     def accounting_plan_params
         params.require(:accounting_plan).permit(:name, :description, :acronym)
     end
-
 end

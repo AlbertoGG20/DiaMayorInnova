@@ -65,35 +65,39 @@ const ExamStatement = ({ statement_id, statement_title, index, mark, student_ent
           <div className="statement__entry">
             <h4>Asientos</h4>
 
-            <table>
-              <thead>
-                <tr>
-                  <th className="statement__entry_column">Apt</th>
-                  <th className="statement__entry_column">Nº Cuenta</th>
-                  <th className="statement__entry_column left-align examen_statement__account_name">Nombre Cuenta</th>
-                  <th className="statement__entry_column">Debe</th>
-                  <th className="statement__entry_column">Haber </th>
-                </tr>
-              </thead>
-              <tbody>
-                {
-                  student_entries.map((entry) => (
-                    entry.student_annotations.map((annotation, index) => {
-                      return (
-                        <tr key={annotation.id}>
-                          <td className="right-align">{index + 1}</td>
-                          <td className="right-align">{annotation.account_number}</td>
-                          <td className="left-align examen_statement__account_name">{annotation.account.name}</td>
-                          <td className="right-align">{annotation.debit} €</td>
-                          <td className="right-align">{annotation.credit} €</td>
-                        </tr>
-                      )
-                    }))
-                  )
-                }
-
-              </tbody>
-            </table>
+            {student_entries.map((entry) => (
+              <div key={entry.id} className="entry-container">
+                <div className="entry-header">
+                  <span className="entry-info">
+                    <strong>Asiento {entry.entry_number}</strong>
+                    <span className="entry-separator">|</span>
+                    <strong>Fecha:</strong> {entry.entry_date ? new Date(entry.entry_date).toLocaleDateString('es-ES') : '-'}
+                  </span>
+                </div>
+                <table>
+                  <thead>
+                    <tr>
+                      <th className="statement__entry_column">Apt</th>
+                      <th className="statement__entry_column"><span className="desktop-text">Nº Cuenta</span><span className="mobile-text">Cuenta</span></th>
+                      <th className="statement__entry_column left-align examen_statement__account_name">Nombre Cuenta</th>
+                      <th className="statement__entry_column">Debe</th>
+                      <th className="statement__entry_column">Haber </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {entry.student_annotations.map((annotation, index) => (
+                      <tr key={annotation.id}>
+                        <td className="right-align">{index + 1}</td>
+                        <td className="right-align">{annotation.account?.account_number}</td>
+                        <td className="left-align examen_statement__account_name">{annotation.account.name}</td>
+                        <td className="right-align">{annotation.debit} €</td>
+                        <td className="right-align">{annotation.credit} €</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ))}
 
             {
               isEdition && isOpen && <textarea className="statement__text-area" name="Comment" id="correctionFeedback" value={comment} onChange={(e) => handleCommentChange(statement_id, e.target.value)}></textarea>
@@ -103,14 +107,12 @@ const ExamStatement = ({ statement_id, statement_title, index, mark, student_ent
                 <div className="btn__container">
                   <button className="btn" onClick={editMenu} disabled={changeMark}>Guardar</button>
                   <button className="btn light" onClick={cancelEdit}>Cancelar</button>
-
                 </div>
               )
             }
             {
               !isEdition && isOpen && <button className="btn" onClick={editMenu}>Editar Nota</button>
             }
-
           </div>
         )
       }

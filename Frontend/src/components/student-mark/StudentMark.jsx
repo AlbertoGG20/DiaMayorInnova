@@ -3,6 +3,7 @@ import "./StudentMark.css";
 import userExerciseDataService from '../../services/userExerciseDataService';
 import Modal from '../modal/Modal'
 import { Tooltip } from 'react-tooltip';
+import PaginationMenu from '../pagination-menu/PaginationMenu';
 
 const StudentMark = () => {
 
@@ -30,6 +31,11 @@ const StudentMark = () => {
 
     fetchMarks();
   }, [currentPage]);
+
+  const changePage = (newPage) => {
+    if (newPage < 1 || newPage > totalPages) return;
+    setCurrentPage(newPage);
+  };
 
   return (
     <section className={includeMark ? "mark__section " : "mark__section principalSection__img"}>
@@ -89,6 +95,7 @@ const StudentMark = () => {
                                     <tr>
                                       <th>Nº</th>
                                       <th>Nº Cuenta</th>
+                                      <th>Nombre Cuenta</th>
                                       <th>Debe</th>
                                       <th>Haber</th>
                                     </tr>
@@ -98,7 +105,8 @@ const StudentMark = () => {
                                       entry.student_annotations.map((annotation, index) => (
                                         <tr key={index + annotation.account_number}>
                                           <td>{index + 1}</td>
-                                          <td>{annotation.account_number}</td>
+                                          <td>{annotation.account?.account_number}</td>
+                                          <td>{annotation.account?.name}</td>
                                           <td>{annotation.debit}</td>
                                           <td>{annotation.credit}</td>
                                         </tr>
@@ -121,22 +129,11 @@ const StudentMark = () => {
         }
       </div>
 
-      {/* Paginacion */}
-      <div className="marks__pagination">
-        <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage(1)}>
-          <i className='fi fi-rr-angle-double-small-left' />
-        </button>
-        <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)}>
-          <i className='fi fi-rr-angle-small-left' />
-        </button>
-        <span>Página {currentPage} de {totalPages}</span>
-        <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage((prev) => prev + 1)}>
-          <i className='fi fi-rr-angle-small-right' />
-        </button>
-        <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage(totalPages)}>
-          <i className='fi fi-rr-angle-double-small-right' />
-        </button>
-      </div>
+      <PaginationMenu
+        currentPage={currentPage}
+        setCurrentPage={changePage}
+        totalPages={totalPages}
+      />
 
     </section>
   )

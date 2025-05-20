@@ -8,10 +8,23 @@ import "../../components/entries-section/EntriesSection.css"
 import "../../pages/modes/practice-page/PracticePage.css"
 import { useLocation } from 'react-router-dom'
 
-export const AuxSection = ({ statements, examStarted, onSelectStatement, helpAvailable = false, entries = [] }) => {
+export const AuxSection = ({ statements, examStarted, onSelectStatement, helpAvailable = false, entries = [], selectedStatement }) => {
   const route = useLocation().pathname
-  const [auxSection, setAuxSection] = useState("balance")
   const isExam = route.includes("/modes/examen/");
+  const [auxSection, setAuxSection] = useState(() => {
+    if (helpAvailable && !isExam) {
+      return "help_example"
+    }
+    return "balance"
+  });
+
+  useEffect(() => {
+    if (helpAvailable && !isExam) {
+      setAuxSection("help_example");
+    } else {
+      setAuxSection("statements");
+    }
+  }, [helpAvailable, isExam]);
 
   const sectionAux = useMemo(() => {
     switch (auxSection) {
@@ -19,12 +32,15 @@ export const AuxSection = ({ statements, examStarted, onSelectStatement, helpAva
         return (
           <AuxSectionTwo
             statements={statements}
-            examStarted={isExam ? examStarted : true}
+            examStarted={examStarted}
             onSelectStatement={onSelectStatement}
           />
         );
       case "help_example":
-        return <HelpSection />;
+        if (!selectedStatement) {
+          return <div>Selecciona un enunciado para ver la ayuda</div>;
+        }
+        return <HelpSection statementId={selectedStatement.id} />;
       case "balance":
         return <RealTimeTrialBalance entries={entries} />;
       case "mayor":
@@ -32,7 +48,7 @@ export const AuxSection = ({ statements, examStarted, onSelectStatement, helpAva
       default:
         return null;
     }
-  }, [auxSection, statements, examStarted, onSelectStatement, entries, isExam]);
+  }, [auxSection, statements, examStarted, onSelectStatement, entries, isExam, selectedStatement]);
 
   const changeAuxSection = (section) => {
     setAuxSection(section);

@@ -54,15 +54,14 @@ const AuxSectionTwo = ({ statements, examStarted, onSelectStatement, isTaskActiv
                 );
               })}
             </div>
-            {selectedStatement && (
+            {selectedStatement ? (
               <div className="statement-detail">
-                <h3 className="statement-detail__title">Enunciado {statements.indexOf(selectedStatement) + 1}</h3>
+                <h3 className="statement-detail__title">Enunciado {statements.findIndex(s => s.id === selectedStatement?.id) + 1}</h3>
                 <div className="statement-detail__content">
                   <p><strong>Definición:</strong> {selectedStatement.definition}</p>
-                  <p><strong>Explicación:</strong> {selectedStatement.explanation || "Sin explicación."}</p>
                 </div>
               </div>
-            )}
+            ) : <p>Sin enunciado seleccionado</p>}
           </section>
         </div>
       }

@@ -572,6 +572,46 @@ input::placeholder {
 }
 
 
+.dt-paging-button:hover:disabled {
+  background-color: var(--Color-grey-50);
+  color: var(--Color-principal-100);
+  cursor: default;
+}
+
+.section-table__pagination {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  gap: var(--gap-xxs);
+  margin-top: var(--gap-xxs);
+
+  & .paging-text {
+    padding: 0 var(--gap-xxs);
+  }
+}
+
+
+
+.dt-paging-button {
+  display: flex;
+  width: 40px;
+  height: 30px;
+  padding: 0;
+  margin: 0;
+  justify-content: center;
+  align-items: center;
+  box-shadow: var(--box-shadow-btn);
+  border-radius: var(--r-xs);
+  background-color: var(--Color-White);
+  color: var(--Color-principal-700);
+
+  &:hover {
+    background-color: var(--Color-Neutral-White);
+    color: var(--Color-Principal-oscuro);
+  }
+}
+
+
 @media (width > 1025px) {
   .app-main {
     height: 100dvh;

@@ -5,8 +5,9 @@ import Entry from './entry/Entry'
 import Modal from '../modal/Modal';
 import { useNavigate } from 'react-router-dom'
 import "./EntriesSection.css"
+import { getCurrentDate } from '../../utils/dateUtils'
 
-const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComplete, exercise, examStarted, handleSave, onEntriesChange }) => {
+const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComplete, exercise, examStarted, onEntriesChange }) => {
   const [statementData, setStatementData] = useState({});
   const [allStatementsData, setAllStatementsData] = useState({});
   const accounts = exercise?.chartOfAccounts || [];
@@ -21,7 +22,7 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
   useEffect(() => {
     if (savedMarks && savedMarks.length > 0) {
       const newStatementData = {};
-      
+
       savedMarks.forEach((mark) => {
         const entriesMap = {};
         const entries = mark.student_entries?.map(entry => {
@@ -32,57 +33,67 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
             entry_date: entry.entry_date
           };
         }) || [];
-        
+
         const annotations = mark.student_entries?.flatMap(entry => 
           entry.student_annotations?.map(anno => ({
             ...anno,
             id: anno.id,
             uid: anno.uid || `anno-${anno.id || Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            student_entry_id: entriesMap[entry.id]
+            student_entry_id: entriesMap[entry.id],
           })) || []
         );
-        
+
         newStatementData[mark.statement_id] = { entries, annotations };
       });
-      
+
       setStatementData(newStatementData);
+      setAllStatementsData(newStatementData);
     }
   }, [savedMarks]);
 
   useEffect(() => {
     if (exercise?.marks) {
       const newStatementData = {};
-      
+
       exercise.marks.forEach((mark) => {
         const entries = mark.student_entries?.map(entry => ({
           id: entry.id,
           entry_number: entry.entry_number,
           entry_date: entry.entry_date
         })) || [];
-  
+
         const annotations = mark.student_entries?.flatMap(entry => 
           entry.student_annotations?.map(anno => ({
             id: anno.id,
             uid: anno.uid || `anno-${anno.id || Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             number: anno.number,
             student_entry_id: entry.entry_number,
-            account_number: anno.account_number || "",
+            account_number: anno.account?.account_number || "",
             account_name: anno.account_name || anno.account?.name || "",
             account_id: anno.account_id || "",
             debit: anno.debit || "",
             credit: anno.credit || ""
           })) || []
         );
-  
+
         newStatementData[mark.statement_id] = {
           entries,
           annotations
         };
       });
-  
+
       setStatementData(newStatementData);
     }
   }, [exercise?.marks]);
+
+  useEffect(() => {
+    if (selectedStatement && currentStatementData) {
+      setAllStatementsData(prevData => ({
+        ...prevData,
+        [selectedStatement.id]: currentStatementData
+      }));
+    }
+  }, [selectedStatement, currentStatementData]);
 
   const addEntry = useCallback((statementId) => {
     // Obtener todas las entradas de todos los statements
@@ -98,7 +109,7 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
   
     const newEntry = {
       entry_number: newEntryNumber,
-      entry_date: "2024-10-10",
+      entry_date: getCurrentDate(),
     };
   
     setStatementData(prev => ({
@@ -200,22 +211,32 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
 
   const handleSubmitStatement = useCallback(() => {
     if (!selectedStatement) return;
-    if(exercise?.task?.is_exam === false){
-      handleSave(true);
-    }
-    setAllStatementsData((prevData) => ({
+
+    const currentData = { entries, annotations };
+    
+    setStatementData(prevData => ({
       ...prevData,
-      [selectedStatement.id]: { entries, annotations },
+      [selectedStatement.id]: currentData
     }));
 
-    setStatementData((prevData) => ({
+    setAllStatementsData(prevData => ({
       ...prevData,
-      [selectedStatement.id]: prevData[selectedStatement.id] || { entries: [], annotations: [] },
+      [selectedStatement.id]: currentData
     }));
+
     if (onStatementComplete) {
-      onStatementComplete(selectedStatement.id, { entries, annotations });
+      if (!exercise?.task?.is_exam) {
+        const allData = {
+          ...allStatementsData,
+          [selectedStatement.id]: currentData
+        };
+        onStatementComplete(selectedStatement.id, allData);
+      } else {
+        onStatementComplete(selectedStatement.id, currentData);
+      }
     }
-  }, [selectedStatement, exercise?.task?.is_exam, handleSave, entries, annotations, onStatementComplete]);
+
+  }, [selectedStatement, exercise?.task?.is_exam, entries, annotations, onStatementComplete, allStatementsData]);
 
   const handleFinalSubmit = useCallback(() => {
     if (!exercise || !exercise.id) {
@@ -225,6 +246,11 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
 
     const updatedStatementsData = { ...allStatementsData, ...statementData };
 
+    if (Object.keys(updatedStatementsData).length === 0) {
+      console.error("❌ Error: No hay datos en updatedStatementsData", updatedStatementsData);
+      return;
+    }
+
     const filteredStatementsData = Object.entries(updatedStatementsData).reduce((acc, [statementId, data]) => {
       acc[statementId] = {
         entries: data.entries,
@@ -232,11 +258,6 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
       };
       return acc;
     }, {});
-
-    if (Object.keys(filteredStatementsData).length === 0) {
-      console.error("❌ Error: No hay datos en updatedStatementsData", filteredStatementsData);
-      return;
-    }
 
     const dataToSubmit = {
       statementsData: filteredStatementsData,

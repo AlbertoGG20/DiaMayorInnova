@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from "../../context/AuthContext";
 import exerciseService from "../../services/userExerciseDataService";
 import Modal from "../modal/Modal";
+import PaginationMenu from "../pagination-menu/PaginationMenu";
 import "./StudentAside.css";
 
 const StudentAside = () => {
@@ -57,6 +58,10 @@ const StudentAside = () => {
     fetchExercises();
   }, [user?.id, currentPage, onlyActive]);
 
+  const changePage = (newPage) => {
+    if (newPage < 1 || newPage > totalPages) return;
+    setCurrentPage(newPage);
+  };
 
   return (
     <section className={exercises.length > 0 ? "student__aside " : "student__aside asidelSection__img"}>
@@ -92,22 +97,11 @@ const StudentAside = () => {
             ))}
           </ul>
 
-          {/* Paginacion */}
-          <div className="student-aside__pagination">
-              <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage(1)}>
-                <i className='fi fi-rr-angle-double-small-left' />
-              </button>
-              <button className="dt-paging-button" disabled={currentPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)}>
-                <i className='fi fi-rr-angle-small-left' />
-              </button>
-              <span>Página {currentPage} de {totalPages}</span>
-              <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage((prev) => prev + 1)}>
-                <i className='fi fi-rr-angle-small-right' />
-              </button>
-              <button className="dt-paging-button" disabled={currentPage === totalPages} onClick={() => setCurrentPage(totalPages)}>
-                <i className='fi fi-rr-angle-double-small-right' />
-              </button>
-            </div>
+          <PaginationMenu
+            currentPage={currentPage}
+            setCurrentPage={changePage}
+            totalPages={totalPages}
+          />
         </>
       ) : (
         <p>No tienes tareas asignadas.</p>

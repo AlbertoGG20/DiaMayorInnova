@@ -9,19 +9,21 @@
 #   end
 
 school1 = SchoolCenter.find_or_create_by!(school_name: "IES El Rincón") do |s|
-  s.address = "Calle de prueba 1"
-  s.phone = "123456789"
-  s.email = "elrincon@ies.elrincon.es"
+  s.address = "Avenida Industrial José Sánchez Peñate s/n"
+  s.phone = "928304367"
+  s.email = "elrincon@ieselrincon.es"
   s.website = "www.ieselrincon.es"
   s.province = "Las Palmas"
+  s.code = "35009577"
 end
 
-school2 = SchoolCenter.find_or_create_by!(school_name: "IES Siete Palmas") do |s|
-  s.address = "Calle de siete palmas 1"
-  s.phone = "987654321"
-  s.email = "sietePalmas@ies.elrincon.es"
-  s.website = "www.sietePalmas.es"
+school2 = SchoolCenter.find_or_create_by!(school_name: "IES Santa Brígida") do |s|
+  s.address = "Camino de los Olivos, 41"
+  s.phone = "928899727"
+  s.email = "santaBrigida@ieselrincon.es"
+  s.website = "www.iessantabrigida.es"
   s.province = "Las Palmas"
+  s.code = "35010129"
 end
 
 class_group1 = ClassGroup.find_or_create_by!(course_module: "TUM", school_center_id: school1.id) do |c|
@@ -222,32 +224,26 @@ task2 = Task.find_or_create_by!(title: "Tarea 2 - Inventada S.L.", created_by: u
 end
 
 statement1 = Statement.find_or_create_by!(definition: "Compramos mercaderías a 30 días por 1250€. El proveedor nos incluye en factura un descuento comercial del 2%. Además, la compra tiene unos gastos de transporte de 100€", user: user2) do |s|
-  s.explanation = "Explicación 1"
   s.is_public = false
 end
 
 statement2 = Statement.find_or_create_by!(definition: "Vendemos mercaderías por valor de 3000€. Para el cobro giramos una letra de cambio a 30 días, que es aceptada.", user: user2) do |s|
-  s.explanation = "Explicación 2"
   s.is_public = false
 end
 
 statement3 = Statement.find_or_create_by!(definition: "Devolvemos mercaderías por valor de 200€  al proveedor, por estar inservibles.", user: user2) do |s|
-  s.explanation = "Explicación 3"
   s.is_public = false
 end
 
 statement4 = Statement.find_or_create_by!(definition: "El proveedor nos hace un descuento del 20% en la mercancía que está un poco defectuosa. Se paga al proveedor mediante transferencia.", user: user2) do |s|
-  s.explanation = "Explicación 4"
   s.is_public = false
 end
 
 statement5 = Statement.find_or_create_by!(definition: "Descontamos la letra de cambio en la entidad bancaria, la cual nos cobra una comisión de 30€ y unos intereses de 80€.", user: user2) do |s|
-  s.explanation = "Explicación 5"
   s.is_public = false
 end
 
 statement6 = Statement.find_or_create_by!(definition: "Se devenga la nómina de uno de nuestros trabajadores. El importe íntegro es de 2000€. La cuota empresarial a la Seguridad Social asciende a 700€. La cuota de la SS del trabajador sería de 30€. La retención de IRPF sería de 350€. Pasada 1 semana se paga mediante trasferencia bancaria.", user: user2) do |s|
-  s.explanation = "Explicación 6"
   s.is_public = true
 end
 
@@ -303,7 +299,7 @@ task2.statements << statement2
   end
 
   annotation1 = Annotation.find_or_create_by!(entry: entry1, account: account1, number: 1) do |a|
-    a.debit = 0 
+    a.debit = 0
     a.credit = 100
   end
   annotation2 = Annotation.find_or_create_by!(entry: entry1, account: account2, number: 2) do |a|
@@ -332,49 +328,49 @@ task2.statements << statement2
     h.debitMoves = "3 Movimientos Deber - Texto de ejemplo para probar el seed de Ayudas para las diferentes cuentas"
   end
 
-  exercise1 = Exercise.find_or_create_by!(user: user4, task: task1) 
-  exercise2 = Exercise.find_or_create_by!(user: user6, task: task1) 
-  exercise3 = Exercise.find_or_create_by!(user: user5, task: task2) 
-  
-  mark1 = Mark.find_or_create_by!(mark: 5.5, exercise: exercise1) 
-  mark2 = Mark.find_or_create_by!(mark: 9, exercise: exercise2) 
+  exercise1 = Exercise.find_or_create_by!(user: user4, task: task1)
+  exercise2 = Exercise.find_or_create_by!(user: user6, task: task1)
+  exercise3 = Exercise.find_or_create_by!(user: user5, task: task2)
+
+  mark1 = Mark.find_or_create_by!(mark: 5.5, exercise: exercise1)
+  mark2 = Mark.find_or_create_by!(mark: 9, exercise: exercise2)
   mark3 = Mark.find_or_create_by!(mark: 7.5, exercise: exercise3)
 
-  student_entry1 = StudentEntry.find_or_create_by!(entry_number: 1, entry_date: Date.new(2024, 11, 25), mark: mark1) 
-  student_entry2 = StudentEntry.find_or_create_by!(entry_number: 2, entry_date: Date.new(2024, 11, 25), mark: mark2) 
-  student_entry3 = StudentEntry.find_or_create_by!(entry_number: 3, entry_date: Date.new(2024, 11, 25), mark: mark3) 
-  student_entry3 = StudentEntry.find_or_create_by!(entry_number: 2, entry_date: Date.new(2022, 10, 25), mark: mark1) 
+  student_entry1 = StudentEntry.find_or_create_by!(entry_number: 1, entry_date: Date.new(2024, 11, 25), mark: mark1)
+  student_entry2 = StudentEntry.find_or_create_by!(entry_number: 2, entry_date: Date.new(2024, 11, 25), mark: mark2)
+  student_entry3 = StudentEntry.find_or_create_by!(entry_number: 3, entry_date: Date.new(2024, 11, 25), mark: mark3)
+  student_entry3 = StudentEntry.find_or_create_by!(entry_number: 2, entry_date: Date.new(2022, 10, 25), mark: mark1)
 
-  student_annotation1 = StudentAnnotation.find_or_create_by!(number: 1, account_number: 1234, credit: 100, debit: 0, student_entry: student_entry1, account: account1) 
-  student_annotation2 = StudentAnnotation.find_or_create_by!(number: 2, account_number: 1334, credit: 0, debit: 1000, student_entry: student_entry2, account: account2) 
-  student_annotation3 = StudentAnnotation.find_or_create_by!(number: 3, account_number: 2234, credit: 100, debit: 0, student_entry: student_entry3, account: account3)
-  
+  student_annotation1 = StudentAnnotation.find_or_create_by!(number: 1, account_id: Account.find_by(account_number: 1234), credit: 100, debit: 0, student_entry: student_entry1, account: account1)
+  student_annotation2 = StudentAnnotation.find_or_create_by!(number: 2, account_id: Account.find_by(account_number: 1334), credit: 0, debit: 1000, student_entry: student_entry2, account: account2)
+  student_annotation3 = StudentAnnotation.find_or_create_by!(number: 3, account_id: Account.find_by(account_number: 2234), credit: 100, debit: 0, student_entry: student_entry3, account: account3)
+
   teacher_class_group1 = TeacherClassGroup.find_or_create_by!(user: user2, class_group: class_group1)
   teacher_class_group3 = TeacherClassGroup.find_or_create_by!(user: user3, class_group: class_group1)
   teacher_class_group2 = TeacherClassGroup.find_or_create_by!(user: user2, class_group: class_group2)
   teacher_class_group4 = TeacherClassGroup.find_or_create_by!(user: user3, class_group: class_group2)
 
-  taskExample1 = Task.find_or_create_by!(title: "Contabiliza en el libro diario las operaciones que la empresa GAMONAL SL realiza durante el año 20X4", created_by: user2.id) do |t| 
+  taskExample1 = Task.find_or_create_by!(title: "Contabiliza en el libro diario las operaciones que la empresa GAMONAL SL realiza durante el año 20X4", created_by: user2.id) do |t|
     t.opening_date = DateTime.new(2024, 10, 8,05, 00, 0)
     t.closing_date = DateTime.new(2024, 12, 1, 23, 59, 0)
   end
 
-  statementExample1 = Statement.find_or_create_by!(definition: "01/08 Hace un pedido a un proveedor de 200 unidades del producto ROJO a 15 € la unidad. El proveedor nos solicita un anticipo por lo que le transferimos por banco 1.284 €.", explanation: "", user: user2, is_public: false)
-  statementExample2 = Statement.find_or_create_by!(definition: "03/08 Llega el pedido anterior junto con la factura en la que se incluye un descuento comercial de 2%,además de 200 envases SIN facultad de devolución a 0,25 € la unidad. En las condiciones comerciales se indica que el pago se realizará a final de mes.", explanation: "Aplica el anticipo", user: user2, is_public: false)
-  statementExample3 = Statement.find_or_create_by!(definition: "07/08 Tras revisar la compra anterior se observa que 25 unidades están inservibles por lo que se las devuelve al proveedor junto con los envases correspondientes.", explanation: "", user: user2, is_public: false)
-  statementExample4 = Statement.find_or_create_by!(definition: "16/08 Acuerda con el proveedor no esperar a final de mes y procede al pago de la deuda pendiente por lo que le concede un descuento de 150 € y le transfiere por banco el resto.", explanation: "", user: user2, is_public: false)
-  statementExample5 = Statement.find_or_create_by!(definition: "19/08 D. Luis Mendoza, abogado que se ha dado de alta en el año 20X3, le remite una factura por los servicios prestados por importe de 450 € + IGIC que le abona mediante transferencia bancaria.", explanation: "", user: user2, is_public: false)
-  statementExample6 = Statement.find_or_create_by!(definition: "21/08 Uno de los empleados solicita un anticipo de la nómina de 600 € que se le paga en efectivo.", explanation: "", user: user2, is_public: false)
-  statementExample7 = Statement.find_or_create_by!(definition: "31/08 El desglose de la nómina del mes de agosto es el siguiente: Sueldos y salarios: 7.500 €, seguridad social a cargo empresa: 1.875 €, seguridad social de los trabajadores 375 €; retenciones: 975 €. La nómina se paga los días 5 de cada mes.", explanation: "", user: user2, is_public: false)
-  statementExample8 = Statement.find_or_create_by!(definition: "El 1/09 firma un contrato de leasing de dos años de duración para la adquisición de un vehículo. La empresa no tiene dudas de que va a ejercer la opción de compra. El pago de las cuotas es prepagable y periodicidad cuatrimestral. El tipo de interés de la operación es del 3% cuatrimestral. El valor actual del bien 32.503,15 € coincide con su valor razonable. El cuadro del leasing es el siguiente:", explanation: "", user: user2, is_public: false)
-  statementExample9 = Statement.find_or_create_by!(definition: "01/09 y el pago de la primera cuota del leasing.", explanation: "", user: user2, is_public: false)
-  statementExample10 = Statement.find_or_create_by!(definition: "05/09 Paga por transferencia bancaria la nómina de los trabajadores correspondiente al mes de agosto.", explanation: "", user: user2, is_public: false)
-  statementExample11 = Statement.find_or_create_by!(definition: "16/09 Vende mercaderías por importe de 7.900 €. En la factura se incluyen envases con facultad de devolución por importe de 100 €. Operación a crédito de 45 días.", explanation: "", user: user2, is_public: false)
-  statementExample12 = Statement.find_or_create_by!(definition: "21/09 Vende en 18.000 € + IGIC una furgoneta que adquirió el 1 de julio del año 20X3 por importe de 26.000 € y un valor residual de 1.000 €. La venía amortizando aplicando el coeficiente lineal máximo que para el 20X3 y 20X4 es del 16%. Cobra la mitad al contado y la otra mitad mediante un efecto aceptado.", explanation: "Contabiliza la amortización del 20X3 y la del 20X4 antes de la venta y la venta.", user: user2, is_public: false)
-  statementExample13 = Statement.find_or_create_by!(definition: "25/09 Llega la factura del suministro eléctrico del mes en curso por importe de 120 € + IGIC. El recibo está domiciliado en el banco y se paga a principios de mes.", explanation: "", user: user2, is_public: false)
-  statementExample14 = Statement.find_or_create_by!(definition: "28/09 La nómina del mes de septiembre es igual a la de agosto. Paga a los empleados el mismo día por transferencia bancaria.", explanation: "", user: user2, is_public: false)
-  statementExample15 = Statement.find_or_create_by!(definition: "29/09 Paga por banco la seguridad social del mes de agosto.", explanation: "", user: user2, is_public: false)
-  statementExample16 = Statement.find_or_create_by!(definition: "30/09 Contabiliza la liquidación del IGIC correspondiente al tercer trimestre del año en curso.", explanation: "", user: user2, is_public: false)
+  statementExample1 = Statement.find_or_create_by!(definition: "01/08 Hace un pedido a un proveedor de 200 unidades del producto ROJO a 15 € la unidad. El proveedor nos solicita un anticipo por lo que le transferimos por banco 1.284 €.", user: user2, is_public: false)
+  statementExample2 = Statement.find_or_create_by!(definition: "03/08 Llega el pedido anterior junto con la factura en la que se incluye un descuento comercial de 2%,además de 200 envases SIN facultad de devolución a 0,25 € la unidad. En las condiciones comerciales se indica que el pago se realizará a final de mes.", user: user2, is_public: false)
+  statementExample3 = Statement.find_or_create_by!(definition: "07/08 Tras revisar la compra anterior se observa que 25 unidades están inservibles por lo que se las devuelve al proveedor junto con los envases correspondientes.", user: user2, is_public: false)
+  statementExample4 = Statement.find_or_create_by!(definition: "16/08 Acuerda con el proveedor no esperar a final de mes y procede al pago de la deuda pendiente por lo que le concede un descuento de 150 € y le transfiere por banco el resto.", user: user2, is_public: false)
+  statementExample5 = Statement.find_or_create_by!(definition: "19/08 D. Luis Mendoza, abogado que se ha dado de alta en el año 20X3, le remite una factura por los servicios prestados por importe de 450 € + IGIC que le abona mediante transferencia bancaria.", user: user2, is_public: false)
+  statementExample6 = Statement.find_or_create_by!(definition: "21/08 Uno de los empleados solicita un anticipo de la nómina de 600 € que se le paga en efectivo.", user: user2, is_public: false)
+  statementExample7 = Statement.find_or_create_by!(definition: "31/08 El desglose de la nómina del mes de agosto es el siguiente: Sueldos y salarios: 7.500 €, seguridad social a cargo empresa: 1.875 €, seguridad social de los trabajadores 375 €; retenciones: 975 €. La nómina se paga los días 5 de cada mes.", user: user2, is_public: false)
+  statementExample8 = Statement.find_or_create_by!(definition: "El 1/09 firma un contrato de leasing de dos años de duración para la adquisición de un vehículo. La empresa no tiene dudas de que va a ejercer la opción de compra. El pago de las cuotas es prepagable y periodicidad cuatrimestral. El tipo de interés de la operación es del 3% cuatrimestral. El valor actual del bien 32.503,15 € coincide con su valor razonable. El cuadro del leasing es el siguiente:", user: user2, is_public: false)
+  statementExample9 = Statement.find_or_create_by!(definition: "01/09 y el pago de la primera cuota del leasing.", user: user2, is_public: false)
+  statementExample10 = Statement.find_or_create_by!(definition: "05/09 Paga por transferencia bancaria la nómina de los trabajadores correspondiente al mes de agosto.", user: user2, is_public: false)
+  statementExample11 = Statement.find_or_create_by!(definition: "16/09 Vende mercaderías por importe de 7.900 €. En la factura se incluyen envases con facultad de devolución por importe de 100 €. Operación a crédito de 45 días.", user: user2, is_public: false)
+  statementExample12 = Statement.find_or_create_by!(definition: "21/09 Vende en 18.000 € + IGIC una furgoneta que adquirió el 1 de julio del año 20X3 por importe de 26.000 € y un valor residual de 1.000 €. La venía amortizando aplicando el coeficiente lineal máximo que para el 20X3 y 20X4 es del 16%. Cobra la mitad al contado y la otra mitad mediante un efecto aceptado.", user: user2, is_public: false)
+  statementExample13 = Statement.find_or_create_by!(definition: "25/09 Llega la factura del suministro eléctrico del mes en curso por importe de 120 € + IGIC. El recibo está domiciliado en el banco y se paga a principios de mes.", user: user2, is_public: false)
+  statementExample14 = Statement.find_or_create_by!(definition: "28/09 La nómina del mes de septiembre es igual a la de agosto. Paga a los empleados el mismo día por transferencia bancaria.", user: user2, is_public: false)
+  statementExample15 = Statement.find_or_create_by!(definition: "29/09 Paga por banco la seguridad social del mes de agosto.", user: user2, is_public: false)
+  statementExample16 = Statement.find_or_create_by!(definition: "30/09 Contabiliza la liquidación del IGIC correspondiente al tercer trimestre del año en curso.", user: user2, is_public: false)
 
   taskExample1.statements << statementExample1
   taskExample1.statements << statementExample2
@@ -412,8 +408,8 @@ task2.statements << statement2
 
 
   entryExample1= Entry.find_or_create_by!(solution:solutionExample1, entry_number: 1, entry_date: Date.new(2024,8,1)) # año/mes/dia
-  entryExample2= Entry.find_or_create_by!(solution:solutionExample2, entry_number: 2, entry_date: Date.new(2024,8,3)) 
-  entryExample3= Entry.find_or_create_by!(solution:solutionExample3, entry_number: 3, entry_date: Date.new(2024,8,7)) 
+  entryExample2= Entry.find_or_create_by!(solution:solutionExample2, entry_number: 2, entry_date: Date.new(2024,8,3))
+  entryExample3= Entry.find_or_create_by!(solution:solutionExample3, entry_number: 3, entry_date: Date.new(2024,8,7))
   entryExample4= Entry.find_or_create_by!(solution:solutionExample4, entry_number: 4, entry_date: Date.new(2024,8,16))
   entryExample5= Entry.find_or_create_by!(solution:solutionExample5, entry_number: 5, entry_date: Date.new(2024,8,19))
   entryExample6= Entry.find_or_create_by!(solution:solutionExample6, entry_number: 6, entry_date: Date.new(2024,8,21))
@@ -434,187 +430,187 @@ task2.statements << statement2
     account.accounting_plan = accPlanPyme
     account.name = "Acreedores por arrendamiento financiero a largo plazo"
   end
-  
+
   Account.find_or_create_by!(account_number: 218) do |account|
     account.description = "Elementos de transporte"
     account.accounting_plan = accPlanPyme
     account.name = "Elementos de transporte"
   end
-  
+
   Account.find_or_create_by!(account_number: 281) do |account|
     account.description = "Amortización acumulada del inmovilizado material"
     account.accounting_plan = accPlanPyme
     account.name = "Amortización acumulada del inmovilizado material"
   end
-  
+
   Account.find_or_create_by!(account_number: 400) do |account|
     account.description = "Proveedores"
     account.accounting_plan = accPlanPyme
     account.name = "Proveedores"
   end
-  
+
   Account.find_or_create_by!(account_number: 407) do |account|
     account.description = "Anticipo a proveedores"
     account.accounting_plan = accPlanPyme
     account.name = "Anticipo a proveedores"
   end
-  
+
   Account.find_or_create_by!(account_number: 410) do |account|
     account.description = "Acreedores por prestaciones de servicios"
     account.accounting_plan = accPlanPyme
     account.name = "Acreedores por prestaciones de servicios"
   end
-  
+
   Account.find_or_create_by!(account_number: 430) do |account|
     account.description = "Clientes"
     account.accounting_plan = accPlanPyme
     account.name = "Clientes"
   end
-  
+
   Account.find_or_create_by!(account_number: 437) do |account|
     account.description = "Envases y embalajes a devolver por clientes"
     account.accounting_plan = accPlanPyme
     account.name = "Envases y embalajes a devolver por clientes"
   end
-  
+
   Account.find_or_create_by!(account_number: 441) do |account|
     account.description = "Deudores, efectos comerciales a cobrar"
     account.accounting_plan = accPlanPyme
     account.name = "Deudores, efectos comerciales a cobrar"
   end
-  
+
   Account.find_or_create_by!(account_number: 460) do |account|
     account.description = "Anticipo de remuneraciones"
     account.accounting_plan = accPlanPyme
     account.name = "Anticipo de remuneraciones"
   end
-  
+
   Account.find_or_create_by!(account_number: 465) do |account|
     account.description = "Remuneraciones pendientes de pago"
     account.accounting_plan = accPlanPyme
     account.name = "Remuneraciones pendientes de pago"
   end
-  
+
   Account.find_or_create_by!(account_number: 476) do |account|
     account.description = "Organismos de la Seguridad Social, acreedores"
     account.accounting_plan = accPlanPyme
     account.name = "Organismos de la Seguridad Social, acreedores"
   end
-  
+
   Account.find_or_create_by!(account_number: 524) do |account|
     account.description = "Acreedores por arrendamiento financiero a corto plazo"
     account.accounting_plan = accPlanPyme
     account.name = "Acreedores por arrendamiento financiero a corto plazo"
   end
-  
+
   Account.find_or_create_by!(account_number: 570) do |account|
     account.description = "Caja, euros"
     account.accounting_plan = accPlanPyme
     account.name = "Caja, euros"
   end
-  
+
   Account.find_or_create_by!(account_number: 572) do |account|
     account.description = "Banco e instituciones de crédito c/c vista, euros"
     account.accounting_plan = accPlanPyme
     account.name = "Banco e instituciones de crédito c/c vista, euros"
   end
-  
+
   Account.find_or_create_by!(account_number: 600) do |account|
     account.description = "Compras"
     account.accounting_plan = accPlanPyme
     account.name = "Compras de mercaderías"
   end
-  
+
   Account.find_or_create_by!(account_number: 602) do |account|
     account.description = "Compras de otros aprovisionamientos"
     account.accounting_plan = accPlanPyme
     account.name = "Compras de otros aprovisionamientos"
   end
-  
+
   Account.find_or_create_by!(account_number: 606) do |account|
     account.description = "Descuentos sobre compras por pronto pago"
     account.accounting_plan = accPlanPyme
     account.name = "Descuentos sobre compras por pronto pago"
   end
-  
+
   Account.find_or_create_by!(account_number: 608) do |account|
     account.description = "Devoluciones de compras y operaciones similares"
     account.accounting_plan = accPlanPyme
     account.name = "Devoluciones de compras y operaciones similares"
   end
-  
+
   Account.find_or_create_by!(account_number: 623) do |account|
     account.description = "Servicios de profesionales independientes"
     account.accounting_plan = accPlanPyme
     account.name = "Servicios de profesionales independientes"
   end
-  
+
   Account.find_or_create_by!(account_number: 628) do |account|
     account.description = "Suministros"
     account.accounting_plan = accPlanPyme
     account.name = "Suministros"
   end
-  
+
   Account.find_or_create_by!(account_number: 640) do |account|
     account.description = "Sueldos y salarios"
     account.accounting_plan = accPlanPyme
     account.name = "Sueldos y salarios"
   end
-  
+
   Account.find_or_create_by!(account_number: 642) do |account|
     account.description = "Seguridad Social a cargo de la empresa"
     account.accounting_plan = accPlanPyme
     account.name = "Seguridad Social a cargo de la empresa"
   end
-  
+
   Account.find_or_create_by!(account_number: 662) do |account|
     account.description = "Intereses de deudas"
     account.accounting_plan = accPlanPyme
     account.name = "Intereses de deudas"
   end
-  
+
   Account.find_or_create_by!(account_number: 671) do |account|
     account.description = "Pérdidas procedentes del inmovilizado material"
     account.accounting_plan = accPlanPyme
     account.name = "Pérdidas procedentes del inmovilizado material"
   end
-  
+
   Account.find_or_create_by!(account_number: 681) do |account|
     account.description = "Amortización del inmovilizado material"
     account.accounting_plan = accPlanPyme
     account.name = "Amortización del inmovilizado material"
   end
-  
+
   Account.find_or_create_by!(account_number: 700) do |account|
     account.description = "Ventas de mercaderías"
     account.accounting_plan = accPlanPyme
     account.name = "Ventas de mercaderías"
   end
-  
+
   Account.find_or_create_by!(account_number: 4751) do |account|
     account.description = "Hacienda Pública, acreedora por retenciones practicadas"
     account.accounting_plan = accPlanPyme
     account.name = "Hacienda Pública, acreedora por retenciones practicadas"
   end
-  
+
   Account.find_or_create_by!(account_number: 4727) do |account|
     account.description = "Hacienda Pública, IGIC soportado"
     account.accounting_plan = accPlanPyme
     account.name = "Hacienda Pública, IGIC soportado"
   end
-  
+
   Account.find_or_create_by!(account_number: 4757) do |account|
     account.description = "Hacienda Pública, acreedora por IGIC"
     account.accounting_plan = accPlanPyme
     account.name = "Hacienda Pública, acreedora por IGIC"
   end
-  
+
   Account.find_or_create_by!(account_number: 4777) do |account|
     account.description = "Hacienda Pública IGIC repercutido"
     account.accounting_plan = accPlanPyme
     account.name = "Hacienda Pública IGIC repercutido"
   end
-  
+
   account174 = Account.find_by(account_number: 174)
   account218 = Account.find_by(account_number: 218)
   account281 = Account.find_by(account_number: 281)
@@ -714,7 +710,7 @@ task2.statements << statement2
   annotationExample53 = Annotation.find_or_create_by!(entry: entryExample13, account: account628, number: 1, debit: 120.00 , credit: "")
   annotationExample54 = Annotation.find_or_create_by!(entry: entryExample13, account: account4727, number: 2, debit: 8.40 , credit: "")
   annotationExample55 = Annotation.find_or_create_by!(entry: entryExample13, account: account410, number: 3, debit: "" , credit: 128.40)
-  
+
   annotationExample56 = Annotation.find_or_create_by!(entry: entryExample14, account: account640, number: 1, debit: 7500.00 , credit: "")
   annotationExample57 = Annotation.find_or_create_by!(entry: entryExample14, account: account642, number: 2, debit: 1875.00 , credit: "")
   annotationExample58 = Annotation.find_or_create_by!(entry: entryExample14, account: account4751, number: 3, debit: "" , credit: 975.00)
@@ -730,23 +726,23 @@ task2.statements << statement2
   annotationExample66 = Annotation.find_or_create_by!(entry: entryExample16, account: account4727, number: 2, debit: "" , credit: 631.24)
   annotationExample67 = Annotation.find_or_create_by!(entry: entryExample16, account: account4757, number: 3, debit: "" , credit: 1188.76)
 
-  exercise_example1 = Exercise.find_or_create_by!(user: user5, task: taskExample1) 
-  
+  exercise_example1 = Exercise.find_or_create_by!(user: user5, task: taskExample1)
+
   mark_example1 = Mark.find_or_create_by!(mark: 10, exercise: exercise_example1, statement: statementExample1)
   mark_example2 = Mark.find_or_create_by!(mark: 5, exercise: exercise_example1, statement: statementExample2)
   mark_example3 = Mark.find_or_create_by!(mark: 7.5, exercise: exercise_example1, statement: statementExample3)
 
-  student_entry_example1 = StudentEntry.find_or_create_by!(entry_number: 1, entry_date: Date.new(2024,8,1), mark: mark_example1) 
-  student_entry_example2 = StudentEntry.find_or_create_by!(entry_number: 2, entry_date: Date.new(2024,8,3), mark: mark_example2) 
-  student_entry_example3 = StudentEntry.find_or_create_by!(entry_number: 3, entry_date: Date.new(2024,8,7), mark: mark_example3) 
+  student_entry_example1 = StudentEntry.find_or_create_by!(entry_number: 1, entry_date: Date.new(2024,8,1), mark: mark_example1)
+  student_entry_example2 = StudentEntry.find_or_create_by!(entry_number: 2, entry_date: Date.new(2024,8,3), mark: mark_example2)
+  student_entry_example3 = StudentEntry.find_or_create_by!(entry_number: 3, entry_date: Date.new(2024,8,7), mark: mark_example3)
 
-  student_annotation_example1 = StudentAnnotation.find_or_create_by!(number: 1, account_number: 407, credit: 0, debit: 1200.00, student_entry: student_entry_example1, account: account407) 
-  student_annotation_example2 = StudentAnnotation.find_or_create_by!(number: 2, account_number: 4727, credit: 100, debit: 84.00, student_entry: student_entry_example1, account: account4727) 
-  student_annotation_example3 = StudentAnnotation.find_or_create_by!(number: 3, account_number: 572, credit: 1284.00, debit: 0, student_entry: student_entry_example1, account: account572) 
+  student_annotation_example1 = StudentAnnotation.find_or_create_by!(number: 1, account_id: Account.find_by(account_number: 407), credit: 0, debit: 1200.00, student_entry: student_entry_example1, account: account407)
+  student_annotation_example2 = StudentAnnotation.find_or_create_by!(number: 2, account_id: Account.find_by(account_number: 4727), credit: 100, debit: 84.00, student_entry: student_entry_example1, account: account4727)
+  student_annotation_example3 = StudentAnnotation.find_or_create_by!(number: 3, account_id: Account.find_by(account_number: 572), credit: 1284.00, debit: 0, student_entry: student_entry_example1, account: account572)
 
-  student_annotation_example4 = StudentAnnotation.find_or_create_by!(number: 1, account_number: 600, credit: 0, debit: 2940.00, student_entry: student_entry_example2, account: account600) 
-  student_annotation_example5 = StudentAnnotation.find_or_create_by!(number: 2, account_number: 602, credit: 0, debit: 50.00, student_entry: student_entry_example2, account: account602) 
-  student_annotation_example6 = StudentAnnotation.find_or_create_by!(number: 3, account_number: 4727, credit: 0, debit: 125.30, student_entry: student_entry_example2, account: account4727) 
-  
-  student_annotation_example7 = StudentAnnotation.find_or_create_by!(number: 1, account_number: 400, credit:0.0, debit: 419.71, student_entry: student_entry_example3, account: account400) 
-  student_annotation_example8 = StudentAnnotation.find_or_create_by!(number: 2, account_number: 608, credit:392.25, debit: 0.0, student_entry: student_entry_example3, account: account608) 
+  student_annotation_example4 = StudentAnnotation.find_or_create_by!(number: 1, account_id: Account.find_by(account_number: 600), credit: 0, debit: 2940.00, student_entry: student_entry_example2, account: account600)
+  student_annotation_example5 = StudentAnnotation.find_or_create_by!(number: 2, account_id: Account.find_by(account_number: 602), credit: 0, debit: 50.00, student_entry: student_entry_example2, account: account602)
+  student_annotation_example6 = StudentAnnotation.find_or_create_by!(number: 3, account_id: Account.find_by(account_number: 4727), credit: 0, debit: 125.30, student_entry: student_entry_example2, account: account4727)
+
+  student_annotation_example7 = StudentAnnotation.find_or_create_by!(number: 1, account_id: Account.find_by(account_number: 400), credit:0.0, debit: 419.71, student_entry: student_entry_example3, account: account400)
+  student_annotation_example8 = StudentAnnotation.find_or_create_by!(number: 2, account_id: Account.find_by(account_number: 608), credit:392.25, debit: 0.0, student_entry: student_entry_example3, account: account608)

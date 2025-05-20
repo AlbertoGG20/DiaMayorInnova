@@ -5,21 +5,22 @@ class StatementsController < ApplicationController
 
   def index
     return render json: { error: "No autorizado" }, status: :forbidden if current_user.student?
-  
+
     begin
       statements = Statement.includes(solutions: { entries: :annotations })
-  
+
       unless current_user.admin?
         statements = statements.where("is_public = ? OR user_id = ?", true, current_user.id)
       end
-  
+
       if params[:search].present?
         search_term = "%#{params[:search]}%"
-        statements = statements.where("definition ILIKE ? OR explanation ILIKE ?", search_term, search_term)
+        statements = statements.where("definition ILIKE ?", search_term)
       end     
 
+      statements = statements.order(created_at: :desc)
       paginated_statements = statements.page(params[:page]).per(params[:per_page] || 10)
-  
+
       render json: {
         statements: paginated_statements.as_json(
           include: {
@@ -46,7 +47,6 @@ class StatementsController < ApplicationController
       render json: @statement.errors, status: :internal_server_error
     end
   end
-  
 
   def show
     render json: @statement.as_json(
@@ -71,7 +71,7 @@ class StatementsController < ApplicationController
       render json: { error: "No autorizado" }, status: :forbidden
     else
       @statement = current_user.statements.build(statement_params)
-      
+
       unless process_account_ids(@statement)
         @statement.solutions.each do |solution|
           solution.entries.each do |entry|
@@ -118,19 +118,83 @@ class StatementsController < ApplicationController
       render json: @solution.errors, status: :unprocessable_entity
       return
     end
-    
+
     if @solution.save
-      if params[:entries]
-        params[:entries].each do |entry_params|
-          entry = @solution.entries.build(entry_params)
-          if entry.save && entry_params[:annotations]
-            entry_params[:annotations].each do |annotation_params|
-              entry.annotations.build(annotation_params)
+      # Gérer les entrées et annotations imbriquées
+      if params[:solution][:entries_attributes].present?
+        params[:solution][:entries_attributes].each do |entry_attr|
+          # Verificamos si ya existe una entrada con el mismo número
+          existing_entry = @solution.entries.find_by(entry_number: entry_attr[:entry_number])
+
+          if existing_entry
+            # Si existe, actualizamos sus datos
+            existing_entry.update(
+              entry_number: entry_attr[:entry_number],
+              entry_date: entry_attr[:entry_date]
+            )
+            entry = existing_entry
+          else
+            # Si no existe, creamos una nueva
+            entry = @solution.entries.build(
+              entry_number: entry_attr[:entry_number],
+              entry_date: entry_attr[:entry_date]
+            )
+            entry.save
+          end
+
+          if entry.persisted? && entry_attr[:annotations_attributes].present?
+            entry_attr[:annotations_attributes].each do |annotation_attr|
+              # Verificamos si ya existe una anotación con el mismo número
+              existing_annotation = entry.annotations.find_by(number: annotation_attr[:number])
+
+              if existing_annotation
+                # Si existe, actualizamos sus datos
+                existing_annotation.update(
+                  number: annotation_attr[:number],
+                  credit: annotation_attr[:credit],
+                  debit: annotation_attr[:debit],
+                  account_number: annotation_attr[:account_number]
+                )
+                annotation = existing_annotation
+              else
+                # Si no existe, creamos una nueva
+                annotation = entry.annotations.build(
+                  number: annotation_attr[:number],
+                  credit: annotation_attr[:credit],
+                  debit: annotation_attr[:debit],
+                  account_number: annotation_attr[:account_number]
+                )
+              end
+
+              unless process_account_ids(annotation)
+                annotation.errors.full_messages.each do |msg|
+                  @solution.errors.add(:base, "Anotación #{annotation.number}: #{msg}")
+                end
+              end
+
+              unless annotation.save
+                annotation.errors.full_messages.each do |msg|
+                  @solution.errors.add(:base, "Anotación #{annotation.number}: #{msg}")
+                end
+              end
             end
           end
         end
       end
-      render json: @solution, status: :created
+
+      render json: @solution.as_json(
+        include: {
+          entries: {
+            include: {
+              annotations: {
+                include: { account: { only: [:account_number, :name] } },
+                methods: [:account_name],
+                order: :number
+              }
+            }
+          }
+        }
+      ), status: :created
     else
       render json: @solution.errors, status: :unprocessable_entity
     end
@@ -140,12 +204,6 @@ class StatementsController < ApplicationController
     Rails.logger.debug "Params received in update: #{params[:statement].inspect}"
     if @statement.user_id == current_user.id || current_user.admin?
       if @statement.update(statement_params)
-        unless process_account_ids(@statement)
-          render json: @statement.errors, status: :unprocessable_entity
-          return
-        end
-
-        update_solutions_and_entries
         render json: @statement, status: :ok
       else
         render json: @statement.errors, status: :unprocessable_entity
@@ -154,27 +212,6 @@ class StatementsController < ApplicationController
       render json: { error: "No autorizado" }, status: :forbidden
     end
   end
-
-=begin   
-def update
-    Rails.logger.debug "Params received in update: #{params[:statement].inspect}"
-  
-    if @statement.user_id == current_user.id || current_user.admin?
-      unless process_account_ids(@statement)  # Validamos cuentas antes de actualizar
-        render json: @statement.errors, status: :unprocessable_entity
-        return
-      end
-  
-      if @statement.update(statement_params)
-        render json: @statement, status: :ok
-      else
-        render json: @statement.errors, status: :unprocessable_entity
-      end
-    else
-      render json: { error: "No autorizado" }, status: :forbidden
-    end
-  end
-=end
 
   def destroy
     if @statement.user_id == current_user.id || current_user.admin?
@@ -186,6 +223,29 @@ def update
       end
     else
       render json: { error: "No autorizado" }, status: :forbidden
+    end
+  end
+
+  def example_solution
+    @statement = Statement.find(params[:id])
+    @solution = @statement.solutions.find_by(is_example: true)
+    
+    if @solution
+      render json: @solution.as_json(
+        include: { 
+          entries: { 
+            include: { 
+              annotations: {
+                include: { account: { only: [:account_number, :name, :charge, :credit, :description] } },
+                methods: [:account_name],
+                order: :number
+              }
+            }
+          }
+        }
+      )
+    else
+      render json: { error: "No hay solución de ejemplo disponible para este enunciado" }, status: :not_found
     end
   end
 
@@ -205,7 +265,6 @@ def update
     Rails.logger.debug "Params received: #{params[:statement].inspect}"
     params.require(:statement).permit(
       :definition, 
-      :explanation, 
       :is_public,
       solutions_attributes: [
         :id,
@@ -221,7 +280,7 @@ def update
             :number,
             :credit,
             :debit,
-            :account_number,
+            :account_id,
             :_destroy
           ]
         ]

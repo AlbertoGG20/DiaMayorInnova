@@ -1,21 +1,24 @@
 Rails.application.routes.draw do
-
   resources :accounting_plans do
     member do
       get 'export_csv'
+      get 'accounts_by_PGC'
+      get 'export_xlsx_by_pgc'
     end
     collection do
       post 'import_csv'
+      post 'import_xlsx'
+      get 'download_template_xlsx'
     end
   end
-  
+
   resources :class_groups do
     member do
       get 'users' # AÑADIDO
       put 'update_users'
     end
   end
-  
+
   resources :school_centers
   resources :accounts do
     get 'find_by_account_number', on: :collection
@@ -24,22 +27,26 @@ Rails.application.routes.draw do
   resources :help_examples do
     get 'find_by_account_id', on: :collection
   end
-  
-resources :accounting_plans do
-  get 'accounts_by_PGC', on: :member
-end
-  
+
   resources :teacher_class_groups
   resources :annotations
   resources :entries
-  resources :solutions
+  resources :solutions, only: [ :index, :show, :create, :update, :destroy ] do
+    member do
+      post 'mark_as_example'
+      post 'unmark_as_example'
+    end
+    collection do
+      get 'example'
+    end
+  end
   resources :student_entries
   resources :student_annotations
   resources :marks do
     put 'update_multiple', on: :collection
   end
 
-  resources :student_exercises, only: [:index, :show, :create, :update] do
+  resources :student_exercises, only: [ :index, :show, :create, :update ] do
     member do
       post 'start'
       put 'finish'
@@ -52,7 +59,7 @@ end
       get 'find_mark_exercise_by_user'
     end
   end
-  
+
   resources :exercises do
     delete 'destroy_on_group', on: :collection
     get 'find_by_task_id', on: :collection
@@ -65,14 +72,23 @@ end
       delete :destroy
     end
   end
-  
-  resources :statements, only: [:create, :index, :show, :update, :destroy] do
+
+  resources :statements, only: [ :create, :index, :show, :update, :destroy ] do
     post 'add_solution', on: :member
     get 'solutions', to: 'statements#get_solutions', on: :member
+    member do
+      get 'example_solution'
+    end
+    resources :solutions, only: [ :create, :update, :destroy ] do
+      member do
+        post 'mark_as_example'
+        post 'unmark_as_example'
+      end
+    end
   end
-  
+
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
-  devise_for :users, controllers: { sessions: 'sessions' }, skip: [:registrations]
+  devise_for :users, controllers: { sessions: 'sessions' }, skip: [ :registrations ]
   devise_scope :user do
     post 'sign_in', to: 'sessions#create'
     delete 'log_out', to: 'sessions#destroy'
@@ -80,18 +96,17 @@ end
     resources :registrations
   end
 
-  resources :users, only: [:index, :show, :create, :update, :destroy] do
+  resources :users, only: [ :index, :show, :create, :update, :destroy ] do
     collection do
       get 'current_user', to: 'users#current'
       get '/users/by_class/:id', to: 'users#by_class'
     end
   end
-  
+
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
 
   # Defines the root path route ("/")
-  root to: 'sessions#create'
+  # root to: 'sessions#create'
 end
-

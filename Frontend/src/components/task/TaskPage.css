@@ -541,7 +541,7 @@
   background-color: var(--Color-Neutral-White);
   border-radius: var(--r-s);
   border: none;
-  padding: var(--gap-m) var(--gap-xxl);
+  padding: var(--gap-m) var(--gap-xxs);
 }
 
 .modal-solutionViewer__statement-content {
@@ -699,6 +699,7 @@
 .annotation-item--item.debit,
 .annotation-item--item.credit {
   align-items: flex-end;
+  padding: var(--gap-xxxs) var(--gap-xs) var(--gap-xxxs) 0;
 }
 
 .annotation-item--item.empty {

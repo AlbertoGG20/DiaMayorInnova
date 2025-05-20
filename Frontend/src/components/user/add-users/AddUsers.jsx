@@ -235,42 +235,44 @@ const AddUsers = ({ selectedUser, setSelectedUser, onUserAdded }) => {
               onChange={onImageChange}
             />
           </label>
-          <label htmlFor='role' className='user_label'>Seleccione un rol
-            <select
-              id="role"
-              name="role"
-              className="user_item"
-              value={input.role}
-              onChange={handleInput}
-            >
-              {auth?.user?.role === "admin" ? (
-                <>
-                  <option value="admin">Admin</option>
-                  <option value="center_admin">Center_Admin</option>
-                  <option value="teacher">Teacher</option>
-                  <option value="student">Student</option>
-                </>
-              ) : (
-                <>
-                  <option value="teacher">Teacher</option>
-                  <option value="student">Student</option>
-                </>
-              )}
-            </select>
-          </label>
-
-          {auth?.user?.role !== "center_admin" && (
-            <label htmlFor="school_center_id" className="user_label--select">Centro Escolar
-              <select id="school_center_id" name="school_center_id" className="user_item" value={input.school_center_id} onChange={handleInput}>
-                <option value="">Seleccione un centro</option>
-                {schoolCenters.map((center) => (
-                  <option key={center.id} value={center.id}>
-                    {center.school_name}
-                  </option>
-                ))}
+          <div className="add-users__selectors-container">
+            <label htmlFor='role' className='user_label--select'>Seleccione un rol
+              <select
+                id="role"
+                name="role"
+                className="user_item"
+                value={input.role}
+                onChange={handleInput}
+              >
+                {auth?.user?.role === "admin" ? (
+                  <>
+                    <option value="admin">Admin</option>
+                    <option value="center_admin">Center_Admin</option>
+                    <option value="teacher">Teacher</option>
+                    <option value="student">Student</option>
+                  </>
+                ) : (
+                  <>
+                    <option value="teacher">Teacher</option>
+                    <option value="student">Student</option>
+                  </>
+                )}
               </select>
             </label>
-          )}
+
+            {auth?.user?.role !== "center_admin" && (
+              <label htmlFor="school_center_id" className="user_label--select">Centro Escolar
+                <select id="school_center_id" name="school_center_id" className="user_item" value={input.school_center_id} onChange={handleInput}>
+                  <option value="">Seleccione un centro</option>
+                  {schoolCenters.map((center) => (
+                    <option key={center.id} value={center.id}>
+                      {center.school_name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+          </div>
           <button type="submit" className="createSchool_submit btn"><i className='fi fi-rr-plus'></i>{selectedUser ? "Actualizar Usuario" : "Registrar Usuario"}</button>
           {selectedUser && <button type="button" className="btn light" onClick={() => setSelectedUser(null)}>Cancelar</button>}
           {error && <p role="alert" style={{ color: "red" }}>{error}</p>}

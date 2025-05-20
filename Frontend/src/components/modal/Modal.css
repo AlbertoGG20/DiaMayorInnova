@@ -22,9 +22,8 @@
 }
 
 .modal__content {
-
   flex-direction: column;
-  overflow: hidden;
+  overflow-y: auto;
   max-height: 70vh;
 }
 
@@ -54,8 +53,73 @@
   display: grid;
   grid-template-columns: 80px auto;
   gap: 10px;
+  cursor: pointer;
+  margin-bottom: 5px;;
 }
 
 .account-item_account {
   text-align: left;
+}
+
+.search-bar {
+  margin-bottom: 1rem;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0rem;
+  border-radius: 4px;
+  font-size: 1,5rem;
+ background-color:var(--Color-Neutral-White);
+ margin-bottom: 0rem;
+}
+
+.search-input:focus {
+  outline: none;
+}
+
+@media screen and (max-width: 768px) {
+  .defaultModal {
+    width: 90%;
+    min-width: unset;
+    max-width: 90%;
+    max-height: 90vh;
+    padding: var(--gap-s);
+    margin: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .modal__header {
+    gap: var(--gap-s);
+    padding-bottom: var(--gap-xs);
+    margin-bottom: var(--gap-xxs);
+  }
+
+  .modal__h2 {
+    font-size: var(--text-mobile-subtitles-1);
+  }
+
+  .modal__content {
+    max-height: calc(90vh - 100px);
+    font-size: var(--text-mobile-body-small);
+  }
+
+  .account-list {
+    padding: var(--gap-s);
+    max-height: 60vh;
+    font-size: var(--text-mobile-body-small);
+  }
+
+  .account-item {
+    grid-template-columns: 60px auto;
+    gap: var(--gap-xxs);
+  }
+
+  .modal__content p,
+  .modal__content span,
+  .modal__content div {
+    font-size: var(--text-mobile-body-small);
+  }
 }

@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import ClassGroupService from "../../services/ClassGroupService";
 import userService from "../../services/userService";
+import SchoolsServices from "../../services/SchoolsServices";
 import ConfirmDeleteModal from "../modal/ConfirmDeleteModal";
 import AssignUserToClass from "../assignUsersToClass/AssignUserToClass";
 import { SearchBar } from "../search-bar/SearchBar";
 import Table from "../table/Table";
 import PaginationMenu from "../pagination-menu/PaginationMenu";
 
-const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange, maxStudents }) => {
+const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange }) => {
   const [classGroups, setClassGroups] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState(null);
@@ -18,8 +19,10 @@ const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange, maxStud
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [schoolCenters, setSchoolCenters] = useState({});
   const itemsPerPage = 10;
   const [localPage, setLocalPage] = useState(1);
+  const [allGroups, setAllGroups] = useState([]);
 
   const isSearching = searchTerm.trim().length > 0;
 
@@ -34,27 +37,13 @@ const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange, maxStud
 
   const totalLocalPages = Math.ceil(filteredGroups.length / itemsPerPage);
 
-  useEffect(() => {
-    setLocalPage(1);
-  }, [searchTerm]);
-
-  useEffect(() => {
-    if (localPage > totalLocalPages) {
-      setLocalPage(1);
-    }
-  }, [totalLocalPages]);
-
-  const paginatedGroups = filteredGroups.slice(
-    (isSearching ? (localPage - 1) : (currentPage - 1)) * itemsPerPage,
-    (isSearching ? localPage : currentPage) * itemsPerPage
-  );
-
-  const fetchClassGroups = async () => {
+  const fetchClassGroups = async (page, name) => {
     setLoading(true);
     try {
-      const response = await ClassGroupService.getAll();
+      const response = await ClassGroupService.getAll(page, itemsPerPage, name);
       if (response?.data?.data?.class_groups) {
-        setClassGroups(response?.data?.data?.class_groups);
+        const groups = response?.data?.data?.class_groups;
+        setClassGroups(groups);
         setTotalPages(response?.data?.data?.meta?.total_pages || 1);
       } else {
         console.error("No se recibieron datos válidos");
@@ -80,9 +69,9 @@ const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange, maxStud
   };
 
   useEffect(() => {
-    fetchClassGroups();
+    fetchClassGroups(currentPage, searchTerm);
     fetchCurrentUser();
-  }, [refreshTrigger, currentPage]);
+  }, [refreshTrigger, currentPage, searchTerm]);
 
   const isButtonDisabled = (group) => {
     if (!currentUser) return true;
@@ -91,17 +80,6 @@ const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange, maxStud
       return !teacherClassGroups.includes(group.id);
     }
     return true;
-  };
-
-  const handleAssignUsers = (groupId) => {
-    const group = classGroups.find(group => group.id === groupId);
-    userService.getUserByClassId(group.id)
-      .then(({ data }) => {
-        setAssignedUsers(prev => ({
-          ...prev,
-          [group.id]: data.data.users.map(user => user.id)
-        }));
-      });
   };
 
   const handleDeleteClick = (groupId) => {
@@ -138,6 +116,23 @@ const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange, maxStud
     onEdit(group);
   };
 
+  const handleSearchChange = (value) => {
+    setSearchTerm(value);
+    setCurrentPage(1);
+
+    if (!value) {
+      fetchClassGroups();
+      return;
+    }
+
+    setClassGroups((prevClassGroups) =>
+      prevClassGroups.filter((classGroup) => {
+        classGroup.course_module.toLowerCase().includes(value);
+        setCurrentPage(1);
+      })
+    );
+  };
+
   return (
     <div className="class-group-page__list">
       <div className="class-group-row">
@@ -146,11 +141,11 @@ const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange, maxStud
 
       <SearchBar
         value={searchTerm}
-        handleSearchChange={setSearchTerm}
+        handleSearchChange={handleSearchChange}
       />
 
       {filteredGroups.length === 0 ? (
-        <p>No hay grupos de clase creados.</p>
+        <p>No hay grupos de clase {searchTerm ? "que coincidan con la búsqueda" : "creados"}.</p>
       ) : (
         <div className="class-group-page__list-content">
           {
@@ -159,7 +154,7 @@ const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange, maxStud
             ) : (
               <Table
                 titles={["Curso", "Módulo", "Modalidad", "Nº Estudiantes", "Máx. Estudiantes", "Aula", "Horas semanales", "Centro", "Acciones"]}
-                data={paginatedGroups}
+                data={classGroups}
                 actions={true}
                 openModal={handleEdit}
                 deleteItem={handleDeleteClick}

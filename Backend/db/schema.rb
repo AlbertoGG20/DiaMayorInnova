@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_03_18_125758) do
+ActiveRecord::Schema[7.2].define(version: 2025_05_15_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -29,6 +29,9 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_18_125758) do
     t.bigint "accounting_plan_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "charge"
+    t.string "credit"
+    t.index ["account_number"], name: "index_accounts_on_account_number", unique: true
     t.index ["accounting_plan_id"], name: "index_accounts_on_accounting_plan_id"
   end
 
@@ -68,7 +71,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_18_125758) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "account_id", null: false
-    t.integer "account_number"
     t.index ["account_id"], name: "index_annotations_on_account_id"
     t.index ["entry_id"], name: "index_annotations_on_entry_id"
     t.index ["number"], name: "index_annotations_on_number"
@@ -104,6 +106,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_18_125758) do
     t.datetime "updated_at", null: false
     t.boolean "started", default: false, null: false
     t.boolean "finished", default: false, null: false
+    t.boolean "is_public", default: false
     t.index ["task_id"], name: "index_exercises_on_task_id"
     t.index ["user_id"], name: "index_exercises_on_user_id"
   end
@@ -115,7 +118,9 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_18_125758) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "description"
+    t.bigint "solution_id"
     t.index ["account_id"], name: "index_help_examples_on_account_id"
+    t.index ["solution_id"], name: "index_help_examples_on_solution_id"
   end
 
   create_table "marks", force: :cascade do |t|
@@ -137,6 +142,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_18_125758) do
     t.string "province"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "code"
+    t.index ["code"], name: "index_school_centers_on_code", unique: true
   end
 
   create_table "solutions", force: :cascade do |t|
@@ -144,12 +151,12 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_18_125758) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "statement_id", null: false
+    t.boolean "is_example", default: false, null: false
     t.index ["statement_id"], name: "index_solutions_on_statement_id"
   end
 
   create_table "statements", force: :cascade do |t|
     t.text "definition"
-    t.text "explanation"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
@@ -160,7 +167,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_18_125758) do
   create_table "student_annotations", force: :cascade do |t|
     t.bigint "account_id"
     t.integer "number"
-    t.integer "account_number"
     t.decimal "credit"
     t.decimal "debit"
     t.datetime "created_at", null: false
@@ -248,6 +254,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_18_125758) do
   add_foreign_key "exercises", "tasks"
   add_foreign_key "exercises", "users"
   add_foreign_key "help_examples", "accounts"
+  add_foreign_key "help_examples", "solutions"
   add_foreign_key "marks", "exercises"
   add_foreign_key "solutions", "statements"
   add_foreign_key "statements", "users"

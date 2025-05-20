@@ -1,10 +1,10 @@
 import { useEffect, useState, useMemo } from 'react'
 import "./Entry.css"
 import EntryForm from './entry-form/EntryForm'
-
+import { getCurrentDate } from '../../../utils/dateUtils'
 const Entry = ({ number, updateEntryDate, annotations, updateAnnotation, deleteAnnotation, addAnnotation, deleteEntry, entryIndex, selectedStatement, date, exercise }) => {
-  const [entryStatus, setEntryStatus] = useState(exercise?.finished || false);
-  const [entryDate, setDate] = useState(date || "2024-10-10");
+  const [entryStatus, setEntryStatus] = useState(exercise?.finished);
+  const [entryDate, setDate] = useState(date || getCurrentDate());
   const formattedDate = new Date(`${entryDate}T00:00:00`).toLocaleDateString("es-ES");
 
   const total = useMemo(() => {
@@ -45,7 +45,7 @@ const Entry = ({ number, updateEntryDate, annotations, updateAnnotation, deleteA
             className='date_input' 
             value={entryDate} 
             onChange={handleChangeDate}
-            disabled={exercise?.finished || false}
+            disabled={exercise?.finished}
             onClick={(e) => e.stopPropagation()}
           />
           <p className='entry_total'>Total: <span>{formattedTotal}</span></p>
@@ -58,7 +58,7 @@ const Entry = ({ number, updateEntryDate, annotations, updateAnnotation, deleteA
             e.stopPropagation();
             deleteEntry(entryIndex);
           }}
-          disabled={exercise?.finished || false}
+          disabled={exercise?.finished}
         >
           <i className='fi fi-rr-trash'></i>
         </button>
@@ -88,11 +88,11 @@ const Entry = ({ number, updateEntryDate, annotations, updateAnnotation, deleteA
           <div className="entry_item_container scroll-style">
             {annotations
             .filter(anno => !anno._destroy)
-            .map((annotation, index) => {
+            .sort((a, b) => a.number - b.number)
+            .map((annotation) => {
               return (
                 <EntryForm
                   key={annotation.uid}
-                  aptNumber={index + 1}
                   annotation={annotation}
                   onDelete={() => deleteAnnotation(annotation.uid)}
                   updateAnnotation={(updatedAnnotation) => updateAnnotation(selectedStatement?.id ?? 0, annotation.uid, updatedAnnotation)}
@@ -106,7 +106,7 @@ const Entry = ({ number, updateEntryDate, annotations, updateAnnotation, deleteA
             <button
               className='btn entry_add_annotation'
               onClick={() => addAnnotation(entryIndex)}
-              disabled={exercise?.finished || false}
+              disabled={exercise?.finished}
               >
               <i className='fi fi-rr-plus'></i>
               Apunte

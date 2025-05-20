@@ -4,12 +4,11 @@ import EntryForm from "../entry/EntryForm.jsx";
 const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
 
   const handleSolutionChange = (event) => {
-    setSolutions((solution) => {
-      const updatedSolutions = [...solutions];
+    setSolutions((prevSolution) => {
+      const updatedSolutions = [...prevSolution];
       updatedSolutions[solutionIndex].description = event.target.value;
       return updatedSolutions;
     });
-
   };
 
   const [collapsedEntries, setCollapsedEntries] = useState(
@@ -27,7 +26,7 @@ const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
     updatedSolutions[solutionIndex].entries.push({
       entry_number: updatedSolutions[solutionIndex].entries.length + 1,
       entry_date: "",
-      annotations: [{ number: 1, account_number: 0, credit: "", debit: "" }],
+      annotations: [{ number: 1, account_id: "", credit: "", debit: "" }],
     });
     setSolutions(updatedSolutions);
   };
@@ -78,7 +77,6 @@ const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
           placeholder="Descripción de la solución"
           aria-label="Descripción de la solución"
         />
-        {/* <button type="button" onClick={removeSolution}>Eliminar Solución</button> */}
       </div>
 
       {
@@ -88,6 +86,7 @@ const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
               <div
                 className="statement-page__entry-collapse"
                 onClick={() => toggleCollapse(entryIndex)}
+                aria-expanded={!collapsedEntries[entryIndex]}
               >
                 <span className="statement-page__entry-title">{`Asiento ${entry.entry_number}`}</span>
                 <span className="statement-page__entry-icon">
@@ -122,11 +121,10 @@ const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
           </div>
         ))}
 
-
       <div className="statement-page-modal__actions" >
         <div className="statement-page-modal__actions-buttons" >
           <button type="button" onClick={addEntry} className="btn">
-            + Asiento
+            <span className="desktop-only">+ </span>Asiento
           </button>
           {/* <button
             type="button"

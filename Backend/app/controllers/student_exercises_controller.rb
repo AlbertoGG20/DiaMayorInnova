@@ -3,24 +3,26 @@ class StudentExercisesController < ApplicationController
 
   def index
     return render json: { error: "No autorizado" }, status: :unauthorized unless current_user.student? || current_user.teacher?
-  
+
     exercises = Exercise.includes(:task, marks: { student_entries: :student_annotations })
-  
+
     if current_user.student?
       exercises = exercises.where(user_id: current_user.id)
     end
-  
+
     if params[:only_active].present? && params[:only_active] == "true"
       now = Time.zone.now
-      exercises = exercises.joins(:task).where("tasks.opening_date <= ? AND tasks.closing_date >= ?", now, now)
+      exercises = exercises
+        .joins(:task)
+        .where("tasks.opening_date <= ? AND tasks.closing_date >= ?", now, now)
     end
-  
+
     paginated_exercises = exercises.page(params[:page]).per(params[:per_page] || 5)
-  
+
     render json: {
       exercises: paginated_exercises.as_json(
         include: {
-          task: { only: [:id, :title, :opening_date, :closing_date, :is_exam] },
+          task: { only: [ :id, :title, :opening_date, :closing_date, :is_exam ] },
           marks: {
             include: {
               student_entries: {
@@ -37,36 +39,35 @@ class StudentExercisesController < ApplicationController
       }
     }
   end
-  
+
 
   def show
     @exercise = Exercise.includes(:task, marks: { student_entries: :student_annotations }).find(params[:id])
 
-    time_remaining = if @exercise.task.is_exam
-                       current_time = Time.current
-                       if current_time < @exercise.task.opening_date
-                         0
-                       elsif current_time > @exercise.task.closing_date
-                         0
-                       else
-                         (@exercise.task.closing_date - current_time).to_i
-                       end
-                     else
-                       nil
-                     end
-  
+    time_remaining =
+      if @exercise.task.is_exam
+        current_time = Time.current
+        if current_time.between?(@exercise.task.opening_date, @exercise.task.closing_date)
+          (@exercise.task.closing_date - current_time).to_i
+        else
+          0
+        end
+      else
+        nil
+      end
+
     render json: {
       exercise: @exercise.as_json(
         include: {
-          task: { 
-            only: [:id, :title, :opening_date, :closing_date, :is_exam, :help_available],
+          task: {
+            only: [ :id, :title, :opening_date, :closing_date, :is_exam, :help_available ],
             include: :statements
           },
           marks: {
             include: {
               student_entries: {
                 include: {
-                  student_annotations: { include: {account: {only: [:name]}}}
+                  student_annotations: { include: { account: { only: [ :name, :account_number ] } } }
                 }
               }
             }
@@ -79,7 +80,7 @@ class StudentExercisesController < ApplicationController
 
   def create
     @exercise = current_user.exercises.build(exercise_params)
-  
+
     if @exercise.save
       render json: @exercise, status: :created
     else
@@ -99,14 +100,15 @@ class StudentExercisesController < ApplicationController
       .joins(:user)                       # Join all student users
       .distinct                           # Avoid dupes
       .page(page).per(per_page)
-    
+
     result = @students_marks.map do |exercise|
       {
-        exercise_id: exercise.id, 
-        task_tittle: exercise.task.title,  
+        exercise_id: exercise.id,
+        task_tittle: exercise.task.title,
         student: exercise.user.name,
         mark: exercise.total_mark.round(1),
-        date: exercise.updated_at.strftime("%d/%m/%Y, %H:%M:%S")
+        date: exercise.updated_at.strftime("%d/%m/%Y, %H:%M:%S"),
+        is_public: exercise.is_public
       }
     end
 
@@ -129,14 +131,14 @@ class StudentExercisesController < ApplicationController
       .where(users: { role: "student" })  # Only students
       .joins(:user)                       # Join all student users
       .distinct                           # Avoid dupes
-    
+
     # Créer un nouveau workbook avec caxlsx
     package = Axlsx::Package.new
     workbook = package.workbook
     sheet = workbook.add_worksheet(name: "Notas Estudiantes")
 
     # Ajouter les en-têtes
-    headers = ["Fecha", "Nombre", "Tarea", "Nota"]
+    headers = [ "Fecha", "Nombre", "Tarea", "Nota" ]
     sheet.add_row headers
 
     # Ajouter les données
@@ -152,32 +154,37 @@ class StudentExercisesController < ApplicationController
 
     # Générer le fichier et l'envoyer
     file_stream = package.to_stream
-    send_data file_stream.read, 
+    send_data file_stream.read,
               filename: "notas_tarea_#{task_id}_#{Time.current.strftime('%Y%m%d_%H%M%S')}.xlsx",
               type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
               disposition: "attachment"
   end
 
   def find_mark_exercise_by_user
+    @exercises = Exercise
+      .includes(:task, marks: { student_entries: { student_annotations: :account } })
+      .where(user_id: current_user.id)
+      .where(is_public: true)
+      .page(params[:page])
+      .per(params[:per_page] || 5)
 
-    @exercises = Exercise.includes(:task, marks: { student_entries: :student_annotations })
-                          .where(user_id: current_user.id)
-                          .page(params[:page])
-                          .per(params[:per_page] || 5)
-  
     render json: {
       exercises: @exercises.as_json(
         include: {
-          task: { only: [:title] },
+          task: { only: [ :title ] },
           marks: {
             include: {
               student_entries: {
-                include: :student_annotations
+                include: {
+                  student_annotations: {
+                    include: { account: { only: [:name, :account_number] } }
+                  }
+                }
               }
             }
           }
         },
-        methods: [:total_mark]
+        methods: [ :total_mark ]
       ),
       meta: {
         current_page: @exercises.current_page,
@@ -186,7 +193,6 @@ class StudentExercisesController < ApplicationController
       }
     }
   end
-  
 
   def start
     @exercise = Exercise.find(params[:id])
@@ -201,7 +207,7 @@ class StudentExercisesController < ApplicationController
       return render json: { error: "Tarea no disponible aún." }, status: :unprocessable_entity if Time.current < task.opening_date
       return render json: { error: "Tarea ya cerrada." }, status: :unprocessable_entity if Time.current > task.closing_date
     end
-  
+
     if @exercise.update(started: true)
       render json: {
         exercise: @exercise,
@@ -224,11 +230,11 @@ class StudentExercisesController < ApplicationController
 
   def finish
     @exercise = Exercise.find(params[:id])
-    
+
     if @exercise.update(finished: true)
       render json: { success: true }
     else
-      render json: { error: @exercise.errors.full_messages }, 
+      render json: { error: @exercise.errors.full_messages },
              status: :unprocessable_entity
     end
   end
@@ -237,34 +243,34 @@ class StudentExercisesController < ApplicationController
     @exercise = Exercise.find(params[:id])
 
     if @exercise.finished
-      render json: { error: "El examen ya ha sido enviado y no puede ser modificado" }, 
+      render json: { error: "El examen ya ha sido enviado y no puede ser modificado" },
              status: :unprocessable_entity
       return
     end
-    
+
     if @exercise.update(exercise_params)
       # Obtener todos los enunciados del ejercicio
       all_statements = @exercise.task.statements
       marks_params = exercise_params[:marks_attributes] || []
-      
+
       # Para cada enunciado del ejercicio
       all_statements.each do |statement|
         # Buscar si hay una marca para este enunciado
         mark_param = marks_params.find { |mp| mp[:statement_id].to_i == statement.id }
-        
+
         if mark_param
           # Si hay una marca, procesarla normalmente
           @exercise.marks.where(statement_id: statement.id).destroy_all
           mark = @exercise.marks.create!(mark_param.except(:student_entries_attributes).merge(mark: 0, statement_id: statement.id))
-          
+
           param_entries = mark_param[:student_entries_attributes] || []
           mark_value = compute_grade(statement, param_entries)
           mark.update!(mark: mark_value)
-          
+
         student_entries_params = mark_param[:student_entries_attributes] || []
         student_entries_params.each do |entry_param|
           entry = mark.student_entries.create!(entry_param.except(:student_annotations_attributes))
-    
+
             student_annotations_params = entry_param[:student_annotations_attributes] || []
             student_annotations_params.each do |annotation_param|
               entry.student_annotations.create!(annotation_param)
@@ -279,7 +285,7 @@ class StudentExercisesController < ApplicationController
           )
         end
       end
-      
+
       render json: @exercise, status: :ok
     else
       render json: { errors: @exercise.errors.full_messages }, status: :unprocessable_entity
@@ -311,15 +317,15 @@ class StudentExercisesController < ApplicationController
       render json: @exercise.as_json(
       include: {
         marks: {
-          methods: [:filtered_student_entries]
+          methods: [ :filtered_student_entries ]
         }
       }
     ), status: :ok
-  else
+    else
       render json: { errors: @exercise.errors.full_messages }, status: :unprocessable_entity
     end
   end
-  
+
   private
 
   def exercise_params
@@ -339,10 +345,9 @@ class StudentExercisesController < ApplicationController
             :id,
             :account_id,
             :number,
-            :account_number,
             :credit,
             :debit,
-            :_destroy,
+            :_destroy
           ]
         ]
       ]

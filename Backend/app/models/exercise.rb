@@ -2,16 +2,15 @@ class Exercise < ApplicationRecord
   belongs_to :user
   belongs_to :task
   has_many :marks, dependent: :destroy
-  validates :started, inclusion: { in: [true, false] }
+  validates :started, inclusion: { in: [ true, false ] }
 
   def total_mark
     marks_count = marks.count
     return 0 if marks_count == 0
+
     total_score = marks.sum(:mark).to_f
-    max_possible_score = marks_count
-    normalized_score = (total_score / max_possible_score) * 10
-    result = normalized_score > 10 ? 10 : normalized_score
-    result.round(1)
+    normalized_score = (total_score / marks_count)
+    normalized_score.round(1)
   end
 
   def time_remaining
@@ -32,4 +31,3 @@ class Exercise < ApplicationRecord
 
   accepts_nested_attributes_for :marks, allow_destroy: true
 end
- 

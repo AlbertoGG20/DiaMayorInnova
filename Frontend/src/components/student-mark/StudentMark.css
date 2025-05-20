@@ -5,6 +5,8 @@
   padding: var(--gap-s);
   box-shadow: var(--box-shadow-btn);
   border-radius: var(--r-xs);
+  display: flex;
+  flex-direction: column;
 
   & .defaultModal {
     min-width: 800px;
@@ -53,9 +55,8 @@
   display: flex;
   flex-direction: column;
   gap: var(--gap-m);
-
   overflow-y: auto;
-  height: 94%;
+  flex: 1;
   padding: var(--gap-xxs);
 
   &>.btn {
