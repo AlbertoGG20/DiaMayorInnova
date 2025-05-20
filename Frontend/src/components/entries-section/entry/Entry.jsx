@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 import "./Entry.css"
 import EntryForm from './entry-form/EntryForm'
 import { getCurrentDate } from '../../../utils/dateUtils'
@@ -7,6 +7,8 @@ const Entry = ({ number, updateEntryDate, annotations, updateAnnotation, deleteA
   const [entryStatus, setEntryStatus] = useState(exercise?.finished);
   const [entryDate, setEntryDate] = useState(date || getCurrentDate());
   const formattedDate = new Date(`${entryDate}T00:00:00`).toLocaleDateString("es-ES");
+  const [isActive, setIsActive] = useState(false);
+  const entryRef = useRef(null);
 
   const total = useMemo(() => {
     return annotations.reduce((acc, annotation) => {
@@ -45,8 +47,45 @@ const Entry = ({ number, updateEntryDate, annotations, updateAnnotation, deleteA
     }
   }, [entryDate]);
 
+  const handleEntryClick = () => {
+    setIsActive(true);
+  };
+
+  const handleKeyDown = (event) => {
+    if ((event.ctrlKey || event.metaKey) && event.key === 'b') {
+      event.preventDefault();
+
+      if (!exercise?.finished && isActive) {
+        deleteEntry(entryIndex);
+      }
+    }
+
+    if ((event.ctrlKey || event.metaKey) && event.key === 'e') {
+      event.preventDefault();
+      if (isActive) {
+        setEntryStatus(!entryStatus);
+      }
+    }
+  }
+
+  const handleClickOutside = (event) => {
+    if (entryRef.current && !entryRef.current.contains(event.target)) {
+      setIsActive(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [deleteEntry, entryIndex, exercise, entryStatus, isActive, number]);
+
   return (
-    <div className='entry_wrapper'>
+    <div className={`entry_wrapper ${isActive ? 'entry-active' : ''}`} ref={entryRef} tabIndex="0" onClick={handleEntryClick}>
       <div className="entry_head">
         <div className="head_tittle" onClick={() => setEntryStatus(!entryStatus)} >
           <p>Asiento {number}</p>
