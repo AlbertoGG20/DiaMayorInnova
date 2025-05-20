@@ -9,19 +9,21 @@
 #   end
 
 school1 = SchoolCenter.find_or_create_by!(school_name: "IES El Rincón") do |s|
-  s.address = "Calle de prueba 1"
-  s.phone = "123456789"
-  s.email = "elrincon@ies.elrincon.es"
+  s.address = "Avenida Industrial José Sánchez Peñate s/n"
+  s.phone = "928304367"
+  s.email = "elrincon@ieselrincon.es"
   s.website = "www.ieselrincon.es"
   s.province = "Las Palmas"
+  s.code = "35009577"
 end
 
-school2 = SchoolCenter.find_or_create_by!(school_name: "IES Siete Palmas") do |s|
-  s.address = "Calle de siete palmas 1"
-  s.phone = "987654321"
-  s.email = "sietePalmas@ies.elrincon.es"
-  s.website = "www.sietePalmas.es"
+school2 = SchoolCenter.find_or_create_by!(school_name: "IES Santa Brígida") do |s|
+  s.address = "Camino de los Olivos, 41"
+  s.phone = "928899727"
+  s.email = "santaBrigida@ieselrincon.es"
+  s.website = "www.iessantabrigida.es"
   s.province = "Las Palmas"
+  s.code = "35010129"
 end
 
 class_group1 = ClassGroup.find_or_create_by!(course_module: "TUM", school_center_id: school1.id) do |c|
@@ -222,32 +224,26 @@ task2 = Task.find_or_create_by!(title: "Tarea 2 - Inventada S.L.", created_by: u
 end
 
 statement1 = Statement.find_or_create_by!(definition: "Compramos mercaderías a 30 días por 1250€. El proveedor nos incluye en factura un descuento comercial del 2%. Además, la compra tiene unos gastos de transporte de 100€", user: user2) do |s|
-  s.explanation = "Explicación 1"
   s.is_public = false
 end
 
 statement2 = Statement.find_or_create_by!(definition: "Vendemos mercaderías por valor de 3000€. Para el cobro giramos una letra de cambio a 30 días, que es aceptada.", user: user2) do |s|
-  s.explanation = "Explicación 2"
   s.is_public = false
 end
 
 statement3 = Statement.find_or_create_by!(definition: "Devolvemos mercaderías por valor de 200€  al proveedor, por estar inservibles.", user: user2) do |s|
-  s.explanation = "Explicación 3"
   s.is_public = false
 end
 
 statement4 = Statement.find_or_create_by!(definition: "El proveedor nos hace un descuento del 20% en la mercancía que está un poco defectuosa. Se paga al proveedor mediante transferencia.", user: user2) do |s|
-  s.explanation = "Explicación 4"
   s.is_public = false
 end
 
 statement5 = Statement.find_or_create_by!(definition: "Descontamos la letra de cambio en la entidad bancaria, la cual nos cobra una comisión de 30€ y unos intereses de 80€.", user: user2) do |s|
-  s.explanation = "Explicación 5"
   s.is_public = false
 end
 
 statement6 = Statement.find_or_create_by!(definition: "Se devenga la nómina de uno de nuestros trabajadores. El importe íntegro es de 2000€. La cuota empresarial a la Seguridad Social asciende a 700€. La cuota de la SS del trabajador sería de 30€. La retención de IRPF sería de 350€. Pasada 1 semana se paga mediante trasferencia bancaria.", user: user2) do |s|
-  s.explanation = "Explicación 6"
   s.is_public = true
 end
 
