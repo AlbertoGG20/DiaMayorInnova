@@ -1,1 +1,1 @@
-export const generateUid = () => `id-${Math.random().toString(32).slice(2, 11)}`;
+export const generateUid = (preffix = 'id') => `${preffix}-${Math.random().toString(32).slice(2, 11)}`;
