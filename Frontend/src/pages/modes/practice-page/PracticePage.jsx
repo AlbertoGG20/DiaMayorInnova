@@ -1,4 +1,5 @@
 import { useEffect, useCallback, useMemo } from 'react'
+import { getItemsArrayFromSessionStorage, setItemsOnSessionStorage } from '../../../utils/sessionStorage'
 import useAnnotation from '../../../hooks/useAnnotation'
 import useEntry from '../../../hooks/useEntry'
 import { AuxSection } from '../../../components/aux-section/AuxSection'
@@ -13,15 +14,6 @@ const STORAGE_KEYS = {
 };
 
 const PracticePage = () => {
-  const getItemsOnSessionStorage = (key) => {
-    try {
-      const raw = sessionStorage.getItem(key);
-      const parsed = raw ? JSON.parse(raw) : [];
-      if (Array.isArray(parsed)) return parsed;
-    } catch (e) {}
-    return [];
-  }
-  const setItemsOnSessionStorage = (key, items) => sessionStorage.setItem(key, JSON.stringify(items));
 
   const {
     entries,
@@ -29,7 +21,7 @@ const PracticePage = () => {
     updateEntry,
     deleteEntry,
     clearEntries,
-  } = useEntry(getItemsOnSessionStorage(STORAGE_KEYS.ENTRIES));
+  } = useEntry(getItemsArrayFromSessionStorage(STORAGE_KEYS.ENTRIES));
 
   const {
     annotations,
@@ -38,7 +30,7 @@ const PracticePage = () => {
     updateAnnotation,
     deleteAnnotation,
     clearAnnotations,
-  } = useAnnotation(getItemsOnSessionStorage(STORAGE_KEYS.ANNOTATIONS));
+  } = useAnnotation(getItemsArrayFromSessionStorage(STORAGE_KEYS.ANNOTATIONS));
 
   // Sync state to session storage
   useEffect(() => setItemsOnSessionStorage(STORAGE_KEYS.ENTRIES, entries), [entries]);
