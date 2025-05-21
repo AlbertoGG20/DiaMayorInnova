@@ -45,7 +45,7 @@ const useAnnotation = (initialAnnotations) => {
   }
 }
 
-type Annotation = {
+export type Annotation = {
   number: number,
   student_entry_uid: string,
   account_id: number,
