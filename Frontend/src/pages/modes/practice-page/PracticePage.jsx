@@ -40,12 +40,9 @@ const PracticePage = () => {
     clearAnnotations,
   } = useAnnotation(getItemsOnSessionStorage(STORAGE_KEYS.ANNOTATIONS));
 
-  // sync entries with session storage
+  // Sync state to session storage
   useEffect(() => setItemsOnSessionStorage(STORAGE_KEYS.ENTRIES, entries), [entries]);
-
-  const handleAddEntry = () => addEntry();
-
-  const handleUpdateEntryDate = (entryUid, newDate) => updateEntry(entryUid, {entry_date: newDate});
+  useEffect(() => setItemsOnSessionStorage(STORAGE_KEYS.ANNOTATIONS, annotations), [annotations]);
 
   const handleDeleteEntry = useCallback((entryUid) => {
     deleteEntry(entryUid);
@@ -53,60 +50,52 @@ const PracticePage = () => {
     setAnnotations(newAnnotations);
   }, [annotations, deleteEntry, setAnnotations]);
 
-  // sync annotations with session storage
-  useEffect(() => setItemsOnSessionStorage(STORAGE_KEYS.ANNOTATIONS, annotations), [annotations]);
-
-  const handleAddAnnotation = (entryUid) => addAnnotation(entryUid);
-
-  const handleUpdateAnnotation = (_statementId, annotationUid, updatedAnnotation) => updateAnnotation(annotationUid, updatedAnnotation);
-
-  const handleDeleteAnnotation = (annotationUid) => deleteAnnotation(annotationUid);
-
   const handleClearStorage = useCallback(() => {
     clearEntries();
     clearAnnotations();
   }, [clearEntries, clearAnnotations]);
 
   // sync student entry annotations to each entry
-  const formattedEntries = useMemo(() =>
-    entries.map(entry => ({
-      ...entry,
-      annotations: annotations.filter(annotation => annotation.student_entry_uid === entry.entry_uid)
-    })
-  ), [entries, annotations]);
+  const formattedEntries = useMemo(
+    () =>
+      entries.map(entry => ({
+        ...entry,
+        annotations: annotations.filter(a => a.student_entry_uid === entry.entry_uid)
+      })),
+    [entries, annotations]
+  );
 
   return (
     <div className='modes_page_container practice_color'>
       <h1 className='head_task'>Modo Práctica</h1>
 
-
       <div className='entry__container'>
         <EntryHeader
-          addEntry={handleAddEntry}
+          addEntry={addEntry}
           selectedStatement={true}
           examStarted={true}
         />
         <section className='modes-entries-container scroll-style'>
-          {
-            entries.map((entry, index) => {
-              return (
-                <Entry
-                  key={entry.entry_uid}
-                  entryIndex={entry.entry_uid}
-                  number={index + 1}
-                  date={entry.entry_date}
-                  markId={entry.mark_id}
-                  annotations={annotations.filter(annotation => annotation.student_entry_uid === entry.entry_uid)}
-                  updateAnnotation={handleUpdateAnnotation}
-                  deleteAnnotation={handleDeleteAnnotation}
-                  addAnnotation={handleAddAnnotation}
-                  deleteEntry={handleDeleteEntry}
-                  updateEntryDate={handleUpdateEntryDate}
-                  exercise={undefined}
-                />
-              )
-            })
-          }
+          {formattedEntries.map((entry, index) =>
+            <Entry
+              key={entry.entry_uid}
+              entryIndex={entry.entry_uid}
+              number={index + 1}
+              date={entry.entry_date}
+              markId={entry.mark_id}
+              updateEntryDate={(entryUid, newDate) =>
+                updateEntry(entryUid, {entry_date: newDate})
+              }
+              deleteEntry={handleDeleteEntry}
+              annotations={entry.annotations}
+              addAnnotation={addAnnotation}
+              updateAnnotation={(_statementId, annotationUid, updatedAnnotation) =>
+                updateAnnotation(annotationUid, updatedAnnotation)
+              }
+              deleteAnnotation={deleteAnnotation}
+              exercise={undefined}
+            />
+          )}
         </section>
         <div className='modes-entries-container--buttons'>
           <button

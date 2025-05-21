@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { getCurrentDate } from '../utils/dateUtils';
 import { generateUid } from '../utils/generateUid';
+import { Annotation } from './useAnnotation';
 
 const useEntry = (initialEntries: Entry[]) => {
 
@@ -8,6 +9,7 @@ const useEntry = (initialEntries: Entry[]) => {
     entry_number: number,
     entry_date: getCurrentDate(),
     entry_uid: generateUid(),
+    annotations: [],
   });
 
   const [entries, setEntries] = useState<Entry[]>(initialEntries.length ? initialEntries : [generateEntry(1)]);
@@ -41,6 +43,7 @@ type Entry = {
   entry_number: number,
   entry_date: string,
   entry_uid: string,
+  annotations: Annotation[],
 }
 
 export default useEntry
