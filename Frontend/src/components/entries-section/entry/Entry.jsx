@@ -2,9 +2,10 @@ import { useEffect, useState, useMemo } from 'react'
 import "./Entry.css"
 import EntryForm from './entry-form/EntryForm'
 import { getCurrentDate } from '../../../utils/dateUtils'
+
 const Entry = ({ number, updateEntryDate, annotations, updateAnnotation, deleteAnnotation, addAnnotation, deleteEntry, entryIndex, selectedStatement, date, exercise }) => {
   const [entryStatus, setEntryStatus] = useState(exercise?.finished);
-  const [entryDate, setDate] = useState(date || getCurrentDate());
+  const [entryDate, setEntryDate] = useState(date || getCurrentDate());
   const formattedDate = new Date(`${entryDate}T00:00:00`).toLocaleDateString("es-ES");
 
   const total = useMemo(() => {
@@ -25,19 +26,24 @@ const Entry = ({ number, updateEntryDate, annotations, updateAnnotation, deleteA
 
   const handleChangeDate = (e) => {
     const newDate = e.target.value;
-    setDate(newDate);
-    if (selectedStatement) {
-      updateEntryDate(selectedStatement.id, entryIndex, newDate);
-    } else {
-      updateEntryDate(entryIndex, newDate);
-    }
+    setEntryDate(newDate);
   }
 
   useEffect(() => {
     if (date) {
-      setDate(date);
+      setEntryDate(date);
     }
   }, [date]);
+
+  useEffect(() => {
+    if (entryDate !== date) {
+      if (selectedStatement) {
+        updateEntryDate(selectedStatement.id, entryIndex, entryDate);
+      } else {
+        updateEntryDate(entryIndex, entryDate);
+      }
+    }
+  }, [entryDate]);
 
   return (
     <div className='entry_wrapper'>
@@ -47,21 +53,21 @@ const Entry = ({ number, updateEntryDate, annotations, updateAnnotation, deleteA
           <i className={entryStatus ? 'fi fi-rr-angle-small-up' : 'fi fi-rr-angle-small-down'}></i>
         </div>
         <div className="head_data">
-          <input 
-            aria-label='Fecha del asiento' 
-            type='date' 
-            className='date_input' 
-            value={entryDate} 
+          <input
+            aria-label='Fecha del asiento'
+            type='date'
+            className='date_input'
+            value={entryDate}
             onChange={handleChangeDate}
             disabled={exercise?.finished}
             onClick={(e) => e.stopPropagation()}
           />
           <p className='entry_total'>Total: <span>{formattedTotal}</span></p>
         </div>
-        
-        <button 
-          className='btn-trash' 
-          aria-label='Eliminar asiento' 
+
+        <button
+          className='btn-trash'
+          aria-label='Eliminar asiento'
           onClick={(e) => {
             e.stopPropagation();
             deleteEntry(entryIndex);
