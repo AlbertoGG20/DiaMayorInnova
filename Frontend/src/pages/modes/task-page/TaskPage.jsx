@@ -13,12 +13,12 @@ const TaskPage = () => {
     marks: [],
     task: {}
   });
-  const [taskStarted, setTaskStarted] = useState(false);
+  const [taskStarted, setTaskStarted] = useState();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [submitTask, setSubmitTask] = useState(false);
   const [canEditTask, setCanEditTask] = useState(false);
   const [selectedStatement, setSelectedStatement] = useState(null);
-  const [saveStatus, setSaveStatus] = useState("");
+  const [saveStatus, setSaveStatus] = useState();
   const [openDate, setOpenDate] = useState(null);
   const [closeDate, setCloseDate] = useState(null);
   const [isTaskClosed, setIsTaskClosed] = useState(false);
@@ -241,7 +241,7 @@ const TaskPage = () => {
   return (
     <div className='modes_page_container task-color'>
       {saveStatus && <div className="error-message">{saveStatus}</div>}
-      {!taskStarted && (
+      {(taskStarted === false) && (
         <div className='modes_page_container--button'>
           <button className="btn" onClick={startTask} disabled={!canStartTask}>
             Comenzar tarea
