@@ -878,13 +878,17 @@
 
 @media (max-width: 768px) {
   .task-page {
-
     display: flex;
     flex-direction: column;
     gap: var(--gap-s);
     padding: var(--gap-s);
     overflow-x: hidden;
     width: 100%;
+    grid-template-areas: 
+      "task-header"
+      "task-form"
+      "task-preview"
+      "statements-selection";
   }
 
   .task-page__buttons-container {
@@ -893,24 +897,30 @@
 
   .task-page__form {
     padding: var(--gap-xxxs);
+    order: 1;
   }
 
   .task-page__form--form {
     padding: var(--gap-xxxs);
   }
 
+  .task-page__preview {
+    display: block;
+    max-height: none;
+    height: auto;
+    margin: var(--gap-s) 0;
+    order: 2;
+  }
+
   .task-page__selection {
     padding: var(--gap-xxxs);
     margin-top: 0;
     border-top: 0;
+    order: 3;
   }
 
   .task-page__selection--content {
     padding: var(--gap-xxxs);
-  }
-
-  .task-page__preview {
-    display: none;
   }
 
   .task-page__header--header {
@@ -919,8 +929,8 @@
     align-items: center;
     padding: var(--gap-s);
     gap: var(--gap-s);
+    order: 0;
   }
-
 
   .task-page__header {
     margin-bottom: var(--gap-xxs);
@@ -955,5 +965,4 @@
   .error-message {
     font-size: var(--text-mobile-body-small);
   }
-
 }

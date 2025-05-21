@@ -411,3 +411,138 @@
     display: inline;
   }
 }
+
+@media (max-width: 768px) {
+  .help_section__container {
+    padding: var(--gap-s);
+    gap: var(--gap-s);
+  }
+
+  .help_section_title {
+    font-size: var(--text-mobile-subtitles-2);
+    margin-bottom: var(--gap-s);
+  }
+
+  .help_section__lead {
+    font-size: var(--text-mobile-body-large);
+  }
+
+  .help_section__header {
+    padding: var(--gap-s);
+  }
+
+  .help_section__solution--description-content,
+  .help_section__solution--entries-list,
+  .help_section__info-accounts--list {
+    padding: var(--gap-s);
+  }
+
+  .help_section__entry_info {
+    margin-bottom: var(--gap-s);
+  }
+
+  .help_section__solution--entry-body {
+    padding: var(--gap-s);
+    overflow-x: auto;
+    width: 100%;
+  }
+
+  .help_section__header_container {
+    gap: var(--gap-s);
+    min-width: 440px;
+  }
+
+  .help_section__tittles_wrapper {
+    gap: var(--gap-s);
+    flex: 1;
+  }
+
+  .help_section__entry_item_container {
+    height: auto;
+    max-height: 200px;
+    padding: var(--gap-xxs) 0;
+    min-width: 600px;
+  }
+
+  .help_section__entry_form_wrapper {
+    gap: var(--gap-s);
+    min-width: 440px;
+  }
+
+  .help_section__entry_form_inputs__wrapper {
+    gap: var(--gap-s);
+    flex: 1;
+  }
+
+  .help_section__account_number,
+  .help_section__account_name,
+  .help_section__debit_value,
+  .help_section__credit_value {
+    font-size: var(--text-mobile-body-small);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .help_section__info-accounts--list-charges {
+    font-size: var(--text-mobile-body-small);
+  }
+
+  .help_section__tittle_account-number {
+    width: 80px;
+    flex-shrink: 0;
+  }
+
+  .help_section__tittle_account-name {
+    width: 180px;
+    flex-shrink: 0;
+  }
+
+  .help_section__tittle_debit {
+    width: 100px;
+    flex-shrink: 0;
+  }
+
+  .help_section__tittle_credit {
+    width: 80px;
+    flex-shrink: 0;
+  }
+
+  .help_section__account_number_group {
+    width: 80px;
+    flex-shrink: 0;
+  }
+
+  .help_section__account_name_group {
+    width: 180px;
+    flex-shrink: 0;
+  }
+
+  .help_section__debit_group {
+    width: 100px;
+    flex-shrink: 0;
+  }
+
+  .help_section__credit_group {
+    width: 80px;
+    flex-shrink: 0;
+  }
+
+  .help_section__solution--entry-body::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  .help_section__solution--entry-body::-webkit-scrollbar-track {
+    background: var(--Color-grey-100);
+    border-radius: var(--r-xs);
+  }
+
+  .help_section__solution--entry-body::-webkit-scrollbar-thumb {
+    background: var(--Color-grey-400);
+    border-radius: var(--r-xs);
+  }
+
+  .help_section__solution--entry-body::-webkit-scrollbar-thumb:hover {
+    background: var(--Color-grey-500);
+  }
+}

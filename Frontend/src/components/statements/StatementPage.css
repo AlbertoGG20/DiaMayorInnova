@@ -571,4 +571,8 @@
   .statement-page__button--form .fi {
     font-size: 0.9rem;
   }
+
+  .statement-page__buttons--actions {
+    flex-direction: column;
+  }
 }
