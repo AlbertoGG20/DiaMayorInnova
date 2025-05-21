@@ -1,11 +1,11 @@
-import { useEffect, useCallback, useMemo } from 'react'
-import useAnnotation from '../../../hooks/useAnnotation'
-import useEntry from '../../../hooks/useEntry'
-import { AuxSection } from '../../../components/aux-section/AuxSection'
+import "./PracticePage.css"
+import "../../../components/entries-section/EntriesSection.css"
 import EntryHeader from '../../../components/entries-section/entry-header/EntryHeader'
+import useEntry from '../../../hooks/useEntry'
+import useAnnotation from '../../../hooks/useAnnotation'
 import Entry from '../../../components/entries-section/entry/Entry'
-import '../../../components/entries-section/EntriesSection.css'
-import './PracticePage.css'
+import { AuxSection } from '../../../components/aux-section/AuxSection'
+import { useState, useEffect, useCallback } from 'react'
 
 const STORAGE_KEYS = {
   ENTRIES: 'practice_entries',
@@ -13,74 +13,125 @@ const STORAGE_KEYS = {
 };
 
 const PracticePage = () => {
-  const getItemsOnSessionStorage = (key) => {
-    try {
-      const raw = sessionStorage.getItem(key);
-      const parsed = raw ? JSON.parse(raw) : [];
-      if (Array.isArray(parsed)) return parsed;
-    } catch (e) {}
-    return [];
-  }
-  const setItemsOnSessionStorage = (key, items) => sessionStorage.setItem(key, JSON.stringify(items));
+  const { addEntry: originalAddEntry, removeEntry: originalRemoveEntry } = useEntry();
+  const { addAnnotation: originalAddAnnotation, deleteAnnotation: originalDeleteAnnotation, updateAnnotation: originalUpdateAnnotation } = useAnnotation();
 
-  const {
-    entries,
-    addEntry,
-    updateEntry,
-    deleteEntry,
-    clearEntries,
-  } = useEntry(getItemsOnSessionStorage(STORAGE_KEYS.ENTRIES));
+  // Estados locales que se sincronizan con localStorage
+  const [entries, setEntries] = useState(() => {
+    const savedEntries = localStorage.getItem(STORAGE_KEYS.ENTRIES);
+    if (savedEntries) {
+      return JSON.parse(savedEntries);
+    }
+    // Si no hay datos guardados, usar el estado inicial
+    const initialEntry = {
+      entry_number: 1,
+      entry_date: "2024-10-10",
+      entry_uid: `id-${Math.random().toString(32).substr(2, 9)}`,
+    };
+    localStorage.setItem(STORAGE_KEYS.ENTRIES, JSON.stringify([initialEntry]));
+    return [initialEntry];
+  });
 
-  const {
-    annotations,
-    setAnnotations,
-    addAnnotation,
-    updateAnnotation,
-    deleteAnnotation,
-    clearAnnotations,
-  } = useAnnotation(getItemsOnSessionStorage(STORAGE_KEYS.ANNOTATIONS));
+  const [annotations, setAnnotations] = useState(() => {
+    const savedAnnotations = localStorage.getItem(STORAGE_KEYS.ANNOTATIONS);
+    return savedAnnotations ? JSON.parse(savedAnnotations) : [];
+  });
 
-  // sync entries with session storage
-  useEffect(() => setItemsOnSessionStorage(STORAGE_KEYS.ENTRIES, entries), [entries]);
+  const [formattedEntries, setFormattedEntries] = useState([]);
 
-  const handleAddEntry = () => addEntry();
+  // Formatear entradas para la vista
+  useEffect(() => {
+    const formatted = entries.map(entry => ({
+      ...entry,
+      annotations: annotations.filter(anno => anno.student_entry_uid === entry.entry_uid)
+    }));
+    setFormattedEntries(formatted);
+  }, [entries, annotations]);
 
-  const handleUpdateEntryDate = (entryUid, newDate) => updateEntry(entryUid, {entry_date: newDate});
+  // Funciones que manejan los cambios y actualizan el estado local y localStorage
+  const handleAddEntry = useCallback(() => {
+    const newEntry = {
+      entry_number: entries.length + 1,
+      entry_date: "2024-10-10",
+      entry_uid: `id-${Math.random().toString(32).substr(2, 9)}`,
+    };
+    const newEntries = [...entries, newEntry];
+    setEntries(newEntries);
+    localStorage.setItem(STORAGE_KEYS.ENTRIES, JSON.stringify(newEntries));
+    originalAddEntry();
+  }, [entries, originalAddEntry]);
 
-  const handleDeleteEntry = useCallback((entryUid) => {
-    deleteEntry(entryUid);
-    const newAnnotations = annotations.filter(annotation => annotation.student_entry_uid !== entryUid);
+  const handleRemoveEntry = useCallback((entryUid) => {
+    const newEntries = entries.filter(entry => entry.entry_uid !== entryUid);
+    const newAnnotations = annotations.filter(anno => anno.student_entry_uid !== entryUid);
+    setEntries(newEntries);
     setAnnotations(newAnnotations);
-  }, [annotations, deleteEntry, setAnnotations]);
+    localStorage.setItem(STORAGE_KEYS.ENTRIES, JSON.stringify(newEntries));
+    localStorage.setItem(STORAGE_KEYS.ANNOTATIONS, JSON.stringify(newAnnotations));
+    originalRemoveEntry(entryUid);
+  }, [entries, annotations, originalRemoveEntry]);
 
-  // sync annotations with session storage
-  useEffect(() => setItemsOnSessionStorage(STORAGE_KEYS.ANNOTATIONS, annotations), [annotations]);
+  const handleAddAnnotation = useCallback((entryUid) => {
+    const entryAnnotations = annotations.filter(annotation => annotation.student_entry_uid === entryUid);
+    const nextAnnotationNumber = entryAnnotations.length + 1;
+    const newAnnotation = {
+      uid: `id-${Math.random().toString(36).substr(2, 9)}`,
+      student_entry_uid: entryUid,
+      account_id: 1,
+      number: nextAnnotationNumber,
+      account_number: "",
+      debit: "",
+      credit: "",
+    };
+    const newAnnotations = [...annotations, newAnnotation];
+    setAnnotations(newAnnotations);
+    localStorage.setItem(STORAGE_KEYS.ANNOTATIONS, JSON.stringify(newAnnotations));
+    originalAddAnnotation(entryUid);
+  }, [annotations, originalAddAnnotation]);
 
-  const handleAddAnnotation = (entryUid) => addAnnotation(entryUid);
+  const handleDeleteAnnotation = useCallback((annotationUid) => {
+    const newAnnotations = annotations.filter(annotation => annotation.uid !== annotationUid);
+    setAnnotations(newAnnotations);
+    localStorage.setItem(STORAGE_KEYS.ANNOTATIONS, JSON.stringify(newAnnotations));
+    originalDeleteAnnotation(annotationUid);
+  }, [annotations, originalDeleteAnnotation]);
 
-  const handleUpdateAnnotation = (_statementId, annotationUid, updatedAnnotation) => updateAnnotation(annotationUid, updatedAnnotation);
+  const handleUpdateAnnotation = useCallback((statementId, annotationUid, updatedAnnotation) => {
+    const newAnnotations = annotations.map(annotation =>
+      annotation.uid === annotationUid ? { ...annotation, ...updatedAnnotation } : annotation
+    );
+    setAnnotations(newAnnotations);
+    localStorage.setItem(STORAGE_KEYS.ANNOTATIONS, JSON.stringify(newAnnotations));
+    originalUpdateAnnotation(statementId, annotationUid, updatedAnnotation);
+  }, [annotations, originalUpdateAnnotation]);
 
-  const handleDeleteAnnotation = (annotationUid) => deleteAnnotation(annotationUid);
+  const handleUpdateEntryDate = useCallback((entryUid, newDate) => {
+    const newEntries = entries.map(entry =>
+      entry.entry_uid === entryUid ? { ...entry, entry_date: newDate } : entry
+    );
+    setEntries(newEntries);
+    localStorage.setItem(STORAGE_KEYS.ENTRIES, JSON.stringify(newEntries));
+  }, [entries]);
 
   const handleClearStorage = useCallback(() => {
-    clearEntries();
-    clearAnnotations();
-  }, [clearEntries, clearAnnotations]);
-
-  // sync student entry annotations to each entry
-  const formattedEntries = useMemo(() =>
-    entries.map(entry => ({
-      ...entry,
-      annotations: annotations.filter(annotation => annotation.student_entry_uid === entry.entry_uid)
-    })
-  ), [entries, annotations]);
+    localStorage.removeItem(STORAGE_KEYS.ENTRIES);
+    localStorage.removeItem(STORAGE_KEYS.ANNOTATIONS);
+    const initialEntry = {
+      entry_number: 1,
+      entry_date: "2024-10-10",
+      entry_uid: `id-${Math.random().toString(32).substr(2, 9)}`,
+    };
+    setEntries([initialEntry]);
+    setAnnotations([]);
+    localStorage.setItem(STORAGE_KEYS.ENTRIES, JSON.stringify([initialEntry]));
+  }, []);
 
   return (
     <div className='modes_page_container practice_color'>
       <h1 className='head_task'>Modo Práctica</h1>
 
 
-      <div className='entry__container'>
+      <div className="entry__container">
         <EntryHeader
           addEntry={handleAddEntry}
           selectedStatement={true}
@@ -100,7 +151,7 @@ const PracticePage = () => {
                   updateAnnotation={handleUpdateAnnotation}
                   deleteAnnotation={handleDeleteAnnotation}
                   addAnnotation={handleAddAnnotation}
-                  deleteEntry={handleDeleteEntry}
+                  deleteEntry={handleRemoveEntry}
                   updateEntryDate={handleUpdateEntryDate}
                   exercise={undefined}
                 />
@@ -108,11 +159,11 @@ const PracticePage = () => {
             })
           }
         </section>
-        <div className='modes-entries-container--buttons'>
+        <div className="modes-entries-container--buttons">
           <button
-            className='btn btn-secondary'
+            className="btn btn-secondary"
             onClick={handleClearStorage}
-            aria-label='Limpiar datos guardados'
+            aria-label="Limpiar datos guardados"
           >
             Limpiar datos guardados
           </button>
