@@ -13,6 +13,9 @@ const ClassGroup = () => {
     id: null,
     course: 0,
     course_module: "",
+    module_name: "",
+    cycle: "",
+    group_name: "",
     modality: "",
     number_students: 0,
     max_students: 0,
@@ -41,9 +44,12 @@ const ClassGroup = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.course) newErrors.course = "El curso es obligatorio.";
-    if (!formData.course_module) newErrors.course_module = "El módulo es obligatorio.";
+    if (!formData.course || formData.course <= 0) newErrors.course = "El curso es obligatorio y debe ser mayor que 0.";
+    if (!formData.course_module) newErrors.course_module = "El código del módulo es obligatorio.";
+    if (!formData.module_name) newErrors.module_name = "El nombre del módulo es obligatorio.";
+    if (!formData.cycle) newErrors.cycle = "El ciclo es obligatorio.";
     if (!formData.modality) newErrors.modality = "La modalidad es obligatoria.";
+    if (!formData.group_name) newErrors.group_name = "El nombre del grupo es obligatorio.";
     if (!formData.location) newErrors.location = "El aula es obligatoria.";
     if (!formData.max_students || formData.max_students <= 0) {
       newErrors.max_students = "El número máximo de estudiantes debe ser mayor que 0.";
@@ -60,6 +66,7 @@ const ClassGroup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage("");
+    setSuccessMessage("");
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length) {
       setErrors(validationErrors);
@@ -73,6 +80,8 @@ const ClassGroup = () => {
         const response = await ClassGroupDataService.update(formData.id, payload);
         if (response && response.data) {
           setSuccessMessage("Grupo actualizado correctamente");
+          setFormData(initialClassGroupState());
+          setRefreshTrigger((prev) => prev + 1);
         }
       } else {
         // Crear nuevo grupo
@@ -80,16 +89,17 @@ const ClassGroup = () => {
         if (response && response.data) {
           setSuccessMessage("Grupo creado correctamente");
           setFormData(initialClassGroupState());
+          setRefreshTrigger((prev) => prev + 1);
         }
       }
-
-      setFormData(initialClassGroupState);
-      setErrors({});
-      setRefreshTrigger((prev) => prev + 1);
       setTimeout(() => setSuccessMessage(""), 5000);
     } catch (error) {
       console.error("Error al guardar el grupo de clase:", error);
-      setErrorMessage("Error al guardar el grupo de clase. Por favor, inténtelo de nuevo.");
+      if (error.response?.data?.error) {
+        setErrorMessage(error.response.data.error);
+      } else {
+        setErrorMessage("Error al guardar el grupo de clase. Por favor, inténtelo de nuevo.");
+      }
       setTimeout(() => setErrorMessage(""), 5000);
     }
   };
@@ -123,7 +133,6 @@ const ClassGroup = () => {
         maxStudents={formData.max_students}
       />
     </main>
-
   );
 };
 

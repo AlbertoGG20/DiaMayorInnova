@@ -82,7 +82,6 @@ const AssignUserToClass = ({
         // data object. We need to handle that case.
         // This is a temporary fix until we can refactor the backend to return consistent data.
         const users = usersResponse?.data?.data?.data?.users || usersResponse?.data?.data?.users || usersResponse?.data?.users || [];
-        console.log(schoolCenterId,users)
         setAllUsers(users);
       } catch (error) {
         console.error("Error cargando datos:", error);
