@@ -41,7 +41,7 @@ const SolutionList = ({ solutions, onEditSolution, onDeleteSolution, solutionToD
         await solutionService.markAsExample(solutionId, {
           creditMoves: "0",
           debitMoves: "0",
-          account_id: 1,
+          account_id: 42,
           solution: solutionData
         });
       }
