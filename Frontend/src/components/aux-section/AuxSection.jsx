@@ -48,10 +48,10 @@ export const AuxSection = ({
           return <div>Selecciona un enunciado para ver la ayuda</div>;
         }
         return <HelpSection statementId={selectedStatement.id} />;
-      case 'balance':
-        return <RealTimeTrialBalance entries={entries} />;
       case 'mayor':
         return <LedgerBook entries={entries} />;
+      case 'balance':
+        return <RealTimeTrialBalance entries={entries} />;
       default:
         return null;
     }
