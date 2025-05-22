@@ -52,6 +52,18 @@ const update = async (id, data) => {
   }
 };
 
+const updateVisibility = async (exerciseIds, isPublic) => {
+  try {
+    return await http.patch('/exercises/update_visibility', {
+      exercise_ids: exerciseIds,
+      is_public: isPublic
+    });
+  } catch (error) {
+    console.error('Error en la actualización de visibilidad: ', error);
+    throw error;
+  }
+};
+
 export default {
   getAll,
   create,
@@ -59,4 +71,5 @@ export default {
   getByExerciseId,
   deleteOnGroup,
   update,
+  updateVisibility,
 };
