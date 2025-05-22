@@ -4,14 +4,6 @@
   height: auto;
   display: flex;
   flex-direction: column;
-  height: auto;
-  /* display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: 0.1fr repeat(2, minmax(500px, 600px));
-  grid-template-areas:
-    "head"
-    "entry"
-    "auxSection"; */
 
   gap: var(--gap-s);
   overflow-y: hidden;
@@ -49,15 +41,8 @@
 }
 
 @media (width > 769px) {
+
   .modes_page_container {
-    /* grid-template-rows: 0.1fr auto auto;
-    grid-template-areas:
-      "head"
-      "entry"
-      "auxSection";
-    padding: var(--gap-xs); */
-    display: flex;
-    flex-direction: column;
     height: 150vh;
   }
 
@@ -77,64 +62,20 @@
 
 @media (width > 1080px) {
 
+  .error-message {
+    grid-area: errorMessage;
+  }
+
   .modes_page_container {
     height: calc(100dvh - 70px);
     display: grid;
-    overflow: hidden;
-    overflow: hidden;
+    overflow-x: hidden;
     grid-template-columns: minmax(550px, 1fr) minmax(450px, 1fr);
-    grid-template-rows: 0.02fr 1fr;
+    grid-template-rows: auto 0.02fr 1fr;
     grid-template-areas:
+      "errorMessage errorMessage"
       "head head"
       "entry auxSection"
   }
-}
 
-@media (width > 1280px) {
-
-  .modes_page_container {
-    overflow: hidden;
-    grid-template-columns: minmax(550px, 1fr) minmax(450px, 1fr);
-    grid-template-rows: 0.02fr 1fr;
-    grid-template-areas:
-      "head head"
-      "entry auxSection"
-  }
-}
-
-@media (with > 2800px) {
-
-  .modes_page_container {
-    padding: var(--gap-l) var(--gap-xl);
-    width: 100%;
-    height: calc(100dvh - 60px);
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: 0.1fr 90% repeat(2, 50%);
-    grid-template-areas:
-      "head"
-      "entry"
-      "auxSection";
-
-    gap: var(--gap-s);
-    overflow-y: scroll;
-  }
-
-  .shortcut__wrapper {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: start;
-    align-items: start;
-  }
-
-  .wrapper-center {
-    justify-content: center;
-    align-items: center;
-  }
-
-  .section_2__tab_buttons {
-    display: flex;
-    height: 48px;
-  }
 }

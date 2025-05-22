@@ -26,6 +26,10 @@
   padding: 0.6rem 0.8rem;
   text-align: center;
   white-space: nowrap;
+
+  &.money-cell {
+    text-align: right;
+  }
 }
 
 .ledger-book-table th {
@@ -105,7 +109,6 @@
   .ledger-book-table th,
   .ledger-book-table td {
     padding: 0.4rem 0.3rem;
-    text-align: center;
   }
 
   /* Ocultar iconos de ordenamiento en móvil */
@@ -182,4 +185,4 @@
 
 .sort-icon-inactive {
   opacity: 0.3;
-} 
+}
