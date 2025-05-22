@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_05_15_125450) do
+ActiveRecord::Schema[7.2].define(version: 2025_05_22_090200) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -87,6 +87,9 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_15_125450) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "school_center_id", default: 1, null: false
+    t.string "module_name"
+    t.string "cycle"
+    t.string "group_name"
     t.index ["school_center_id"], name: "index_class_groups_on_school_center_id"
   end
 
@@ -114,7 +117,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_15_125450) do
   create_table "help_examples", force: :cascade do |t|
     t.text "creditMoves"
     t.text "debitMoves"
-    t.bigint "account_id", null: false
+    t.bigint "account_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "description"
