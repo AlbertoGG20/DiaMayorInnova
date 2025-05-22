@@ -30,6 +30,9 @@ const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange }) => {
     ? classGroups.filter(group =>
       String(group.course || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
       String(group.course_module || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      String(group.module_name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      String(group.cycle || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      String(group.group_name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
       String(group.modality || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
       String(group.location || "").toLowerCase().includes(searchTerm.toLowerCase())
     )
@@ -153,20 +156,27 @@ const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange }) => {
               <p>Cargando grupos de clase...</p>
             ) : (
               <Table
-                titles={["Curso", "Módulo", "Modalidad", "Nº Estudiantes", "Máx. Estudiantes", "Aula", "Horas semanales", "Centro", "Acciones"]}
+                titles={["Curso", "Ciclo", "Grupo", "Cod. Módulo", "Nombre Módulo", "Modalidad", "Nº Estudiantes", "Máx. Estudiantes", "Aula", "Hrs/sem", "Centro", "Acciones"]}
                 data={classGroups}
                 actions={true}
                 openModal={handleEdit}
                 deleteItem={handleDeleteClick}
                 columnConfig={[
                   { field: 'course', sortable: true },
+                  { field: 'cycle', sortable: true },
+                  { field: 'group_name', sortable: true },
                   { field: 'course_module', sortable: true },
+                  { field: 'module_name', sortable: true },
                   { field: 'modality', sortable: true },
                   { field: 'number_students', sortable: true },
                   { field: 'max_students', sortable: true },
                   { field: 'location', sortable: true },
                   { field: 'weekly_hours', sortable: true },
-                  { field: 'school_center_id', sortable: true },
+                  { 
+                    field: 'school_center',
+                    sortable: true,
+                    render: (row) => row.school_center?.code || ''
+                  },
                 ]}
                 customActions={(row) => (
                   <AssignUserToClass
@@ -197,7 +207,7 @@ const ClassGroupsList = ({ refreshTrigger, onEdit, onStudentCountChange }) => {
       <ConfirmDeleteModal
         isOpen={isDeleteModalOpen}
         title="¿Estás seguro de eliminar este grupo de clase?"
-        message={`El grupo de clase con curso ${groupToDelete?.course} y módulo ${groupToDelete?.course_module} será eliminado permanentemente.`}
+        message={`El grupo de clase ${groupToDelete?.course}-${groupToDelete?.cycle}-${groupToDelete?.group_name} será eliminado permanentemente.`}
         onDelete={handleDelete}
         onClose={() => setIsDeleteModalOpen(false)}
       />

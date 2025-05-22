@@ -7,11 +7,10 @@ class ClassGroupsController < ApplicationController
     Rails.logger.debug "Current User: #{current_user.inspect}"
 
     if current_user.admin?
-        @classGroups = ClassGroup.all
+        @classGroups = ClassGroup.includes(:school_center).all
     else
-
       if current_user.teacher? || current_user.center_admin?
-        @classGroups = ClassGroup.where(school_center_id: current_user.school_center_id)
+        @classGroups = ClassGroup.includes(:school_center).where(school_center_id: current_user.school_center_id)
       else
         return json_response "Unauthorized", false, {}, :unauthorized
       end
@@ -27,7 +26,7 @@ class ClassGroupsController < ApplicationController
 
     render json: {
       data: {
-        class_groups: paginated_class_groups,
+        class_groups: paginated_class_groups.as_json(include: { school_center: { only: [:id, :code, :school_name] } }),
         meta: {
           current_page: paginated_class_groups.current_page,
           total_pages: paginated_class_groups.total_pages,
@@ -38,8 +37,8 @@ class ClassGroupsController < ApplicationController
   end
     
   def show
-      @classGroup = ClassGroup.find(params[:id])
-      render json: @classGroup
+      @classGroup = ClassGroup.includes(:school_center).find(params[:id])
+      render json: @classGroup.as_json(include: { school_center: { only: [:id, :code, :school_name] } })
   end
 
   def users
@@ -68,7 +67,11 @@ class ClassGroupsController < ApplicationController
     if @classGroup.save
       render json: @classGroup, status: :created
     else
-      render json: @classGroup.errors, status: :unprocessable_entity
+      if @classGroup.errors[:base].include?("Ya existe un grupo con el mismo curso, ciclo, modalidad y nombre en este centro escolar")
+        render json: { error: "Ya existe un grupo con el mismo curso, ciclo, modalidad y nombre en este centro escolar" }, status: :unprocessable_entity
+      else
+        render json: @classGroup.errors, status: :unprocessable_entity
+      end
     end
   end
 
@@ -84,7 +87,11 @@ class ClassGroupsController < ApplicationController
     if @classGroup.update(class_group_params)
       render json: @classGroup
     else
-      render json: @classGroup.errors, status: :unprocessable_entity
+      if @classGroup.errors[:base].include?("Ya existe un grupo con el mismo curso, ciclo, modalidad y nombre en este centro escolar")
+        render json: { error: "Ya existe un grupo con el mismo curso, ciclo, modalidad y nombre en este centro escolar" }, status: :unprocessable_entity
+      else
+        render json: @classGroup.errors, status: :unprocessable_entity
+      end
     end
   end
 
@@ -144,6 +151,6 @@ class ClassGroupsController < ApplicationController
 
     # Método para manejar los parámetros permitidos usando strong parameters
     def class_group_params
-        params.require(:class_group).permit(:course, :course_module, :modality, :number_students, :max_students, :location, :weekly_hours, :school_center_id)
+        params.require(:class_group).permit(:course, :course_module, :modality, :number_students, :max_students, :location, :weekly_hours, :school_center_id, :module_name, :cycle, :group_name)
     end
 
