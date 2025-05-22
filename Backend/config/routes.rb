@@ -64,6 +64,7 @@ Rails.application.routes.draw do
     delete 'destroy_on_group', on: :collection
     get 'find_by_task_id', on: :collection
     get 'find_by_exercise_id', on: :collection
+    patch 'update_visibility', on: :collection
   end
 
   resources :tasks, param: :id do

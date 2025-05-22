@@ -68,7 +68,13 @@ const ExerciseMarksList = () => {
 
   const handleToggleVisibility = async (exercise_id, newVisibility) => {
     try {
-      await exerciseServices.update(exercise_id, { is_public: newVisibility });
+      const response = await exerciseServices.updateVisibility([exercise_id], newVisibility);
+      
+      if (response.data.updated_count === 0) {
+        setErrorMessage('Error: No se pudo actualizar la visibilidad de las notas');
+        return;
+      }
+
       setExerciseMarksList((prevExerciseMarksList) => {
         const updatedList = prevExerciseMarksList.map((exerciseMark) =>
           exerciseMark.exercise_id === exercise_id
@@ -79,9 +85,17 @@ const ExerciseMarksList = () => {
         return updatedList;
       });
     } catch (error) {
-      const errorMessage = error.response && error.response.status === 403
-        ? 'No se puede cambiar la visibilidad de las notas'
-        : 'Error al cambiar la visibilidad de las notas';
+      let errorMessage = 'Error al cambiar la visibilidad de las notas';
+      
+      if (error.response) {
+        if (error.response.status === 403) {
+          errorMessage = 'Error: No tiene permiso para cambiar la visibilidad de las notas';
+        } else if (error.response.data?.non_existent_ids) {
+          errorMessage = 'Error: No se encuentra el ejercicio.';
+        } else if (error.response.data?.details) {
+          errorMessage = `Error: ${error.response.data.details}`;
+        }
+      }
 
       setErrorMessage(errorMessage);
       setTimeout(() => {
@@ -92,11 +106,18 @@ const ExerciseMarksList = () => {
 
   const handleToggleAllVisibility = async (newVisibility) => {
     try {
-      const updatePromises = exerciseMarksList.map(exerciseMark =>
-        exerciseServices.update(exerciseMark.exercise_id, { is_public: newVisibility })
-      );
+      const exerciseIds = exerciseMarksList.map(exerciseMark => exerciseMark.exercise_id);
+      const response = await exerciseServices.updateVisibility(exerciseIds, newVisibility);
       
-      await Promise.all(updatePromises);
+      if (response.data.updated_count === 0) {
+        setErrorMessage('Error al cambiar la visibilidad de las notas');
+        return;
+      }
+
+      if (response.data.updated_count < exerciseIds.length) {
+        setErrorMessage(`Se actualizaron ${response.data.updated_count} ejercicios`);
+        return;
+      }
       
       setExerciseMarksList(prevExerciseMarksList =>
         prevExerciseMarksList.map(exerciseMark => ({
@@ -107,9 +128,17 @@ const ExerciseMarksList = () => {
       setAllNotesVisible(newVisibility);
       setHasMixedVisibility(false);
     } catch (error) {
-      const errorMessage = error.response && error.response.status === 403
-        ? 'No se puede cambiar la visibilidad de las notas'
-        : 'Error al cambiar la visibilidad de las notas';
+      let errorMessage = 'Error al cambiar la visibilidad de las notas';
+      
+      if (error.response) {
+        if (error.response.status === 403) {
+          errorMessage = 'Error: No tiene permiso para cambiar la visibilidad de las notas';
+        } else if (error.response.data?.non_existent_ids) {
+          errorMessage = 'Error: No se encuentra el ejercicio.';
+        } else if (error.response.data?.details) {
+          errorMessage = `Error: ${error.response.data.details}`;
+        }
+      }
 
       setErrorMessage(errorMessage);
       setTimeout(() => {
