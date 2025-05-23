@@ -68,21 +68,69 @@ const AddUsers = ({ selectedUser, setSelectedUser, onUserAdded }) => {
     setInput({ ...input, featured_image: event.target.files[0] });
   };
 
+  const validateForm = () => {
+    // Validación de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!input.email || !emailRegex.test(input.email)) {
+      setError("Por favor, introduzca un correo electrónico válido");
+      return false;
+    }
+
+    // Validaciones de contraseña solo para nuevos usuarios
+    if (!selectedUser) {
+      if (!input.password) {
+        setError("La contraseña es obligatoria");
+        return false;
+      }
+      if (input.password.length < 6) {
+        setError("La contraseña debe tener al menos 6 caracteres");
+        return false;
+      }
+
+      if (!input.confirmation_password) {
+        setError("Debe confirmar la contraseña");
+        return false;
+      }
+      if (input.password !== input.confirmation_password) {
+        setError("Las contraseñas no coinciden");
+        return false;
+      }
+    } else if (input.password) {
+      // Validaciones para actualización de contraseña
+      if (input.password.length < 6) {
+        setError("La contraseña debe tener al menos 6 caracteres");
+        return false;
+      }
+
+      if (input.password !== input.confirmation_password) {
+        setError("Las contraseñas no coinciden");
+        return false;
+      }
+    }
+
+    // Validación de campos obligatorios
+    if (!input.name) {
+      setError("El nombre es obligatorio");
+      return false;
+    }
+    if (!input.first_lastName) {
+      setError("El primer apellido es obligatorio");
+      return false;
+    }
+    if (!input.second_lastName) {
+      setError("El segundo apellido es obligatorio");
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    setSuccessMessage("");
 
-    if (!input.email || !input.name || !input.first_lastName || !input.second_lastName) {
-      setError("Por favor, complete todos los campos obligatorios.");
-      return;
-    }
-
-    if (!selectedUser && (!input.password || input.password !== input.confirmation_password)) {
-      setError("Las contraseñas no coinciden o están vacías.");
-      return;
-    }
-
-    if (selectedUser && input.password && input.password !== input.confirmation_password) {
-      setError("Las contraseñas no coinciden.");
+    if (!validateForm()) {
       return;
     }
 
@@ -159,7 +207,6 @@ const AddUsers = ({ selectedUser, setSelectedUser, onUserAdded }) => {
                 value={input.password}
                 onChange={handleInput}
                 placeholder="Password"
-                required={!selectedUser}
               />
             </label>
             <label htmlFor='confirmation_password' className='user_label'>Confirmar contraseña
@@ -171,7 +218,6 @@ const AddUsers = ({ selectedUser, setSelectedUser, onUserAdded }) => {
                 value={input.confirmation_password}
                 onChange={handleInput}
                 placeholder="Confirmar Password"
-                required={!selectedUser}
               />
             </label>
           </fieldset>
@@ -275,8 +321,8 @@ const AddUsers = ({ selectedUser, setSelectedUser, onUserAdded }) => {
           </div>
           <button type="submit" className="createSchool_submit btn"><i className='fi fi-rr-plus'></i>{selectedUser ? "Actualizar Usuario" : "Registrar Usuario"}</button>
           {selectedUser && <button type="button" className="btn light" onClick={() => setSelectedUser(null)}>Cancelar</button>}
-          {error && <p role="alert" style={{ color: "red" }}>{error}</p>}
-          {successMessage && <p role="alert" style={{ color: "green" }}>{successMessage}</p>}
+          {error && <p role="alert" className="error-message">{error}</p>}
+          {successMessage && <p role="alert" className="success-message">{successMessage}</p>}
         </form>
       </section>
     </>
