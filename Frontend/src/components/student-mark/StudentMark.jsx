@@ -107,8 +107,8 @@ const StudentMark = () => {
                                           <td>{index + 1}</td>
                                           <td>{annotation.account?.account_number}</td>
                                           <td>{annotation.account?.name}</td>
-                                          <td>{annotation.debit}</td>
-                                          <td>{annotation.credit}</td>
+                                          <td>{annotation.debit} €</td>
+                                          <td>{annotation.credit} €</td>
                                         </tr>
                                       ))
                                     }

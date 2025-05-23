@@ -110,7 +110,8 @@ textarea {
 .statement-page__totals {
   display: flex;
   justify-content: space-around;
-  width: 300px;
+  width: auto;
+  gap: var(--gap-m);
 }
 
 .statement-page__entry {
@@ -153,9 +154,14 @@ textarea {
 
 .statement-page__annotation-row {
   display: grid;
-  grid-template-columns: 1fr 2fr 3fr 2fr 2fr 1fr;
+  grid-template-columns: 1fr 2fr 3fr 2fr 0.1fr 2fr 0.1fr 1fr;
   gap: 10px;
   align-items: center;
+}
+
+.statement-page__input--edit-solution:nth-child(5),
+.statement-page__input--edit-solution:nth-child(7) {
+  text-align: right;
 }
 
 .statement-page__input {
@@ -389,7 +395,7 @@ textarea {
   }
 
   .statement-page__annotation-row {
-    grid-template-columns: 1fr 2fr 2fr 2fr;
+    grid-template-columns: 1fr 2fr 2fr 0.1fr 2fr 0.1fr;
   }
 
   .statement-page__annotation-row span:nth-child(3),
@@ -398,7 +404,7 @@ textarea {
   }
 
   .statement-page__annotation-row input[id="number"],
-  .statement-page__annotation-row input[id="account_number"],
+  .statement-page__annotation-row input[id="account_name"],
   .statement-page__annotation-row input[id="debit"],
   .statement-page__annotation-row input[id="credit"] {
     width: 100%;

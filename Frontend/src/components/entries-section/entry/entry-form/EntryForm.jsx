@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import AccountService from '../../../../services/AccountService';
 import useAccountSelector from '../../../../hooks/useAccountSelector';
 import AccountSelectorModal from '../../../modal/AccountSelectionModal';
+import { formatNumber } from '../../../../utils/numberUtils';
 import './EntryForm.css';
 
 const EntryForm = ({ annotation, updateAnnotation, onDelete, exercise }) => {
@@ -10,6 +11,14 @@ const EntryForm = ({ annotation, updateAnnotation, onDelete, exercise }) => {
   const modalRef = useRef(null);
   const debounceTimeout = useRef(null);
   const accountSelector = useAccountSelector();
+
+  const handleBlur = (event) => {
+    const { name, value } = event.target;
+    if (name === 'debit' || name === 'credit') {
+      const formattedValue = formatNumber(value);
+      updateAnnotation({ ...annotation, [name]: formattedValue });
+    }
+  };
 
   const handleAccountSelect = (account) => {
     const updated = {
@@ -165,11 +174,13 @@ const EntryForm = ({ annotation, updateAnnotation, onDelete, exercise }) => {
               name='debit'
               placeholder='1000.00'
               onChange={handleChange}
+              onBlur={handleBlur}
               value={annotation.debit || ''}
               disabled={annotation.credit || exercise?.finished}
               pattern='[0-9]*[.,]?[0-9]*'
               inputMode='decimal'
             />
+            <span>€</span>
           </div>
           <div className='form_group'>
             <input
@@ -177,11 +188,13 @@ const EntryForm = ({ annotation, updateAnnotation, onDelete, exercise }) => {
               name='credit'
               placeholder='1000.00'
               onChange={handleChange}
+              onBlur={handleBlur}
               value={annotation.credit || ''}
               disabled={annotation.debit || exercise?.finished}
               pattern='[0-9]*[.,]?[0-9]*'
               inputMode='decimal'
             />
+            <span>€</span>
           </div>
         </div>
         <button
