@@ -25,12 +25,12 @@ const AccountsList = ({ newAcc }) => {
 
   useEffect(() => {
     retrieveAccounts(currentPage, searchAccount);
-  }, [newAcc, currentPage, searchAccount]);
+  }, [newAcc, currentPage]);
 
-  const retrieveAccounts = async (page, name) => {
+  const retrieveAccounts = async (page, search) => {
     setIsLoading(true);
     try {
-      const data = await AccountService.getAll(page, 10, name);
+      const data = await AccountService.getAll(page, 10, search);
       if (data) {
         setAccounts(data.accounts);
         setTotalPages(data.meta.total_pages);
@@ -61,21 +61,9 @@ const AccountsList = ({ newAcc }) => {
   }
 
   const handleSearchChange = (value) => {
-    const searchTerm = value;
-    setSearchAccount(searchTerm);
+    setSearchAccount(value);
     setCurrentPage(1);
-
-    if (!searchTerm) {
-      retrieveAccounts();
-      return;
-    }
-
-    setAccounts((prevAccounts) =>
-      prevAccounts.filter((acc) => {
-        acc.name.toLowerCase().includes(searchTerm);
-        setCurrentPage(1);
-      })
-    );
+    retrieveAccounts(1, value);
   };
 
   const openEditModal = (id) => {
