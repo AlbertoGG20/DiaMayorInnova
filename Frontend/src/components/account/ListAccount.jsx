@@ -125,7 +125,7 @@ const AccountsList = ({ newAcc }) => {
                   { field: 'account_number', sortable: true },
                   { field: 'name', sortable: true },
                   { field: 'description', sortable: true },
-                  { field: 'accounting_plan_id', sortable: true },
+                  { field: 'accounting_plan', sortable: true, render: (account) => account.accounting_plan?.acronym || '-' },
                   { field: 'charge',},
                   { field: 'credit'}
                 ]}
