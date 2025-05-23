@@ -26,7 +26,7 @@ class AccountsController < ApplicationController
     paginated_accounts = accounts.page(params[:page]).per(params[:per_page] || 10)
 
     render json: {
-      accounts: paginated_accounts,
+      accounts: paginated_accounts.as_json(include: { accounting_plan: { only: [:id, :acronym] } }),
       meta: {
         current_page: paginated_accounts.current_page,
         total_pages: paginated_accounts.total_pages,
