@@ -210,6 +210,8 @@ const AccountingPlansList = ({ newPGC }) => {
                   <th>Nº Cuenta</th>
                   <th>Nombre</th>
                   <th>Descripción</th>
+                  <th>Cargo</th>
+                  <th>Crédito</th>
                 </tr>
               </thead>
               <tbody>
@@ -218,6 +220,8 @@ const AccountingPlansList = ({ newPGC }) => {
                     <td>{account.account_number}</td>
                     <td>{account.name}</td>
                     <td>{account.description}</td>
+                    <td>{account.charge}</td>
+                    <td>{account.credit}</td>
                   </tr>
                 ))}
               </tbody>
