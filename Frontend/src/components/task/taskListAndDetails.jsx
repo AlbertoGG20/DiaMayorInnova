@@ -171,7 +171,7 @@ const TaskListAndDetails = () => {
             <header>
               <div className="task-list__header">
                 <div className="task-list__title-container">
-                  <h2 className="task-list__title">
+                  <h2 className="task-list__title" title="Una Tarea es un Supuesto">
                     {showActiveTasks ? "Tareas Activas" : "Tareas Cerradas"}
                   </h2>
                   <div className="task-list__filter">

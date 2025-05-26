@@ -196,7 +196,7 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
 
   return (
     <>
-      <h2 className="statement-page__form--header">Crear Enunciado</h2>
+      <h2 className="statement-page__form--header" title="Una Enunciado es una Operación Económica">Crear Enunciado</h2>
       <form className="statement-page__form--form" onSubmit={handleSubmit}>
         <div className="statement-page__form--content">
           <label className="statement-page__label--definition" htmlFor="definition">Definición:</label>
