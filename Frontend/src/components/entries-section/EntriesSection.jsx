@@ -9,10 +9,11 @@ import Entry from './entry/Entry'
 import './EntriesSection.css'
 
 const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComplete, exercise, examStarted, onEntriesChange }) => {
-  const [statementData, setStatementData] = useState({});
-  const [allStatementsData, setAllStatementsData] = useState({});
-  const confirmModalRef = useRef(null);
   const navigate = useNavigate();
+  const confirmModalRef = useRef(null);
+
+  const [allStatementsData, setAllStatementsData] = useState({});
+  const [statementData, setStatementData] = useState({});
 
   const currentStatementData = selectedStatement ? statementData[selectedStatement.id] : null;
   const entries = useMemo(() => currentStatementData?.entries || [], [currentStatementData]);
