@@ -129,7 +129,7 @@ const TaskForm = ({
             // className="task-page__button--form"
             className="btn light"
             onClick={() => navigate("/add-statements")}
-            title="Una Enunciado es una Operación Económica"
+            title="Un Enunciado es una Operación Económica"
           >
             <i className="fi fi-rr-arrow-right" ></i>
             Ir a enunciados

@@ -94,7 +94,7 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
           errors += `La fecha del asiento de la solución ${solutionIndex + 1} es obligatoria.\n`;
         }
 
-        (entry.annotations || []).forEach((annotation, annotationIndex) => {      
+        (entry.annotations || []).forEach((annotation, annotationIndex) => {
           let credit = Number(annotation.credit) || 0;
           let debit = Number(annotation.debit) || 0;
 
@@ -196,7 +196,7 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
 
   return (
     <>
-      <h2 className="statement-page__form--header" title="Una Enunciado es una Operación Económica">Crear Enunciado</h2>
+      <h2 className="statement-page__form--header" title="Un Enunciado es una Operación Económica">Crear Enunciado</h2>
       <form className="statement-page__form--form" onSubmit={handleSubmit}>
         <div className="statement-page__form--content">
           <label className="statement-page__label--definition" htmlFor="definition">Definición:</label>
