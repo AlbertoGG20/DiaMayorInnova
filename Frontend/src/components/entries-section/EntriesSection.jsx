@@ -1,19 +1,19 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { getCurrentDate } from '../../utils/dateUtils'
+import { generateUid } from '../../utils/generateUid'
 import taskSubmitService from '../../services/taskSubmitService'
+import Modal from '../modal/Modal';
 import EntryHeader from './entry-header/EntryHeader'
 import Entry from './entry/Entry'
-import Modal from '../modal/Modal';
-import { useNavigate } from 'react-router-dom'
-import "./EntriesSection.css"
-import { getCurrentDate } from '../../utils/dateUtils'
+import './EntriesSection.css'
 
 const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComplete, exercise, examStarted, onEntriesChange }) => {
-  const [statementData, setStatementData] = useState({});
-  const [allStatementsData, setAllStatementsData] = useState({});
-  const accounts = exercise?.chartOfAccounts || [];
-  const confirmModalRef = useRef(null);
   const navigate = useNavigate();
-  const [entriesData, setEntriesData] = useState([]);
+  const confirmModalRef = useRef(null);
+
+  const [allStatementsData, setAllStatementsData] = useState({});
+  const [statementData, setStatementData] = useState({});
 
   const currentStatementData = selectedStatement ? statementData[selectedStatement.id] : null;
   const entries = useMemo(() => currentStatementData?.entries || [], [currentStatementData]);
@@ -34,11 +34,11 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
           };
         }) || [];
 
-        const annotations = mark.student_entries?.flatMap(entry => 
+        const annotations = mark.student_entries?.flatMap(entry =>
           entry.student_annotations?.map(anno => ({
             ...anno,
             id: anno.id,
-            uid: anno.uid || `anno-${anno.id || Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            uid: anno.uid || generateUid(`anno-${anno.id || Date.now()}`),
             student_entry_id: entriesMap[entry.id],
           })) || []
         );
@@ -62,17 +62,17 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
           entry_date: entry.entry_date
         })) || [];
 
-        const annotations = mark.student_entries?.flatMap(entry => 
+        const annotations = mark.student_entries?.flatMap(entry =>
           entry.student_annotations?.map(anno => ({
             id: anno.id,
-            uid: anno.uid || `anno-${anno.id || Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            uid: anno.uid || generateUid(`anno-${anno.id || Date.now()}`),
             number: anno.number,
             student_entry_id: entry.entry_number,
-            account_number: anno.account?.account_number || "",
-            account_name: anno.account_name || anno.account?.name || "",
-            account_id: anno.account_id || "",
-            debit: anno.debit || "",
-            credit: anno.credit || ""
+            account_number: anno.account?.account_number || '',
+            account_name: anno.account_name || anno.account?.name || '',
+            account_id: anno.account_id || '',
+            debit: anno.debit || '',
+            credit: anno.credit || ''
           })) || []
         );
 
@@ -98,20 +98,20 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
   const addEntry = useCallback((statementId) => {
     // Obtener todas las entradas de todos los statements
     const allEntries = Object.values(statementData).flatMap(data => data.entries || []);
-    
+
     // Encontrar el número máximo de entrada
-    const maxEntryNumber = allEntries.length > 0 
-      ? Math.max(...allEntries.map(e => e.entry_number)) 
+    const maxEntryNumber = allEntries.length > 0
+      ? Math.max(...allEntries.map(e => e.entry_number))
       : 0;
-    
+
     // El nuevo número de entrada será el máximo + 1
     const newEntryNumber = maxEntryNumber + 1;
-  
+
     const newEntry = {
       entry_number: newEntryNumber,
       entry_date: getCurrentDate(),
     };
-  
+
     setStatementData(prev => ({
       ...prev,
       [statementId]: {
@@ -123,50 +123,75 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
 
   const removeEntry = useCallback((entryNumber) => {
     if (!selectedStatement) return;
-  
+
     setStatementData((prevData) => {
-      const updatedEntries = prevData[selectedStatement.id].entries.filter(
-        (entry) => entry.entry_number !== entryNumber
+      const currentStatement = prevData[selectedStatement.id];
+      if (!currentStatement) return prevData;
+
+      const { entries, annotations } = currentStatement;
+      const updatedEntries = entries.filter(
+        entry => entry.entry_number !== entryNumber
       );
-  
+      const updatedAnnotations = annotations.filter(
+        annotation => annotation.student_entry_id !== entryNumber
+      );
+
       return {
         ...prevData,
         [selectedStatement.id]: {
           entries: updatedEntries,
-          annotations: prevData[selectedStatement.id].annotations.filter(
-            (annotation) => annotation.student_entry_id !== entryNumber
-          ),
+          annotations: updatedAnnotations,
         },
       };
     });
   }, [selectedStatement]);
 
   const updateEntryDate = useCallback((statementId, entryNumber, newDate) => {
-    setStatementData((prevData) => ({
-      ...prevData,
-      [statementId]: {
-        ...prevData[statementId],
-        entries: prevData[statementId].entries.map((entry) =>
-          entry.entry_number === entryNumber
-            ? { ...entry, entry_date: newDate }
-            : entry
-        ),
-      },
-    }));
-  }, []);
+    setStatementData((prevData) => {
+      const updatedData = {
+        ...prevData,
+        [statementId]: {
+          ...prevData[statementId],
+          entries: prevData[statementId].entries.map((entry) =>
+            entry.entry_number === entryNumber
+              ? { ...entry, entry_date: newDate }
+              : entry
+          ),
+        },
+      };
+
+      // Notificar cambios si hay un callback
+      if (onEntriesChange) {
+        const formattedEntries = updatedData[statementId].entries
+          .filter(entry => !entry._destroy)
+          .map(entry => ({
+            ...entry,
+            annotations: updatedData[statementId].annotations
+              .filter(anno => anno.student_entry_id === entry.entry_number && !anno._destroy)
+              .map(anno => ({
+                ...anno,
+                _destroy: anno._destroy || false
+              }))
+          }));
+        onEntriesChange(formattedEntries);
+      }
+
+      return updatedData;
+    });
+  }, [onEntriesChange]);
 
   const addAnnotation = useCallback((statementId, entryId) => {
     if (!selectedStatement) return;
-  
+
     const newAnnotation = {
-      uid: `anno-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      uid: generateUid(`anno-${Date.now()}`),
       student_entry_id: entryId,
-      account_number: "",
-      account_name: "",
-      debit: "",
-      credit: "",
+      account_number: '',
+      account_name: '',
+      debit: '',
+      credit: '',
     };
-  
+
     setStatementData((prevData) => ({
       ...prevData,
       [statementId]: {
@@ -179,7 +204,7 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
 
   const updateAnnotation = useCallback((statementId, annotationUid, updatedAnnotation) => {
     if (!selectedStatement) return;
-  
+
     setStatementData((prevData) => ({
       ...prevData,
       [statementId]: {
@@ -195,13 +220,13 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
 
   const handleDeleteAnnotation = useCallback((annotationUid) => {
     if (!selectedStatement) return;
-  
+
     setStatementData((prevData) => ({
       ...prevData,
       [selectedStatement.id]: {
         entries: entries,
-        annotations: prevData[selectedStatement.id].annotations.map(annotation => 
-          annotation.uid === annotationUid 
+        annotations: prevData[selectedStatement.id].annotations.map(annotation =>
+          annotation.uid === annotationUid
             ? { ...annotation, _destroy: true }
             : annotation
         )
@@ -213,7 +238,7 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
     if (!selectedStatement) return;
 
     const currentData = { entries, annotations };
-    
+
     setStatementData(prevData => ({
       ...prevData,
       [selectedStatement.id]: currentData
@@ -240,14 +265,14 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
 
   const handleFinalSubmit = useCallback(() => {
     if (!exercise || !exercise.id) {
-      console.error("El objeto exercise no está definido correctamente:", exercise);
+      console.error('El objeto exercise no está definido correctamente:', exercise);
       return;
     }
 
     const updatedStatementsData = { ...allStatementsData, ...statementData };
 
     if (Object.keys(updatedStatementsData).length === 0) {
-      console.error("❌ Error: No hay datos en updatedStatementsData", updatedStatementsData);
+      console.error('❌ Error: No hay datos en updatedStatementsData', updatedStatementsData);
       return;
     }
 
@@ -312,24 +337,24 @@ const EntriesSection = ({ savedMarks, selectedStatement, taskId, onStatementComp
       </div>
       <div className='modes-entries-container--buttons'>
         <button onClick={handleSubmitStatement} className='btn light' disabled={!examStarted || exercise.finished}>
-          {exercise?.task?.is_exam ? "Guardar y Continuar" : "Guardar Progreso"}
+          {exercise?.task?.is_exam ? 'Guardar y Continuar' : 'Guardar Progreso'}
         </button>
         <button onClick={() => confirmModalRef.current?.showModal()} className='btn' disabled={!examStarted || exercise.finished}>
-          {exercise?.task?.is_exam ? "Enviar Examen" : "Finalizar Tarea"}
+          {exercise?.task?.is_exam ? 'Enviar Examen' : 'Finalizar Tarea'}
         </button>
       </div>
 
       <Modal
         ref={confirmModalRef}
-        modalTitle="Confirmar envío"
+        modalTitle='Confirmar envío'
         showButton={false}
       >
         <p>¿Estás seguro de que quieres enviar la tarea? No podrás hacer más cambios después.</p>
-        <div className="modal-buttons">
-          <button className="btn light" onClick={() => confirmModalRef.current?.close()}>
+        <div className='modal-buttons'>
+          <button className='btn light' onClick={() => confirmModalRef.current?.close()}>
             Cancelar
           </button>
-          <button className="btn" onClick={handleFinalSubmit}>
+          <button className='btn' onClick={handleFinalSubmit}>
             Confirmar
           </button>
         </div>

@@ -21,27 +21,9 @@
   margin-bottom: var(--gap-xxs);
 }
 
-/* ERROR 
-.error-message {
-  color: var(--Color-red-600);
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-} */
-
 .task-page__input.error {
   border: 1px solid var(--Color-red-600);
   font-family: var(--font-family)
-}
-
-/* Estilo para el mensaje de error genérico */
-.task-page__error-message {
-  color: var(--Color-red-600);
-  font-size: var(--text-desktop-small);
-  font-weight: bold;
-  margin-top: var(--gap-s);
-  text-align: center;
-  display: none;
-  /* Se ocultará hasta que haya un error */
 }
 
 .task-page__form {

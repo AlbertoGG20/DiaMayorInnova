@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { formatCurrency } from '../../utils/formatCurrency'
 import './LedgerBook.css';
 
 const LedgerBook = ({ entries, title = "Libro Mayor" }) => {
@@ -9,7 +10,7 @@ const LedgerBook = ({ entries, title = "Libro Mayor" }) => {
 
   const processedData = useMemo(() => {
     const accountsMap = new Map();
-    
+
     entries.forEach(entry => {
       const validAnnotations = entry.annotations?.filter(anno => !anno._destroy) || [];
       validAnnotations.forEach((annotation, index) => {
@@ -36,14 +37,14 @@ const LedgerBook = ({ entries, title = "Libro Mayor" }) => {
     let accounts = Array.from(accountsMap.values()).map(account => {
       let totalDebit = 0;
       let totalCredit = 0;
-      
+
       account.entries.forEach(entry => {
         totalDebit += entry.debit;
         totalCredit += entry.credit;
       });
 
       const balance = totalDebit - totalCredit;
-      
+
       return {
         ...account,
         totalDebit,
@@ -77,7 +78,7 @@ const LedgerBook = ({ entries, title = "Libro Mayor" }) => {
         return 0;
       })
     }));
-    
+
     // Calcular totales generales
     const totalDebit = accounts.reduce((sum, acc) => sum + acc.totalDebit, 0);
     const totalCredit = accounts.reduce((sum, acc) => sum + acc.totalCredit, 0);
@@ -96,17 +97,10 @@ const LedgerBook = ({ entries, title = "Libro Mayor" }) => {
     }));
   };
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('es-ES', {
-      style: 'currency',
-      currency: 'EUR'
-    }).format(amount);
-  };
-
   const getSortIcon = (key) => {
     if (sortConfig.key !== key) return <i className="fi fi-rr-angle-small-down sort-icon-inactive" />;
-    return sortConfig.direction === 'asc' 
-      ? <i className="fi fi-rr-angle-small-up" /> 
+    return sortConfig.direction === 'asc'
+      ? <i className="fi fi-rr-angle-small-up" />
       : <i className="fi fi-rr-angle-small-down" />;
   };
 
@@ -133,22 +127,22 @@ const LedgerBook = ({ entries, title = "Libro Mayor" }) => {
               <tr className="ledger-book-account-totals">
                 <td>{account.accountNumber}</td>
                 <td></td>
-                <td>{formatCurrency(account.totalDebit)}</td>
-                <td>{formatCurrency(account.totalCredit)}</td>
-                <td className={account.balance < 0 ? 'ledger-book-negative' : ''}>
+                <td className='money-cell'>{formatCurrency(account.totalDebit)}</td>
+                <td className='money-cell'>{formatCurrency(account.totalCredit)}</td>
+                <td className={`money-cell ${account.balance < 0 ? 'ledger-book-negative' : ''}`}>
                   {formatCurrency(account.balance)}
                 </td>
               </tr>
               {account.entries.map((entry) => (
-                <tr 
-                  key={`${account.accountNumber}-${entry.entryNumber}-${entry.entryIndex}`} 
+                <tr
+                  key={`${account.accountNumber}-${entry.entryNumber}-${entry.entryIndex}`}
                   className="ledger-book-entry-row"
                 >
                   <td></td>
                   <td>{entry.entryNumber}</td>
-                  <td>{formatCurrency(entry.debit)}</td>
-                  <td>{formatCurrency(entry.credit)}</td>
-                  <td className={entry.debit - entry.credit < 0 ? 'ledger-book-negative' : ''}>
+                  <td className='money-cell'>{formatCurrency(entry.debit)}</td>
+                  <td className='money-cell'>{formatCurrency(entry.credit)}</td>
+                  <td className={`money-cell ${entry.credit < 0 ? 'ledger-book-negative' : ''}`}>
                     {formatCurrency(entry.debit - entry.credit)}
                   </td>
                 </tr>
@@ -159,9 +153,9 @@ const LedgerBook = ({ entries, title = "Libro Mayor" }) => {
         <tfoot>
           <tr>
             <th colSpan="2">Total General</th>
-            <th>{formatCurrency(processedData.totalDebit)}</th>
-            <th>{formatCurrency(processedData.totalCredit)}</th>
-            <th className={processedData.totalDebit - processedData.totalCredit < 0 ? 'ledger-book-negative' : ''}>
+            <th className='money-cell'>{formatCurrency(processedData.totalDebit)}</th>
+            <th className='money-cell'>{formatCurrency(processedData.totalCredit)}</th>
+            <th className={`money-cell ${processedData.totalDebit - processedData.totalCredit < 0 ? 'ledger-book-negative' : ''}`}>
               {formatCurrency(processedData.totalDebit - processedData.totalCredit)}
             </th>
           </tr>
