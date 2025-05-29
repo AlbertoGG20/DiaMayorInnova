@@ -3,6 +3,7 @@ import http from '../../http-common';
 import AccountService from '../../services/AccountService';
 import useAccountSelector from '../../hooks/useAccountSelector';
 import AccountSelectorModal from '../modal/AccountSelectionModal';
+import { formatNumber } from '../../utils/numberUtils';
 
 const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions, setSolutions }) => {
   const annotation = solutions[solutionIndex].entries[entryIndex].annotations[annotationIndex];
@@ -29,6 +30,16 @@ const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions,
       fetchAccountDataById();
     }
   }, [annotation.account_id]);
+  
+  const handleBlur = (event) => {
+    const { name, value } = event.target;
+    if (name === 'debit' || name === 'credit') {
+      const formattedValue = formatNumber(value);
+      const updatedSolutions = [...solutions];
+      updatedSolutions[solutionIndex].entries[entryIndex].annotations[annotationIndex][name] = formattedValue;
+      setSolutions(updatedSolutions);
+    }
+  };
 
   const debounceTimeout = useRef(null);
 
@@ -170,20 +181,24 @@ const AnnotationForm = ({ solutionIndex, entryIndex, annotationIndex, solutions,
         value={annotation.debit || ''}
         disabled={!!annotation.credit}
         onChange={handleAnnotationChange}
+        onBlur={handleBlur}
         id='debit'
         className='statement-page__input--edit-solution'
         placeholder='Debe'
       />
+      <span>€</span>
       <input
         type='number'
         name='credit'
         value={annotation.credit || ''}
         disabled={!!annotation.debit}
         onChange={handleAnnotationChange}
+        onBlur={handleBlur}
         id='credit'
         className='statement-page__input--edit-solution'
         placeholder='Haber'
       />
+      <span>€</span>
       <button
         type='button'
         onClick={removeAnnotation}

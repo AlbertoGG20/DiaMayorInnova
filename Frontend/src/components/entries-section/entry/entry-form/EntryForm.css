@@ -68,6 +68,10 @@
 .form_group {
   font-size: var(--text-mobile-small);
 
+  >span {
+    margin-right: var(--gap-xxxs);
+  }
+
   >input {
     width: 100px;
     margin: 0;
@@ -124,8 +128,9 @@
 
 .form_group:nth-child(3) {
   >input {
-    margin-right: var(--gap-xxs);
+    margin-right: var(--gap-xxxs);
     width: 140px;
+    text-align: right;
 
     @container parent (width < 809px) {
       width: 120px;
@@ -145,8 +150,9 @@
 
 .form_group:nth-child(4) {
   >input {
-    margin-right: var(--gap-xxs);
+    margin-right: var(--gap-xxxs);
     width: 140px;
+    text-align: right;
 
     @container parent (width < 809px) {
       width: 120px;

@@ -165,10 +165,10 @@ const HelpSection = ({statementId}) => {
                                 <span className="help_section__account_name">{annotation.account?.name || ''}</span>
                               </div>
                               <div className="help_section__form_group help_section__debit_group">
-                                <span className="help_section__debit_value">{annotation.debit || ''}</span>
+                                <span className="help_section__debit_value">{annotation.debit || ''} €</span>
                               </div>
                               <div className="help_section__form_group help_section__credit_group">
-                                <span className="help_section__credit_value">{annotation.credit || ''}</span>
+                                <span className="help_section__credit_value">{annotation.credit || ''} €</span>
                               </div>
                             </div>
                           </div>

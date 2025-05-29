@@ -82,20 +82,20 @@ const RealTimeTrialBalance = ({ entries }) => {
               <td data-label="Orden">{row.orden}</td>
               <td data-label="Nº de cuenta">{row.account_number}</td>
               <td data-label="Nombre Cuenta">{row.account_name}</td>
-              <td data-label="Debe">{row.debe.toFixed(2)}</td>
-              <td data-label="Haber">{row.haber.toFixed(2)}</td>
-              <td data-label="Deudores">{row.deudor !== '' ? row.deudor.toFixed(2) : ''}</td>
-              <td data-label="Acreedores">{row.acreedor !== '' ? row.acreedor.toFixed(2) : ''}</td>
+              <td data-label="Debe">{row.debe.toFixed(2)} €</td>
+              <td data-label="Haber">{row.haber.toFixed(2)} €</td>
+              <td data-label="Deudores">{row.deudor !== '' ? row.deudor.toFixed(2) : ''} €</td>
+              <td data-label="Acreedores">{row.acreedor !== '' ? row.acreedor.toFixed(2) : ''} €</td>
             </tr>
           ))}
         </tbody>
         <tfoot>
           <tr>
             <th colSpan="3">Totales</th>
-            <th data-testid="total-debe">{totals.debe.toFixed(2)}</th>
-            <th data-testid="total-haber">{totals.haber.toFixed(2)}</th>
-            <th data-testid="total-deudores">{totals.deudor.toFixed(2)}</th>
-            <th data-testid="total-acreedores">{totals.acreedor.toFixed(2)}</th>
+            <th data-testid="total-debe">{totals.debe.toFixed(2)} €</th>
+            <th data-testid="total-haber">{totals.haber.toFixed(2)} €</th>
+            <th data-testid="total-deudores">{totals.deudor.toFixed(2)} €</th>
+            <th data-testid="total-acreedores">{totals.acreedor.toFixed(2)} €</th>
           </tr>
         </tfoot>
       </table>

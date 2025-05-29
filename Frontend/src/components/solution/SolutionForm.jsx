@@ -97,11 +97,11 @@ const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
                   }
                   ></i>
                 </span>
-                <span className="statement-page__entry-date">Fecha: {entry.entry_date || "Sin fecha"}</span>
+                <span className="statement-page__entry-date"><strong>Fecha:</strong> {entry.entry_date || "Sin fecha"}</span>
               </div>
               <button
                 type="button"
-                className="statement-page__button--remove-entry btn__icon"
+                className="statement-page__button--remove-entry statement-page__button-delete btn__icon"
                 onClick={() => removeEntry(entryIndex)}
               >
                 <i className="fi fi-rr-trash"></i>
@@ -135,8 +135,8 @@ const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
           </button> */}
         </div>
         <div className="statement-page__totals">
-          <span>Total Debe: {totals.debit.toFixed(2)}</span>
-          <span>Total Haber: {totals.credit.toFixed(2)}</span>
+          <span><strong>Total Debe:</strong> {totals.debit.toFixed(2)}</span>
+          <span><strong>Total Haber:</strong> {totals.credit.toFixed(2)}</span>
         </div>
       </div>
     </>

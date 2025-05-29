@@ -105,6 +105,16 @@
   & th {
     text-align: left;
   }
+
+  & th:nth-child(4),
+  th:nth-child(5) {
+    text-align: right;
+  }
+
+  & td:nth-child(4),
+  td:nth-child(5) {
+    text-align: right;
+  }
 }
 
 .exercise_modal__container {

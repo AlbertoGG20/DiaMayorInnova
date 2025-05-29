@@ -1,7 +1,17 @@
 import AnnotationForm from "../annotation/AnnotationForm.jsx";
 import { getCurrentDate } from "../../utils/dateUtils";
+import { useEffect } from 'react';
 
 const EntryForm = ({ solutionIndex, entry, entryIndex, solutions, setSolutions }) => {
+  useEffect(() => {
+    if (!entry.entry_date) {
+      const currentDate = getCurrentDate();
+      const updatedSolutions = [...solutions];
+      updatedSolutions[solutionIndex].entries[entryIndex].entry_date = currentDate;
+      setSolutions(updatedSolutions);
+    }
+  }, []);
+
   const handleEntryChange = (event) => {
     if (!event.target || !event.target.name) {
       console.error("Error: event.target o event.target.name no están definidos");
