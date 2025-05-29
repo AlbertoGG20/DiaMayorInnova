@@ -1,90 +1,87 @@
-import React, { useEffect, useState, useRef } from 'react'
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import AccountService from '../../services/AccountService';
-import "./Account.css";
-import Account from "./Account";
+import ConfirmDeleteModal from '../modal/ConfirmDeleteModal';
 import Modal from '../modal/Modal';
+import PaginationMenu from '../pagination-menu/PaginationMenu';
 import { SearchBar } from '../search-bar/SearchBar';
 import Table from '../table/Table';
-import PaginationMenu from '../pagination-menu/PaginationMenu';
-import ConfirmDeleteModal from '../modal/ConfirmDeleteModal';
+import Account from './Account';
+import './Account.css';
 
-const AccountsList = ({ newAcc }) => {
-  const [accounts, setAccounts] = useState([]);
-  const [selectedAccountId, setSelectedAccountId] = useState([]);
+const AccountsList = ({ newAccount }) => {
   const modalRef = useRef(null); // Referencia para la modal
-  const [currentAccount, setCurrentAccount] = useState(null);
-  const [currentIndex, setCurrentIndex] = useState(-1);
-  const [searchAccount, setSearchAccount] = useState("");
-  const navigate = useNavigate();
+  const [accounts, setAccounts] = useState([]);
+  const [selectedAccountId, setSelectedAccountId] = useState(undefined);
+  const [searchAccount, setSearchAccount] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [accountToDelete, setAccountToDelete] = useState(null);
+  const [deleteModalData, setDeleteModalData] = useState({
+    title: '',
+    message: '',
+    buttonStatus: 'default',
+  });
+
+  const retrieveAccounts = useCallback(async (page, search) => {
+    const data = await AccountService.getAll(page, 10, search);
+    if (data) {
+      setAccounts(data.accounts);
+      setTotalPages(data.meta.total_pages);
+    }
+  }, []);
 
   useEffect(() => {
-    retrieveAccounts(currentPage, searchAccount);
-  }, [newAcc, currentPage]);
-
-  const retrieveAccounts = async (page, search) => {
-    setIsLoading(true);
-    try {
-      const data = await AccountService.getAll(page, 10, search);
-      if (data) {
-        setAccounts(data.accounts);
-        setTotalPages(data.meta.total_pages);
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const setActiveAccount = (account, index) => {
-    setCurrentAccount(account);
-    setCurrentIndex(index);
-  }
-
-  const deleteAccount = (id) => {
-    AccountService.remove(id)
-      .then((response) => {
-        retrieveAccounts();
-        setCurrentAccount(null);
-        setCurrentIndex(-1);
-        navigate("/accounts/");
-      })
-      .catch((e) => {
-        console.log(e)
-      });
-  }
+    retrieveAccounts(currentPage, searchAccount)
+  }, [newAccount, currentPage, searchAccount, retrieveAccounts]);
 
   const handleSearchChange = (value) => {
     setSearchAccount(value);
     setCurrentPage(1);
-    retrieveAccounts(1, value);
   };
 
   const openEditModal = (id) => {
     setSelectedAccountId(id);
     modalRef.current?.showModal();
-  }
-
-  const closeEditModal = () => {
-    setSelectedAccountId(null);
-    modalRef.current?.close();
   };
 
-  const handleSaveSuccess = () => {
-    retrieveAccounts();
-  };
+  const handleEditSaveSuccess = useCallback(() => {
+    retrieveAccounts(currentPage, searchAccount);
+  }, [currentPage, searchAccount]);
+
+  const closeEditModal = () => setSelectedAccountId(null);
 
   const openDeleteModal = (accountId) => {
     const account = accounts.find(s => s.id === accountId);
     setAccountToDelete(account);
+    setDeleteModalData({
+      title: '¿Estás seguro de que deseas eliminar este enunciado?',
+      message: `La cuenta llamada '${account.name}' será eliminada permanentemente.`,
+      buttonStatus: 'default',
+    });
     setIsDeleteModalOpen(true);
   };
+
+  const deleteAccount = useCallback(async (id) => {
+    const response = await AccountService.remove(id);
+
+    if (response) {
+      retrieveAccounts(currentPage, searchAccount);
+      setDeleteModalData({
+        title: 'Cuenta eliminada',
+        message: `Se ha eliminado la cuenta llamada '${accountToDelete.name}'.`,
+        buttonStatus: 'close',
+      });
+      setAccountToDelete(null);
+    }
+    else {
+      setDeleteModalData({
+        title: 'No se ha podido eliminar la cuenta',
+        message: `Revise que la cuenta '${accountToDelete.name}' no tenga ninguna anotación asociada.`,
+        buttonStatus: 'close',
+      });
+    }
+  }, [currentPage, searchAccount, accountToDelete]);
 
   return (
     <>
@@ -104,7 +101,7 @@ const AccountsList = ({ newAcc }) => {
               <p>No hay cuentas disponibles</p>
             ) : (
               <Table
-                titles={["Nº Cuenta", "Nombre", "Descripción", "PGC", "Cargo", "Abono", "Acciones"]}
+                titles={['Nº Cuenta', 'Nombre', 'Descripción', 'PGC', 'Cargo', 'Abono', 'Acciones']}
                 data={accounts}
                 actions={true}
                 openModal={openEditModal}
@@ -126,23 +123,22 @@ const AccountsList = ({ newAcc }) => {
             totalPages={totalPages}
           />
         </div>
-
       </section>
 
-      <Modal ref={modalRef} modalTitle="Editar Cuenta" showButton={false}>
+      <Modal ref={modalRef} modalTitle='Editar Cuenta' showButton={false} onCloseModal={closeEditModal}>
         {selectedAccountId && (
           <Account
             id={selectedAccountId}
-            onSaveSuccess={handleSaveSuccess}
-            onCloseModal={closeEditModal}
+            onSaveSuccess={handleEditSaveSuccess}
           />
         )}
       </Modal>
 
       <ConfirmDeleteModal
         isOpen={isDeleteModalOpen}
-        title="¿Estás seguro de que deseas eliminar este enunciado?"
-        message={`La cuenta llamada "${accountToDelete?.name}" será eliminado permanentemente.`}
+        title={deleteModalData.title}
+        message={deleteModalData.message}
+        deleteModalButtonStatus={deleteModalData.buttonStatus}
         onDelete={() => deleteAccount(accountToDelete?.id)}
         onClose={() => setIsDeleteModalOpen(false)}
       />
