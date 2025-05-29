@@ -1,23 +1,23 @@
-import React, { useEffect, useState } from 'react'
-import AccountDataService from '../../services/AccountService';
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
-import "./Account.css";
 import AccountingPlanService from '../../services/AccountingPlanService';
+import AccountDataService from '../../services/AccountService';
+import './Account.css';
 
-const AddAccount = ({ setNewAcc }) => {
+const AddAccount = ({ setNewAccount }) => {
   const initialAccountState = {
     id: null,
     account_number: 0,
-    description: "",
+    description: '',
     accounting_plan_id: 0,
-    name: "",
-    charge: "",
-    credit: ""
+    name: '',
+    charge: '',
+    credit: '',
   };
 
   const [account, setAccount] = useState(initialAccountState);
   const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [plans, setPlans] = useState([]);
 
   const handleInputChange = event => {
@@ -28,24 +28,24 @@ const AddAccount = ({ setNewAcc }) => {
 
   const validateForm = () => {
     if (!account.name || !account.account_number || !account.description || !account.accounting_plan_id) {
-      setError("Todos los campos son obligatorios y deben tener valores válidos.");
+      setError('Todos los campos son obligatorios y deben tener valores válidos.');
       return false;
     };
-    setError("")
+    setError('')
     return true;
   }
 
 
   const saveAccount = () => {
-    setNewAcc(false);
+    setNewAccount(false);
     if (validateForm()) {
       let data = {
         name: account.name.trim(),
         account_number: account.account_number,
         description: account.description.trim(),
         accounting_plan_id: account.accounting_plan_id,
-        charge: account.charge?.trim() || "",
-        credit: account.credit?.trim() || ""
+        charge: account.charge?.trim() || '',
+        credit: account.credit?.trim() || ''
       };
 
       AccountDataService.create(data)
@@ -56,14 +56,14 @@ const AddAccount = ({ setNewAcc }) => {
             account_number: parseInt(response.data.account_number),
             description: response.data.description.trim(),
             accounting_plan_id: parseInt(response.data.accounting_plan_id),
-            charge: response.data.charge ?? "",
-            credit: response.data.credit ?? ""
+            charge: response.data.charge ?? '',
+            credit: response.data.credit ?? ''
           })
-          setNewAcc(true);
+          setNewAccount(true);
         })
         .catch(e => {
           console.error(e);
-          setError("Hubo un problema al guardar la cuenta")
+          setError('Hubo un problema al guardar la cuenta')
         });
     };
   };
@@ -72,7 +72,7 @@ const AddAccount = ({ setNewAcc }) => {
   const newAccount = () => {
     setAccount(initialAccountState);
     setSubmitted(false);
-    setError("");
+    setError('');
   };
 
   useEffect(() => {
@@ -85,7 +85,7 @@ const AddAccount = ({ setNewAcc }) => {
         }
       })
       .catch((error) => {
-        console.error("Error al obtener los planes contables:", error);
+        console.error('Error al obtener los planes contables:', error);
         setPlans([]);
       });
   }, []);
@@ -96,8 +96,8 @@ const AddAccount = ({ setNewAcc }) => {
       {submitted ? (
         <div>
           <h4>Se ha enviado correctamente</h4>
-          <button className="account__button" onClick={newAccount}>Añadir otra cuenta</button>
-          <button><Link to={"/accounts"}>Atrás</Link></button>
+          <button className='account__button' onClick={newAccount}>Añadir otra cuenta</button>
+          <button><Link to={'/accounts'}>Atrás</Link></button>
         </div>
       ) : (
         <>
@@ -109,7 +109,7 @@ const AddAccount = ({ setNewAcc }) => {
                   <input
                     className='account__input'
                     placeholder='Nº cuenta'
-                    type="number"
+                    type='number'
                     id='account_number'
                     required
                     value={account.account_number}
@@ -124,7 +124,7 @@ const AddAccount = ({ setNewAcc }) => {
                   <input
                     className='account__input'
                     placeholder='Nombre'
-                    type="text"
+                    type='text'
                     id='name'
                     required
                     value={account.name}
@@ -138,7 +138,7 @@ const AddAccount = ({ setNewAcc }) => {
                 <label>Plan de cuentas
                   <select
                     className='account__input'
-                    type="text"
+                    type='text'
                     id='accounting_plan_id'
                     required
                     value={account.accounting_plan_id}
@@ -162,7 +162,7 @@ const AddAccount = ({ setNewAcc }) => {
                   <input
                     className='account__input'
                     placeholder='Descripción'
-                    type="text"
+                    type='text'
                     id='description'
                     required
                     value={account.description}
@@ -179,7 +179,7 @@ const AddAccount = ({ setNewAcc }) => {
                   <input
                     className='account__input'
                     placeholder='Ej. Pago de servicios'
-                    type="text"
+                    type='text'
                     name='charge'
                     value={account.charge}
                     onChange={handleInputChange}
@@ -194,7 +194,7 @@ const AddAccount = ({ setNewAcc }) => {
                   <input
                     className='account__input'
                     placeholder='Ej. Ingreso mensual'
-                    type="text"
+                    type='text'
                     name='credit'
                     value={account.credit}
                     onChange={handleInputChange}
@@ -205,12 +205,12 @@ const AddAccount = ({ setNewAcc }) => {
 
             <div className='account__form--actions'>
               <div className='account__form--add'>
-                <button className="btn account__button" onClick={saveAccount}> <i className='fi-rr-plus' />Añadir cuenta</button>
+                <button className='btn account__button' onClick={saveAccount}> <i className='fi-rr-plus' />Añadir cuenta</button>
               </div>
             </div>
 
 
-            {error && <div className="account__error">{error}</div>}
+            {error && <div className='account__error'>{error}</div>}
 
           </div>
         </>
