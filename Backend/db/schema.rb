@@ -118,6 +118,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_15_125450) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "description"
+    t.integer "solution"
     t.bigint "solution_id"
     t.index ["account_id"], name: "index_help_examples_on_account_id"
     t.index ["solution_id"], name: "index_help_examples_on_solution_id"
