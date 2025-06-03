@@ -1,6 +1,5 @@
 import "./Table.css";
-import { useNavigate } from 'react-router-dom';
-import { useRef, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import React from 'react';
 
 const Table = ({

@@ -139,7 +139,7 @@ const StatementsList = forwardRef(({ onSelectStatement }, ref) => {
   return (
     <div className="statement-page__selection--content">
       <div className="statement-page__row" style={{ display: "flex", gap: "var(--gap-m)", alignItems: "center", width: "100%" }}>
-        <h2 className="statement-page__list--header">Enunciados</h2>
+        <h2 className="statement-page__list--header" title="Un Enunciado es una Operación Económica">Enunciados</h2>
       </div>
       {errorMessage && <div className="error-message">{errorMessage}</div>}
 
