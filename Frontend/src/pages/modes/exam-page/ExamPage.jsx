@@ -15,7 +15,6 @@ const ExamPage = () => {
   const [selectedStatement, setSelectedStatement] = useState(null);
   const [completedStatements, setCompletedStatements] = useState({});
   const [statementData, setStatementData] = useState({});
-  const [entries, setEntries] = useState([]);
   const modalNotAvailableRef = useRef(null);
   const modalTimeExpiredRef = useRef(null);
   const modalFinishedRef = useRef(null);
@@ -28,6 +27,8 @@ const ExamPage = () => {
     const remainingSeconds = timeInSeconds % 60;
     return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
   };
+
+  const isExamInProgress = examStarted && !exercise?.finished;
 
   useEffect(() => {
     const checkIfFinished = async () => {
@@ -97,11 +98,11 @@ const ExamPage = () => {
     };
 
     fetchExercise();
-  }, [exerciseId, navigate]);
+  }, [exerciseId]);
 
   useEffect(() => {
     const handleBeforeUnload = (e) => {
-      if (examStarted && !exercise?.finished) {
+      if (isExamInProgress) {
         const message = 'Estás en medio de un examen. Si sales, perderás tu progreso.';
         e.returnValue = message;
         return message;
@@ -126,7 +127,7 @@ const ExamPage = () => {
   };
 
   useEffect(() => {
-    if (examStarted && !exercise?.finished) {
+    if (isExamInProgress) {
       const handleVisibilityChange = () => {
         if (document.visibilityState === 'hidden') {
           modalExitWarningRef.current?.showModal();
@@ -136,7 +137,7 @@ const ExamPage = () => {
       document.addEventListener('visibilitychange', handleVisibilityChange);
       return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
     }
-  }, [examStarted, navigate, exercise?.finished]);
+  }, [isExamInProgress]);
 
   useEffect(() => {
     if (examStarted) {
@@ -155,11 +156,11 @@ const ExamPage = () => {
   }, [examStarted]);
 
   useEffect(() => {
-    if (timeRemaining === 0 && examStarted && !exercise?.finished) {
+    if (timeRemaining === 0 && isExamInProgress) {
       modalTimeExpiredRef.current?.showModal();
       navigate('/home');
     }
-  }, [timeRemaining, examStarted, navigate, exercise]);
+  }, [timeRemaining, isExamInProgress, navigate]);
 
   const startExam = async () => {
     if (!exercise?.task) return;
@@ -224,6 +225,7 @@ const ExamPage = () => {
   }, [selectedStatement]);
 
   if (!exercise) return <p>Cargando...</p>;
+
   const now = new Date();
   const openingDate = new Date(exercise.task.opening_date);
   const closingDate = new Date(exercise.task.closing_date);
