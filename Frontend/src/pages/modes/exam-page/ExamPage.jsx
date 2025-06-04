@@ -1,12 +1,10 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useState, useRef, useCallback } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import EntriesSection from '../../../components/entries-section/EntriesSection';
-import AuxSectionTwo from '../../../components/aux-section-two/AuxSectionTwo';
-import HelpSection from '../../../components/help-section/HelpSection';
-import userExerciseDataService from "../../../services/userExerciseDataService";
-import Modal from "../../../components/modal/Modal"
-import "./ExamPage.css";
+import userExerciseDataService from '../../../services/userExerciseDataService';
+import Modal from '../../../components/modal/Modal'
 import { AuxSection } from '../../../components/aux-section/AuxSection';
+import './ExamPage.css';
 
 const ExamPage = () => {
   const { exerciseId } = useParams();
@@ -17,7 +15,6 @@ const ExamPage = () => {
   const [selectedStatement, setSelectedStatement] = useState(null);
   const [completedStatements, setCompletedStatements] = useState({});
   const [statementData, setStatementData] = useState({});
-  const [entries, setEntries] = useState([]);
   const modalNotAvailableRef = useRef(null);
   const modalTimeExpiredRef = useRef(null);
   const modalFinishedRef = useRef(null);
@@ -31,6 +28,8 @@ const ExamPage = () => {
     return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
   };
 
+  const isExamInProgress = examStarted && !exercise?.finished;
+
   useEffect(() => {
     const checkIfFinished = async () => {
       try {
@@ -38,14 +37,14 @@ const ExamPage = () => {
         if (response?.exercise?.finished) {
           const now = new Date();
           const closingDate = new Date(response.exercise.task.closing_date);
-          
+
           if (now < closingDate) {
             modalTestSentRef.current?.showModal();
             return;
           }
         }
       } catch (error) {
-        console.error("Error verificando estado del examen:", error);
+        console.error('Error verificando estado del examen:', error);
       }
     };
     checkIfFinished();
@@ -57,7 +56,7 @@ const ExamPage = () => {
         const response = await userExerciseDataService.getById(exerciseId);
 
         if (!response || !response.exercise) {
-          throw new Error("Respuesta vacía o malformada");
+          throw new Error('Respuesta vacía o malformada');
         }
         setExercise(response.exercise);
         setStatements(response.exercise.task.statements || []);
@@ -75,14 +74,14 @@ const ExamPage = () => {
         if (exercise.finished) {
           const marks = exercise.marks || [];
           const formattedData = {};
-          
+
           marks.forEach(mark => {
             formattedData[mark.statement_id] = {
               entries: mark.student_entries?.map(entry => ({
                 entry_number: entry.entry_number,
                 entry_date: entry.entry_date
               })) || [],
-              annotations: mark.student_entries?.flatMap(entry => 
+              annotations: mark.student_entries?.flatMap(entry =>
                 entry.student_annotations?.map(anno => ({
                   ...anno,
                   student_entry_id: entry.entry_number
@@ -90,21 +89,21 @@ const ExamPage = () => {
               ) || []
             };
           });
-          
+
           setStatementData(formattedData);
         }
       } catch (err) {
-        console.error("Error fetching exercise:", err);
+        console.error('Error fetching exercise:', err);
       }
     };
 
     fetchExercise();
-  }, [exerciseId, navigate]);
+  }, [exerciseId]);
 
   useEffect(() => {
     const handleBeforeUnload = (e) => {
-      if (examStarted && !exercise?.finished) {
-        const message = "Estás en medio de un examen. Si sales, perderás tu progreso.";
+      if (isExamInProgress) {
+        const message = 'Estás en medio de un examen. Si sales, perderás tu progreso.';
         e.returnValue = message;
         return message;
       }
@@ -118,27 +117,27 @@ const ExamPage = () => {
     try {
       const response = await userExerciseDataService.finish(exerciseId);
       if (response && response.status === 200) {
-        console.log("Examen finalizado correctamente");
+        console.log('Examen finalizado correctamente');
       } else {
-        console.error("Error al finalizar el examen", response);
+        console.error('Error al finalizar el examen', response);
       }
     } catch (err) {
-      console.error("Error al finalizar el examen", err);
+      console.error('Error al finalizar el examen', err);
     }
   };
 
   useEffect(() => {
-    if (examStarted && !exercise?.finished) {
+    if (isExamInProgress) {
       const handleVisibilityChange = () => {
-        if (document.visibilityState === "hidden") {
+        if (document.visibilityState === 'hidden') {
           modalExitWarningRef.current?.showModal();
         }
       };
 
-      document.addEventListener("visibilitychange", handleVisibilityChange);
-      return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
     }
-  }, [examStarted, navigate, exercise?.finished]);
+  }, [isExamInProgress]);
 
   useEffect(() => {
     if (examStarted) {
@@ -157,11 +156,11 @@ const ExamPage = () => {
   }, [examStarted]);
 
   useEffect(() => {
-    if (timeRemaining === 0 && examStarted && !exercise?.finished) {
+    if (timeRemaining === 0 && isExamInProgress) {
       modalTimeExpiredRef.current?.showModal();
-      navigate("/home");
+      navigate('/home');
     }
-  }, [timeRemaining, examStarted, navigate, exercise]);
+  }, [timeRemaining, isExamInProgress, navigate]);
 
   const startExam = async () => {
     if (!exercise?.task) return;
@@ -184,10 +183,10 @@ const ExamPage = () => {
         setTimeRemaining(remaining);
         setExercise({ ...exercise, started: true });
       } else {
-        console.error("Error al iniciar el examen: ", response);
+        console.error('Error al iniciar el examen: ', response);
       }
     } catch (err) {
-      console.error("Error al iniciar el examen:", err);
+      console.error('Error al iniciar el examen:', err);
     }
   };
 
@@ -212,7 +211,7 @@ const ExamPage = () => {
               entry_number: entry.entry_number,
               entry_date: entry.entry_date
             })),
-            annotations: newEntries.flatMap(entry => 
+            annotations: newEntries.flatMap(entry =>
               entry.annotations.map(anno => ({
                 ...anno,
                 student_entry_id: entry.entry_number
@@ -226,6 +225,7 @@ const ExamPage = () => {
   }, [selectedStatement]);
 
   if (!exercise) return <p>Cargando...</p>;
+
   const now = new Date();
   const openingDate = new Date(exercise.task.opening_date);
   const closingDate = new Date(exercise.task.closing_date);
@@ -234,8 +234,8 @@ const ExamPage = () => {
   let availabilityMessage = '';
   if (!examAvailable) {
     availabilityMessage = now < openingDate
-      ? `La tarea estará disponible el ${openingDate?.toLocaleString?.() || "fecha no disponible"}`
-      : `La tarea cerró el ${closingDate?.toLocaleString?.() || "fecha no disponible"}`;
+      ? `La tarea estará disponible el ${openingDate?.toLocaleString?.() || 'fecha no disponible'}`
+      : `La tarea cerró el ${closingDate?.toLocaleString?.() || 'fecha no disponible'}`;
   }
 
   return (
@@ -244,8 +244,8 @@ const ExamPage = () => {
       <div className='modes_page_container--button'>
         {!examStarted && (
           <>
-            <button className="btn" onClick={startExam} disabled={!examAvailable}>
-              {exercise.finished ? "Examen enviado" : "Comenzar examen"}
+            <button className='btn' onClick={startExam} disabled={!examAvailable}>
+              {exercise.finished ? 'Examen enviado' : 'Comenzar examen'}
             </button>
             {!examAvailable && (
               <p className='exam-available'>
@@ -262,7 +262,7 @@ const ExamPage = () => {
         )}
 
         {examStarted && (
-          <div className="timer">
+          <div className='timer'>
             <p>Tiempo restante: {formatTime(timeRemaining)}</p>
           </div>
         )}
@@ -282,7 +282,7 @@ const ExamPage = () => {
         examStarted={examStarted || exercise?.finished}
         onSelectStatement={setSelectedStatement}
         helpAvailable={exercise.task.help_available}
-        entries={Object.values(statementData).flatMap(data => 
+        entries={Object.values(statementData).flatMap(data =>
           data.entries.map(entry => ({
             ...entry,
             annotations: data.annotations
@@ -293,68 +293,68 @@ const ExamPage = () => {
 
       <Modal
         ref={modalNotAvailableRef}
-        modalTitle="Examen terminado"
+        modalTitle='Examen terminado'
         showButton={false}
       >
         <p>Examen terminado.</p>
-        <button className="btn light" onClick={() => modalNotAvailableRef.current?.close()}>
+        <button className='btn light' onClick={() => modalNotAvailableRef.current?.close()}>
           Aceptar
         </button>
       </Modal>
 
       <Modal
         ref={modalTimeExpiredRef}
-        modalTitle="Tiempo agotado"
+        modalTitle='Tiempo agotado'
         showButton={false}
       >
         <p>El tiempo del examen ha expirado.</p>
-        <button className="btn light" onClick={() => modalTimeExpiredRef.current?.close()}>
+        <button className='btn light' onClick={() => modalTimeExpiredRef.current?.close()}>
           Aceptar
         </button>
       </Modal>
 
       <Modal
         ref={modalFinishedRef}
-        modalTitle="Examen completado"
+        modalTitle='Examen completado'
         showButton={false}
       >
         <p>Has completado todos los enunciados del examen.</p>
-        <button className="btn light" onClick={() => modalFinishedRef.current?.close()}>
+        <button className='btn light' onClick={() => modalFinishedRef.current?.close()}>
           Aceptar
         </button>
       </Modal>
 
       <Modal
         ref={modalTestSentRef}
-        modalTitle="Examen enviado"
+        modalTitle='Examen enviado'
         showButton={false}
         showCloseButton={false}
       >
         <p>Este examen ya ha sido enviado.</p>
-        <button className="btn-light" onClick={() => navigate("/home")}>
+        <button className='btn-light' onClick={() => navigate('/home')}>
           Volver al inicio
         </button>
       </Modal>
 
       <Modal
         ref={modalExitWarningRef}
-        modalTitle="Atención"
+        modalTitle='Atención'
         showButton={false}
       >
         <p>Si sales de la pestaña, perderás tu progreso y no hay vuelta atrás. ¿Desea continuar?</p>
-        <div className="modal__buttons">
+        <div className='modal__buttons'>
           <button
-            className="btn"
+            className='btn'
             onClick={async () => {
               await finishExam();
               modalExitWarningRef.current?.close();
-              navigate("/home");
+              navigate('/home');
             }}
           >
             Sí, salir
           </button>
           <button
-            className="btn light"
+            className='btn light'
             onClick={() => modalExitWarningRef.current?.close()}
           >
             No, continuar

@@ -5,8 +5,9 @@
 .head_task {
   grid-area: head;
   text-align: center;
-  font-size: var(--text-desktop-tiny);
+  font-size: var(--text-desktop-small);
   font-weight: 400;
+  align-content: center;
 }
 
 .modes-entries-container--buttons {
