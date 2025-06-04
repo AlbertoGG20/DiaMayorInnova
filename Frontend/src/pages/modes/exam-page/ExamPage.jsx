@@ -71,15 +71,16 @@ const ExamPage = () => {
           setTimeRemaining(0);
         }
 
-        if (exercise.finished) {
-          const marks = exercise.marks || [];
-          const formattedData = {};
-
-          marks.forEach(mark => {
+        // Formatear los datos de las observaciones
+        const formattedData = {};
+        if (response.exercise.marks) {
+          response.exercise.marks.forEach(mark => {
             formattedData[mark.statement_id] = {
               entries: mark.student_entries?.map(entry => ({
+                id: entry.id,
                 entry_number: entry.entry_number,
-                entry_date: entry.entry_date
+                entry_date: entry.entry_date,
+                observations: entry.observations || '',
               })) || [],
               annotations: mark.student_entries?.flatMap(entry =>
                 entry.student_annotations?.map(anno => ({
@@ -89,8 +90,29 @@ const ExamPage = () => {
               ) || []
             };
           });
-
           setStatementData(formattedData);
+        }
+
+        // Si el examen está finalizado, asegurarnos de que los datos se carguen correctamente
+        if (response.exercise.finished) {
+          const finishedData = {};
+          response.exercise.marks?.forEach(mark => {
+            finishedData[mark.statement_id] = {
+              entries: mark.student_entries?.map(entry => ({
+                id: entry.id,
+                entry_number: entry.entry_number,
+                entry_date: entry.entry_date,
+                observations: entry.observations || '',
+              })) || [],
+              annotations: mark.student_entries?.flatMap(entry =>
+                entry.student_annotations?.map(anno => ({
+                  ...anno,
+                  student_entry_id: entry.entry_number
+                })) || []
+              ) || []
+            };
+          });
+          setStatementData(finishedData);
         }
       } catch (err) {
         console.error('Error fetching exercise:', err);
@@ -209,7 +231,8 @@ const ExamPage = () => {
           [selectedStatement.id]: {
             entries: newEntries.map(entry => ({
               entry_number: entry.entry_number,
-              entry_date: entry.entry_date
+              entry_date: entry.entry_date,
+              observations: entry.observations
             })),
             annotations: newEntries.flatMap(entry =>
               entry.annotations.map(anno => ({
