@@ -1,12 +1,11 @@
 import { useEffect, useState, useMemo, useRef } from 'react'
-import "./Entry.css"
 import EntryForm from './entry-form/EntryForm'
 import { getCurrentDate } from '../../../utils/dateUtils'
+import './Entry.css'
 
 const Entry = ({ number, updateEntryDate, annotations, updateAnnotation, deleteAnnotation, addAnnotation, deleteEntry, entryIndex, selectedStatement, date, exercise }) => {
   const [entryStatus, setEntryStatus] = useState(exercise?.finished);
   const [entryDate, setEntryDate] = useState(date || getCurrentDate());
-  const formattedDate = new Date(`${entryDate}T00:00:00`).toLocaleDateString("es-ES");
   const [isActive, setIsActive] = useState(false);
   const entryRef = useRef(null);
 
@@ -21,10 +20,6 @@ const Entry = ({ number, updateEntryDate, annotations, updateAnnotation, deleteA
   const formattedTotal = useMemo(() => {
     return total.toFixed(2);
   }, [total]);
-
-  const changeStatus = () => {
-    setEntryStatus(!entryStatus)
-  }
 
   const handleChangeDate = (e) => {
     const newDate = e.target.value;
@@ -85,13 +80,13 @@ const Entry = ({ number, updateEntryDate, annotations, updateAnnotation, deleteA
   }, [deleteEntry, entryIndex, exercise, entryStatus, isActive, number]);
 
   return (
-    <div className={`entry_wrapper ${isActive ? 'entry-active' : ''}`} ref={entryRef} tabIndex="0" onClick={handleEntryClick}>
-      <div className="entry_head">
-        <div className="head_tittle" onClick={() => setEntryStatus(!entryStatus)} >
+    <div className={`entry_wrapper ${isActive ? 'entry-active' : ''}`} ref={entryRef} tabIndex='0' onClick={handleEntryClick}>
+      <div className='entry_head'>
+        <div className='head_tittle' onClick={() => setEntryStatus(!entryStatus)} >
           <p>Asiento {number}</p>
           <i className={entryStatus ? 'fi fi-rr-angle-small-up' : 'fi fi-rr-angle-small-down'}></i>
         </div>
-        <div className="head_data">
+        <div className='head_data'>
           <input
             aria-label='Fecha del asiento'
             type='date'
@@ -118,18 +113,18 @@ const Entry = ({ number, updateEntryDate, annotations, updateAnnotation, deleteA
       </div>
 
       {selectedStatement && (
-        <div className="statement-info">
+        <div className='statement-info'>
           <h4>Enunciado Seleccionado:</h4>
           <p>{selectedStatement.definition}</p>
         </div>
       )}
 
       {entryStatus && (
-        <div className="entry_body">
-          <section className="entry_body_tittle">
-            <header className="header_container">
+        <div className='entry_body'>
+          <section className='entry_body_tittle'>
+            <header className='header_container'>
               <p className='apt_number'>Apt</p>
-              <div className="tittles_wrapper">
+              <div className='tittles_wrapper'>
                 <p className='tittle_account-number' id='tittle_account-number'>Nº Cuenta</p>
                 <p className='tittle_account-name tittle_account-name--no-visible' id='tittle_account-name'>Nombre Cuenta</p>
                 <p className='tittle_debit' id='tittle_debit'>Debe</p>
@@ -138,7 +133,7 @@ const Entry = ({ number, updateEntryDate, annotations, updateAnnotation, deleteA
             </header>
           </section>
 
-          <div className="entry_item_container scroll-style">
+          <div className='entry_item_container scroll-style'>
             {annotations
             .filter(anno => !anno._destroy)
             .sort((a, b) => a.number - b.number)
