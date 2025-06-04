@@ -1,4 +1,3 @@
-/* dialog */
 .setting__modal {
   width: 45vw;
   min-width: 440px;
@@ -11,27 +10,30 @@
   gap: var(--gap-xxs);
   align-items: end;
   position: absolute;
-  top: 25vh;
-  left: 25vw;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-height: 70vh;
+  overflow-y: auto;
 
   & h2 {
     font-size: var(--text-desktop-subtitles-1);
+    color: #1E2830;
   }
 
   & h3 {
     font-size: var(--text-desktop-subtitles-2);
     font-weight: 600;
-    color: var(--Color-Principal-claro);
+    color: #1E2830;
   }
 
   & .fi {
     display: flex;
   }
-
 }
 
 .modal__background {
-  background-color: #30303049;
+  background-color: #303030B3;
   position: absolute;
   top: 0;
   bottom: 0;
@@ -40,7 +42,6 @@
   width: 100vw;
   height: 100vh;
 }
-
 
 .user-img__container {
   width: 100%;
@@ -59,10 +60,10 @@
       width: 100%;
       padding: var(--gap-xs);
       margin: 0;
-      background-color: var(--Color-White);
+      background-color: #FFFFFF;
       border-radius: var(--r-xs);
-      border-color: var(--Color-grey-300);
-      color: var(--Color-grey-300);
+      border-color: #666666;
+      color: #333333;
     }
   }
 }
@@ -70,7 +71,7 @@
 .user-img__img {
   height: 80px;
   width: 80px;
-  background-color: var(--Color-grey-100);
+  background-color: #B0B0B0;
   border-radius: 100px;
 }
 
@@ -93,7 +94,7 @@
     flex-direction: column;
     align-items: start;
     gap: var(--gap-xs);
-
+    color: #333333;
   }
 }
 
@@ -103,4 +104,35 @@
   flex-direction: column;
   gap: var(--gap-s);
   align-items: start;
+}
+
+@media (max-width: 768px) {
+  .setting__modal {
+    width: 90vw;
+    min-width: 0;
+    max-width: 90vw;
+    top: 10%;
+    left: 5%;
+    transform: translate(0, 0);
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  .modal__background {
+    background-color: #303030B3;
+  }
+
+  .user-img__container,
+  .user-passwd__container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .user-img__img {
+    margin-bottom: var(--gap-xs);
+  }
+
+  .passwrd__inputs {
+    width: 100%;
+  }
 }
