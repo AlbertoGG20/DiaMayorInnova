@@ -132,18 +132,6 @@ const ClassGroupForm = ({ formData, handleInputChange, handleSubmit, errors, suc
                 />
                 {errors.course && <p className="error-message">{errors.course}</p>}
               </div>
-              {/* <div className="form-group form-group--small">
-                <label className="long-label" htmlFor="number_students">Nº Estudiantes</label>
-                <input
-                  type="number"
-                  id="number_students"
-                  className="class-group-page__input"
-                  required
-                  value={formData.number_students}
-                  onChange={handleInputChange}
-                  name="number_students"
-                />
-              </div> */}
               <div className="form-group form-group--small">
                 <label className="long-label" htmlFor="max_students">Máx. estudiantes</label>
                 <input
