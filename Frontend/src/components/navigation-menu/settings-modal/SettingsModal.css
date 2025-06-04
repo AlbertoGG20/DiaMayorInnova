@@ -136,3 +136,11 @@
     width: 100%;
   }
 }
+.success__message {
+  color: #598368; /* Vert foncé (Color-green-800) */
+  font-weight: 600;
+  background-color: #F6FDF8; /* Vert clair (Color-green-50) */
+  padding: var(--gap-xxs) var(--gap-xs);
+  border-radius: var(--r-xxs);
+  margin-top: var(--gap-xs);
+}
