@@ -66,10 +66,7 @@ const TaskPage = () => {
 
           setCanStartTask(isAvailable);
           setCanEditTask(isAvailable && response.exercise.started);
-
-          if (response.exercise.started && isAvailable) {
-            setTaskStarted(true);
-          }
+          setTaskStarted(response.exercise.started && isAvailable);
 
           const newStatementData = {};
           response.exercise.marks?.forEach(mark => {
@@ -234,19 +231,19 @@ const TaskPage = () => {
   return (
     <div className='modes_page_container task-color'>
       {saveStatus && <div className='error-message'>{saveStatus}</div>}
-      {(taskStarted === false) && (
-        <div className='modes_page_container--button'>
-          <button className='btn' onClick={startTask} disabled={!canStartTask}>
-            Comenzar tarea
-          </button>
-          {!canStartTask && (
-            <p className='exam-available'><strong>{availabilityMessage}</strong></p>
-          )}
-        </div>
-      )}
       <>
         <div className='task-page_header'>
-          <h1 className='head-task_tittle'>Modo Tarea - {exercise?.task?.title}</h1>
+          {(taskStarted === false) && (
+            <div className='modes_page_container--button'>
+              <button className='btn' onClick={startTask} disabled={!canStartTask}>
+                Comenzar tarea
+              </button>
+              {!canStartTask && (
+                <p className='exam-available'><strong>{availabilityMessage}</strong></p>
+              )}
+            </div>
+          )}
+          <h1 className='head-task_tittle'>Modo Tarea{exercise?.task?.title ? ` - ${exercise?.task?.title}` : ''}</h1>
         </div>
         {exercise && (
           <EntriesSection
