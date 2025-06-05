@@ -72,10 +72,16 @@ const AddSchoolCenter = ({ setSchools, selectedSchool, setSelectedSchool, setHan
 
     } catch (err) {
       if (err.response?.status === 422) {
-        if (err.response.data?.code?.includes("has already been taken")) {
-          setError("El código del centro ya está en uso. Por favor, utilice un código diferente.");
+        const errorData = err.response.data;
+        if (errorData?.school_name?.includes("has already been taken")) {
+          setError("Ya existe un centro con ese nombre");
+        } else if (errorData?.email?.includes("has already been taken")) {
+          setError("El correo electrónico ya está registrado");
+        } else if (errorData?.code?.includes("has already been taken")) {
+          setError("Código ya vinculado a otro centro");
         } else {
-          setError("Por favor, verifique que todos los campos sean válidos.");
+          const errorMessages = Object.values(errorData).flat();
+          setError(errorMessages[0] || "Por favor, verifique que todos los campos sean válidos.");
         }
       } else {
         setError(err.response?.data?.message || "Hubo un problema al procesar la solicitud.");

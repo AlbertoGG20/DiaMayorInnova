@@ -1,15 +1,16 @@
-import { useRef, forwardRef, useImperativeHandle } from "react";
-import "./Modal.css";
+import { useRef, forwardRef, useImperativeHandle } from 'react';
+import './Modal.css';
 
 const Modal = forwardRef(({
   children,
-  btnText = "Abrir Modal",
-  modalTitle = "Modal",
+  btnText = 'Abrir Modal',
+  modalTitle = 'Modal',
   showButton = true,
   needOpen = true,
   saveBtn = false,
   btnNoBg = false,
-  auxFunction
+  auxFunction,
+  onCloseModal = undefined,
 }, ref) => {
   const modalRef = useRef(null);
 
@@ -27,10 +28,10 @@ const Modal = forwardRef(({
   const closeModal = (e) => {
     e.preventDefault();
     modalRef.current.close();
+    onCloseModal && onCloseModal();
   };
 
-  const btnClass = btnNoBg ? "btn btn__icon" : "btn light";
-
+  const btnClass = btnNoBg ? 'btn btn__icon' : 'btn light';
 
   return (
     <>
@@ -44,18 +45,18 @@ const Modal = forwardRef(({
         </button >
       )}
 
-      <dialog ref={modalRef} className="defaultModal">
-        <header className="modal__header">
-          <h2 className="modal__h2">{modalTitle}</h2>
-          <button className="btn light" onClick={closeModal} aria-label="Cerrar">X</button>
+      <dialog ref={modalRef} className='defaultModal'>
+        <header className='modal__header'>
+          <h2 className='modal__h2'>{modalTitle}</h2>
+          <button className='btn light' onClick={closeModal} aria-label='Cerrar'>X</button>
         </header>
-        <div className="modal__content">
+        <div className='modal__content'>
           {children}
         </div>
         {saveBtn &&
-          <footer className="modal__footer">
-            <button className="btn " onClick={() => auxFunction()} aria-label="Guardar">Guardar</button>
-            <button className="btn light" aria-label="Cerrar">Cancelar</button>
+          <footer className='modal__footer'>
+            <button className='btn' onClick={() => auxFunction()} aria-label='Guardar'>Guardar</button>
+            <button className='btn light' aria-label='Cerrar'>Cancelar</button>
           </footer>
         }
       </dialog>

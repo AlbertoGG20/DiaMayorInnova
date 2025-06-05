@@ -21,8 +21,10 @@ const Header = () => {
     }
   }, [screenSize.width]);
 
+  // Rutas donde se muestra el header simple
+  const authRoutes = ['/sign_in', '/forgot-password', '/reset-password'];
 
-  if (location.pathname === "/sign_in") {
+  if (authRoutes.includes(location.pathname)) {
     return (
       <nav className="header">
         <NavLink to={"/home"}>

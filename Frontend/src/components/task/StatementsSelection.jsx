@@ -84,7 +84,7 @@ const StatementsSelection = ({
     <section className="task-page__selection">
       <div className="task-page__selection--content">
         <div className="task-page__header-row">
-          <h2 className="task-page__header">Enunciados</h2>
+          <h2 className="task-page__header" title="Un Enunciado es una Operación Económica">Enunciados</h2>
         </div>
         <SearchBar
           value={searchTerm}

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { useNavigate, Link } from "react-router-dom";
 import { API_BASE_URL } from "../../config";
 import "./Sign.css";
 
@@ -11,6 +12,7 @@ const SignIn = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const auth = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmitEvent = (e) => {
     e.preventDefault();
@@ -90,6 +92,9 @@ const SignIn = () => {
             {errorMessage && <div className="error__message">{errorMessage}</div>}
             {successMessage && <div style={{ color: "green", marginBottom: "10px" }}>{successMessage}</div>}
             <button className="btn light">Iniciar Sesión</button>
+            <div className="forgot-password-link">
+              <Link to="/forgot-password">¿Olvidaste tu contraseña?</Link>
+            </div>
           </form>
         </div>
       </div>

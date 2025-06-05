@@ -28,7 +28,7 @@ const create = async (data) => {
         return response;
     } catch (error) {
         console.error("Error en la creación:", error);
-        return null;
+        throw error;
     }
 };
 
@@ -38,7 +38,7 @@ const update = async (id, data) => {
         return response;
     } catch (error) {
         console.error("Error en la actualización:", error);
-        return null;
+        throw error;
     }
 };
 

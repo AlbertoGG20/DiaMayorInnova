@@ -295,7 +295,23 @@ class StudentExercisesController < ApplicationController
   def update_student_task
     @exercise = Exercise.find(params[:id])
 
+    # Loop through each marks_attributes sent
     params[:exercise][:marks_attributes].each do |mark|
+      mark[:student_entries_attributes] ||= []
+
+      # Detect the entries that are not present in the incoming data and mark them for destruction
+      if mark[:id].present?
+        existing_entries = Mark.find(mark[:id]).student_entries.pluck(:id).map(&:to_s)
+        incoming_entries = mark[:student_entries_attributes].map { |entry| entry[:id].to_s }.compact
+
+        entries_to_destroy = existing_entries - incoming_entries
+
+        entries_to_destroy.each do |entry_id|
+          mark[:student_entries_attributes] << { id: entry_id, _destroy: true }
+        end
+      end
+
+      # === 🧹 Lógica existente para annotations
       mark[:student_entries_attributes].each do |entry|
         entry[:student_annotations_attributes] ||= []
         entry[:student_annotations_attributes].each do |anno|
@@ -314,13 +330,14 @@ class StudentExercisesController < ApplicationController
           entry.student_annotations = entry.student_annotations.reject(&:marked_for_destruction?)
         end
       end
+
       render json: @exercise.as_json(
-      include: {
-        marks: {
-          methods: [ :filtered_student_entries ]
+        include: {
+          marks: {
+            methods: [:filtered_student_entries]
+          }
         }
-      }
-    ), status: :ok
+      ), status: :ok
     else
       render json: { errors: @exercise.errors.full_messages }, status: :unprocessable_entity
     end

@@ -5,6 +5,7 @@ scRoutes.push({
   icon: "fi fi-rr-home",
   name: "home",
   rol: ["student"],
+  tooltipName: 'Inicio',
 })
 
 scRoutes.push({
@@ -12,6 +13,7 @@ scRoutes.push({
   icon: "fi fi-rr-edit",
   name: "Tarea",
   rol: ["teacher"],
+  tooltipName: 'Supuesto',
 })
 
 scRoutes.push({
@@ -19,6 +21,7 @@ scRoutes.push({
   icon: "fi fi-rr-pencil",
   name: "Enunciado",
   rol: ["teacher"],
+  tooltipName: 'Operación u Operaciones Económicas',
 })
 
 scRoutes.push({
@@ -26,6 +29,7 @@ scRoutes.push({
   icon: "fi fi-rr-bank",
   name: "Práctica",
   rol: ["teacher", "student"],
+  tooltipName: 'Modo Práctica',
 })
 
 scRoutes.push({
@@ -40,6 +44,7 @@ scRoutes.push({
   icon: "fi fi-rr-book",
   name: "PGC",
   rol: ["teacher", "center_admin", "admin"],
+  tooltipName: 'Planes de Contabilidad',
 })
 
 scRoutes.push({
@@ -48,6 +53,7 @@ scRoutes.push({
   name: "Lista Grupos",
   student: false,
   rol: ["teacher", "center_admin", "admin"],
+  tooltipName: 'Grupos de Clase',
 })
 
 scRoutes.push({

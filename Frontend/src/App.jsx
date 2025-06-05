@@ -10,6 +10,8 @@ import SchoolsCenters from './components/schoolCenters/SchoolCenters'
 import { AuthProvider } from "./context/AuthContext";
 import PrivateRoute from "./components/private-route/PrivateRoute";
 import SignIn from "./components/user/SignIn";
+import ForgotPassword from "./components/user/ForgotPassword";
+import ResetPassword from "./components/user/ResetPassword";
 import NavStateProvider from "./context/nav-menu/NavStateProvider";
 import NavigationMenu from "./components/navigation-menu/NavigationMenu";
 import Account from './components/account/Account';
@@ -46,6 +48,8 @@ function App() {
             <div className='app-main'>
               <Routes>
                 <Route path="/sign_in" element={<SignIn />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="*" element={<Home />} />
                 <Route element={<PrivateRoute allowedRoles={['admin', 'center_admin', 'teacher', 'student']} />}>
                   <Route path="/home" element={<Home />} />

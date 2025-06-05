@@ -1,42 +1,42 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import AccountDataService from '../../services/AccountService';
 
-const Account = ({id, onSaveSuccess, onCloseModal}) => {
+const Account = ({id, onSaveSuccess}) => {
 
   const initialAccountState = {
-    id: null,
+    id: undefined,
     account_number: 0,
-    description: "",
+    description: '',
     accounting_plan_id: 0,
-    name: "",
-    charge: "",
-    credit: ""
+    name: '',
+    charge: '',
+    credit: ''
   };
 
   const [currentAccount, setCurrentAccount] = useState(initialAccountState);
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    setMessage("");
-    setError("");
+    setMessage('');
+    setError('');
 
     if (id) {
       AccountDataService.get(id)
         .then(response => {
           setCurrentAccount(response.data);
-          setError("");
+          setError('');
         })
         .catch(e => {
-          setError("Error al cargar cuenta");
+          setError('Error al cargar cuenta');
         });
     }
 
     return () => {
-      setMessage("");
-      setError("");
+      setMessage('');
+      setError('');
     };
-  }, [id, onCloseModal]);
+  }, [id]);
 
   const handleInputChange = (event) => {
     const {name, value} = event.target;
@@ -46,25 +46,25 @@ const Account = ({id, onSaveSuccess, onCloseModal}) => {
   const updateAccount = async (e) => {
     e.preventDefault();
 
-    setError("");
+    setError('');
 
     if (!currentAccount.name || !currentAccount.account_number || !currentAccount.description || !currentAccount.accounting_plan_id) {
-      setMessage("");
-      setError("Todos los campos son oblgatorios");
+      setMessage('');
+      setError('Todos los campos son oblgatorios');
       return;
     }
 
     try {
       await AccountDataService.update(currentAccount.id, currentAccount);
-      setMessage("Actualizado correctamente");
-      setError("");
+      setMessage('Actualizado correctamente');
+      setError('');
       onSaveSuccess();
     } catch (error) {
-      setError("Error al actualizar");
-      setMessage("");
+      setError('Error al actualizar');
+      setMessage('');
     }
   };
-  
+
   return (
     <>
       <div className='editForm__container'>
@@ -78,7 +78,7 @@ const Account = ({id, onSaveSuccess, onCloseModal}) => {
                   onChange={handleInputChange}/>
               </label>
             </div>
-            
+
             <div className='editForm__form--group'>
               <label> Nombre
                 <input
@@ -135,17 +135,13 @@ const Account = ({id, onSaveSuccess, onCloseModal}) => {
               </label>
             </div>
           </div>
-          
 
           {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
           {message && <p style={{ color: 'green', textAlign: 'center'}}>{message}</p>}
 
-          <button className="editForm__form--save" type="submit">Guardar</button>
-      
+          <button className='editForm__form--save' type='submit'>Guardar</button>
         </form>
       </div>
-
-      
     </>
   )
 }

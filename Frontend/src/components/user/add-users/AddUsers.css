@@ -107,3 +107,25 @@ legend {
   font-size: 1rem;
   margin-bottom: 0;
 }
+
+.error-message {
+  color: var(--Color-red-600);
+  background-color: var(--Color-red-50);
+  border: 1px solid var(--Color-red-600);
+  font-size: var(--text-desktop-body-small);
+  margin-top: var(--gap-s);
+  padding: var(--gap-xs);
+  border-radius: var(--r-xs);
+  width: 100%;
+}
+
+.success-message {
+  color: var(--Color-green-800);
+  background-color: var(--Color-green-50);
+  font-size: var(--text-desktop-body-small);
+  margin-top: var(--gap-s);
+  padding: var(--gap-xs);
+  border: 1px solid var(--Color-green-800);
+  border-radius: var(--r-xs);
+  width: 100%;
+}

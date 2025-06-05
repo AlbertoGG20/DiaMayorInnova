@@ -5,11 +5,14 @@ import Shortcut from "../../components/shortcuts/shortcut/Shortcut"
 import { navContext } from '../../context/nav-menu/navMenuContext';
 import { useAuth } from '../../context/AuthContext';
 
-
 const Shortcuts = () => {
   const { currentRole } = useContext(navContext);
   const navigate = useNavigate();
   const auth = useAuth();
+
+  if (!auth.user) {
+    return null;
+  }
 
   return (
     <section className="top">
@@ -29,10 +32,12 @@ const Shortcuts = () => {
                 icon={route.icon}
                 name={route.name}
                 url={route.to}
+                tooltipName={route.tooltipName}
                 onClick={onClick}
               />
             );
           }
+          return null;
         })}
       </div>
     </section>

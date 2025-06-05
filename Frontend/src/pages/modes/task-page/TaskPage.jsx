@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import { useParams } from 'react-router-dom';
-import userExerciseDataService from "../../../services/userExerciseDataService";
+import { useState, useEffect, useCallback } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import userExerciseDataService from '../../../services/userExerciseDataService'
 import EntriesSection from '../../../components/entries-section/EntriesSection'
 import { AuxSection } from '../../../components/aux-section/AuxSection'
-import "./TaskPage.css"
-import { useNavigate } from 'react-router-dom'
+import './TaskPage.css'
 
 const TaskPage = () => {
   const navigate = useNavigate();
@@ -13,15 +12,13 @@ const TaskPage = () => {
     marks: [],
     task: {}
   });
-  const [taskStarted, setTaskStarted] = useState(false);
+  const [taskStarted, setTaskStarted] = useState();
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [submitTask, setSubmitTask] = useState(false);
   const [canEditTask, setCanEditTask] = useState(false);
   const [selectedStatement, setSelectedStatement] = useState(null);
-  const [saveStatus, setSaveStatus] = useState("");
+  const [saveStatus, setSaveStatus] = useState();
   const [openDate, setOpenDate] = useState(null);
   const [closeDate, setCloseDate] = useState(null);
-  const [isTaskClosed, setIsTaskClosed] = useState(false);
   const [canStartTask, setCanStartTask] = useState(false);
   const [handleSave, setHandleSave] = useState(false);
   const [statementData, setStatementData] = useState({});
@@ -65,11 +62,8 @@ const TaskPage = () => {
           setCloseDate(clDate);
 
           const now = new Date();
-          console.log("Current time:", now);
-          const isClosed = now > clDate;
           const isAvailable = now >= opDate && now <= clDate;
 
-          setIsTaskClosed(isClosed);
           setCanStartTask(isAvailable);
           setCanEditTask(isAvailable && response.exercise.started);
 
@@ -101,7 +95,7 @@ const TaskPage = () => {
           }
         }
       } catch (error) {
-        console.error("Error fetching exercise:", error);
+        console.error('Error fetching exercise:', error);
       }
     };
 
@@ -123,7 +117,6 @@ const TaskPage = () => {
       const now = new Date();
       setCurrentTime(now);
       if (openDate && closeDate) {
-        setIsTaskClosed(now > closeDate);
         setCanStartTask(now >= openDate && now <= closeDate);
       }
     }, 60000);
@@ -139,7 +132,7 @@ const TaskPage = () => {
         setCanEditTask(true);
       }
     } catch (err) {
-      console.error("Error al iniciar la tarea:", err);
+      console.error('Error al iniciar la tarea:', err);
     }
   };
 
@@ -148,8 +141,8 @@ const TaskPage = () => {
   let availabilityMessage = '';
   if (!canStartTask) {
     availabilityMessage = currentTime < openDate
-      ? `La tarea estará disponible el ${openDate?.toLocaleString?.() || "fecha no disponible"}`
-      : `La tarea cerró el ${closeDate?.toLocaleString?.() || "fecha no disponible"}`;
+      ? `La tarea estará disponible el ${openDate?.toLocaleString?.() || 'fecha no disponible'}`
+      : `La tarea cerró el ${closeDate?.toLocaleString?.() || 'fecha no disponible'}`;
   }
 
   const handleSaveProgress = async (statementId, data) => {
@@ -229,21 +222,21 @@ const TaskPage = () => {
           navigate('/');
         }
       } else {
-        console.error("Error al guardar:", response.error);
+        console.error('Error al guardar:', response.error);
         setSaveStatus(`Error al guardar el progreso: ${response.error}`);
       }
     } catch (error) {
-      console.error("Error al guardar:", error);
-      setSaveStatus("Error al guardar el progreso");
+      console.error('Error al guardar:', error);
+      setSaveStatus('Error al guardar el progreso');
     }
   };
 
   return (
     <div className='modes_page_container task-color'>
-      {saveStatus && <div className="error-message">{saveStatus}</div>}
-      {!taskStarted && (
+      {saveStatus && <div className='error-message'>{saveStatus}</div>}
+      {(taskStarted === false) && (
         <div className='modes_page_container--button'>
-          <button className="btn" onClick={startTask} disabled={!canStartTask}>
+          <button className='btn' onClick={startTask} disabled={!canStartTask}>
             Comenzar tarea
           </button>
           {!canStartTask && (
@@ -252,12 +245,11 @@ const TaskPage = () => {
         </div>
       )}
       <>
-        <div className="task-page_header">
+        <div className='task-page_header'>
           <h1 className='head-task_tittle'>Modo Tarea - {exercise?.task?.title}</h1>
         </div>
         {exercise && (
           <EntriesSection
-            taskSubmit={submitTask}
             taskId={exercise.task.id}
             existingExerciseId={exercise.id}
             examStarted={canEditTask}
