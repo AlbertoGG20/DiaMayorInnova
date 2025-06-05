@@ -59,7 +59,6 @@
   gap: var(--gap-l);
   justify-content: left;
   align-items: center;
-
 }
 
 .mark_list__header {
@@ -115,4 +114,27 @@
     padding: var(--gap-s);
     color: var(--Color-Principal);
   }
+}
+
+.mark_list__header-buttons {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.visibility-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.visibility-buttons .btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.visibility-buttons .btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: var(--Color-grey-100);
 }

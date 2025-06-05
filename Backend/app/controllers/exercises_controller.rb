@@ -116,7 +116,27 @@ class ExercisesController < ApplicationController
     end
   end
 
+  def update_visibility
+    if current_user.student?
+      render json: { error: "No autorizado" }, status: :forbidden
+      return
+    end
 
+    exercise_ids = params[:exercise_ids]
+    is_public = params[:is_public]
+
+    if exercise_ids.blank?
+      render json: { error: "Se requieren IDs de ejercicios" }, status: :unprocessable_entity
+      return
+    end
+
+    begin
+      Exercise.where(id: exercise_ids).update_all(is_public: is_public)
+      render json: { message: "Visibilidad actualizada correctamente" }, status: :ok
+    rescue => e
+      render json: { error: "Error al actualizar la visibilidad: #{e.message}" }, status: :unprocessable_entity
+    end
+  end
 
   private
 
