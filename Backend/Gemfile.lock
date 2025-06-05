@@ -82,6 +82,9 @@ GEM
     ast (2.4.3)
     base64 (0.2.0)
     bcrypt (3.1.20)
+    bcrypt_pbkdf (1.1.1)
+    bcrypt_pbkdf (1.1.1-arm64-darwin)
+    bcrypt_pbkdf (1.1.1-x86_64-darwin)
     benchmark (0.4.0)
     bigdecimal (3.1.9)
     bootsnap (1.18.4)
@@ -136,6 +139,7 @@ GEM
       dotenv (= 3.1.8)
       railties (>= 6.1)
     drb (2.2.1)
+    ed25519 (1.4.0)
     erubi (1.13.1)
     factory_bot (6.5.1)
       activesupport (>= 6.1.0)
@@ -378,6 +382,7 @@ PLATFORMS
 
 DEPENDENCIES
   active_model_serializers
+  bcrypt_pbkdf (~> 1.0)
   bootsnap
   brakeman
   cancancan
@@ -391,6 +396,7 @@ DEPENDENCIES
   debug
   devise (~> 4.2)
   dotenv-rails
+  ed25519 (~> 1.2)
   factory_bot_rails
   fuubar
   kaminari
