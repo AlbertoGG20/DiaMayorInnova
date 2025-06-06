@@ -1,41 +1,38 @@
-import { BrowserRouter as Router, Routes, Route, HashRouter } from 'react-router-dom'
-import Home from "./pages/Home";
-import AccountingPlan from './components/accounting-plan/AccountingPlan';
-import AccountingPlanList from './components/accounting-plan/ListAccountingPlan';
-import AddAccountingPlan from './components/accounting-plan/AddAccountingPlan';
-import ClassGroup from "./components/class-group/ClassGroup";
-import ClassGroups from "./pages/class-group/ClassGroup";
-import AddClassGroup from "./components/class-group/AddClassGroup";
-import SchoolsCenters from './components/schoolCenters/SchoolCenters'
-import { AuthProvider } from "./context/AuthContext";
-import PrivateRoute from "./components/private-route/PrivateRoute";
-import SignIn from "./components/user/SignIn";
-import ForgotPassword from "./components/user/ForgotPassword";
-import ResetPassword from "./components/user/ResetPassword";
-import NavStateProvider from "./context/nav-menu/NavStateProvider";
-import NavigationMenu from "./components/navigation-menu/NavigationMenu";
-import Account from './components/account/Account';
-// import AccountList from './components/account/ListAccount';
-// import AddAccount from './components/account/AddAccount';
-import HelpExample from './components/help-example/HelpExample';
-import HelpExampleList from './components/help-example/ListHelpExample';
-import AddHelpExample from './components/help-example/AddHelpExample';
-import TaskListAndDetails from './components/task/taskListAndDetails';
-import ExerciseMarksList from './components/task/ExerciseMarksList';
-import StatementsList from './components/statements/StatementList';
-import Modes from './pages/modes/Modes';
-import AccountingPlans from './pages/accounting-plan/AccountingPlans';
-import TaskPage from './pages/modes/task-page/TaskPage';
-import PracticePage from './pages/modes/practice-page/PracticePage';
-import ExamPage from './pages/modes/exam-page/ExamPage';
-import Accounts from './pages/account/Accounts';
-import TaskCreateForm from './components/task/TaskCreateForm';
-import StatementCreateForm from './components/statements/StatementCreateForm';
-import 'react-tooltip/dist/react-tooltip.css'
-import './App.css';
-import './assets/Styles/Global.css';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import NavStateProvider from './context/nav-menu/NavStateProvider';
+import NavigationMenu from './components/navigation-menu/NavigationMenu';
+import PrivateRoute from './components/private-route/PrivateRoute';
+import SignIn from './components/user/SignIn';
+import ForgotPassword from './components/user/ForgotPassword';
+import ResetPassword from './components/user/ResetPassword';
 import UserManagement from './components/user/UserManagement';
+import Home from './pages/Home';
+import Accounts from './pages/account/Accounts';
+import Account from './components/account/Account';
+import AccountingPlans from './pages/accounting-plan/AccountingPlans';
+import AccountingPlan from './components/accounting-plan/AccountingPlan';
+import AddAccountingPlan from './components/accounting-plan/AddAccountingPlan';
+import ClassGroups from './pages/class-group/ClassGroup';
+import ClassGroup from './components/class-group/ClassGroup';
+import AddClassGroup from './components/class-group/AddClassGroup';
+import HelpExampleList from './components/help-example/ListHelpExample';
+import HelpExample from './components/help-example/HelpExample';
+import AddHelpExample from './components/help-example/AddHelpExample';
+import Modes from './pages/modes/Modes';
+import PracticePage from './pages/modes/practice-page/PracticePage';
+import TaskPage from './pages/modes/task-page/TaskPage';
+import TaskListAndDetails from './components/task/taskListAndDetails';
+import TaskCreateForm from './components/task/TaskCreateForm';
+import ExamPage from './pages/modes/exam-page/ExamPage';
+import ExerciseMarksList from './components/task/ExerciseMarksList';
 import ExamInformation from './components/task/ExamInformation/ExamInformation';
+import StatementsList from './components/statements/StatementList';
+import StatementCreateForm from './components/statements/StatementCreateForm';
+import SchoolsCenters from './components/schoolCenters/SchoolCenters'
+import 'react-tooltip/dist/react-tooltip';
+import './assets/styles/index.scss';
+import './App.css';
 
 function App() {
 

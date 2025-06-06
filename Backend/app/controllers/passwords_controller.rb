@@ -13,7 +13,7 @@ class PasswordsController < Devise::PasswordsController
       user.send_reset_password_instructions
       json_response("Se han enviado las instrucciones a tu correo electrónico", true, {}, :ok)
     else
-      json_response("Si tu email está registrado, recibirás instrucciones para restablecer tu contraseña", true, {}, :ok)
+      json_response("El email no pertenece a ningún usuario", false, {}, :not_found)
     end
   end
 
@@ -24,7 +24,7 @@ class PasswordsController < Devise::PasswordsController
 
     # Usar el método de Devise para validar el token
     user = User.with_reset_password_token(params[:reset_password_token])
-    
+
     if user.present?
       # Redirigir al frontend con el token como parámetro
       redirect_to "#{ENV['FRONTEND_URL']}/reset-password?reset_password_token=#{params[:reset_password_token]}"
@@ -64,4 +64,4 @@ class PasswordsController < Devise::PasswordsController
   def reset_password_params
     params.require(:user).permit(:password, :password_confirmation, :reset_password_token)
   end
-end 
+end
