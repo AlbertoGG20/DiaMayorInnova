@@ -1,6 +1,13 @@
-# Capistrano is a framework for building automated deployment scripts.
-gem 'capistrano', '>= 3.6.1'
-gem 'capistrano-rbenv', '~> 2.0'
-gem 'capistrano-yarn'
-gem 'capistrano-bundler', '~> 1.1.2'
-gem 'capistrano-rails', '~> 1.0'
+source "https://rubygems.org"
+
+group :development, :test do
+  gem 'ed25519', '~> 1.2'
+  gem 'bcrypt_pbkdf', '~> 1.0'
+
+  # Capistrano is a framework for building automated deployment scripts.
+  gem 'capistrano', '>= 3.6.1'
+  gem 'capistrano-rbenv', '~> 2.0'
+  gem 'capistrano-yarn'
+  gem 'capistrano-bundler', '~> 1.1.2'
+  gem 'capistrano-rails', '~> 1.0'
+end

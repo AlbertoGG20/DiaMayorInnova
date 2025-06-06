@@ -1,9 +1,16 @@
 import React, { useEffect } from "react";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 const PrivateRoute = ({ allowedRoles = [] }) => {
   const { token, role, loading, setError } = useAuth();
+  const location = useLocation();
+
+  const publicRoutes = ['/sign_in', '/forgot-password', '/reset-password'];
+
+  if (publicRoutes.includes(location.pathname)) {
+    return <Outlet />;
+  }
 
   useEffect(() => {
     if (!token) {
