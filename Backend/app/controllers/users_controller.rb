@@ -1,7 +1,8 @@
 class UsersController < ApplicationController
   skip_before_action :authenticate_user!, only: [:create]
-  before_action :authenticate_admin, except: [:current, :index, :show]
+  before_action :authenticate_admin, except: [:current, :index, :show, :update] # Ajout de :update à l'exception
   before_action :set_user, only: [:show, :update, :destroy]
+  before_action :authorize_update, only: [:update] # Nouvelle vérification pour update
   
   def index
     unless current_user&.admin? || current_user&.teacher? || current_user&.school_admin?
@@ -26,7 +27,7 @@ class UsersController < ApplicationController
       users = users.joins(:student_class_groups).where(student_class_groups: { class_group_id: params[:class_groups_id] })
     end
 
-    paginated_users  = users.page(params[:page]).per(params[:per_page] || 10)
+    paginated_users = users.page(params[:page]).per(params[:per_page] || 10)
 
     users_data = paginated_users.map do |user|
       user_data = user.as_json
@@ -61,12 +62,11 @@ class UsersController < ApplicationController
   end
 
   def create
-
     current_user = User.find_by(authentication_token: request.headers['AUTH-TOKEN'])
 
     user = User.new(user_params)
 
-    if current_user.center_admin?
+    if current_user&.center_admin?
       user.school_center_id = current_user.school_center_id
     end
 
@@ -84,7 +84,6 @@ class UsersController < ApplicationController
   end
 
   def update
-
     if current_user.school_admin? && @user.school_center_id != current_user.school_center_id
       return json_response "Unauthorized", false, {}, :unauthorized
     end
@@ -95,6 +94,10 @@ class UsersController < ApplicationController
         user_data[:featured_image] = { url: rails_blob_url(@user.featured_image, only_path: true) }
       else
         user_data[:featured_image] = nil
+      end
+      # Régénérer le token après un changement de mot de passe pour forcer une reconnexion
+      if user_params[:password].present?
+        @user.generate_new_authentication_token
       end
       json_response "User updated successfully", true, { user: user_data }, :ok
     else
@@ -142,7 +145,8 @@ class UsersController < ApplicationController
   def user_params
     permitted = params.require(:user).permit(:email, :password, :password_confirmation, :name, :first_lastName, :second_lastName, :featured_image, :role, :school_center_id)
     permitted.delete(:featured_image) if permitted[:featured_image].is_a?(String)
-    permitted  end
+    permitted
+  end
 
   def authenticate_admin
     current_user = User.find_by(authentication_token: request.headers['AUTH-TOKEN'])
@@ -151,4 +155,10 @@ class UsersController < ApplicationController
     end
   end
 
+  def authorize_update
+    current_user = User.find_by(authentication_token: request.headers['AUTH-TOKEN'])
+    unless current_user&.id == @user.id || current_user&.admin? || current_user&.center_admin?
+      json_response "Unauthorized", false, {}, :unauthorized
+    end
+  end
 end
