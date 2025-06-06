@@ -1,0 +1,11 @@
+.help-example-indicator {
+  color: #28a745;
+  margin-right: 6px;
+  font-size: 1.2em;
+  vertical-align: middle;
+}
+
+.button-example-active {
+  color: #28a745;
+  font-weight: bold;
+}
