@@ -1,0 +1,19 @@
+@use './variables';
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.gap-s {
+  gap: var(--gap-s);
+}
+
+@media screen and (max-width: variables.$breakpoint-md) {
+  .flex-col-rev-sm {
+    flex-direction: column-reverse;
+  }
+}
