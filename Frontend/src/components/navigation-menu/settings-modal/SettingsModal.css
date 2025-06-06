@@ -15,6 +15,7 @@
   transform: translate(-50%, -50%);
   max-height: 70vh;
   overflow-y: auto;
+  background-color: #F5F5F5; /* Fond gris clair comme l'autre modale */
 
   & h2 {
     font-size: var(--text-desktop-subtitles-1);
@@ -33,7 +34,7 @@
 }
 
 .modal__background {
-  background-color: #303030B3;
+  background-color: rgba(70, 68, 75, 0.7);
   position: absolute;
   top: 0;
   bottom: 0;
@@ -47,6 +48,7 @@
   width: 100%;
   display: flex;
   gap: var(--gap-l);
+  align-items: center; /* Centrer verticalement l'image et le label */
 
   & .img-label__user {
     display: flex;
@@ -116,10 +118,11 @@
     transform: translate(0, 0);
     max-height: 80vh;
     overflow-y: auto;
+    background-color: #F5F5F5; /* Fond gris clair pour mobile aussi */
   }
 
   .modal__background {
-    background-color: #303030B3;
+    background-color: rgba(211, 207, 207, 0.7);
   }
 
   .user-img__container,
@@ -136,6 +139,7 @@
     width: 100%;
   }
 }
+
 .success__message {
   color: #598368; /* Vert foncé (Color-green-800) */
   font-weight: 600;
