@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import SolutionForm from "./SolutionForm.jsx";
 import solutionService from "../../services/solutionService";
+import "./SolutionList.css";
 
 const SolutionList = ({ solutions, onEditSolution, onDeleteSolution, solutionToDeleteIndex, refreshSolutions }) => {
   const [isToggling, setIsToggling] = useState(null); // État pour suivre la solution en cours de bascule
@@ -11,50 +12,32 @@ const SolutionList = ({ solutions, onEditSolution, onDeleteSolution, solutionToD
 
     try {
       const solution = solutions.find(s => s.id === solutionId);
-      if (!solution) {
-        throw new Error("No se encontró la solución");
-      }
+      if (!solution) throw new Error("No se encontró la solución");
+
+      const statementId = solution.statement_id;
 
       if (isCurrentlyExample) {
-        await solutionService.unmarkAsExample(solutionId);
+        await solutionService.unmarkAsExample(statementId, solutionId);
       } else {
-        // Primero actualizamos la solución con sus datos actuales
-        const solutionData = {
-          description: solution.description,
-          entries_attributes: solution.entries.map(entry => ({
-            id: entry.id,
-            entry_number: entry.entry_number,
-            entry_date: entry.entry_date,
-            annotations_attributes: entry.annotations.map(annotation => ({
-              id: annotation.id,
-              number: annotation.number,
-              credit: annotation.credit,
-              debit: annotation.debit,
-              account_id: annotation.account_id
-            }))
-          }))
-        };
-
-        await solutionService.updateSolution(solutionId, solutionData);
-
-        // Luego la marcamos como ejemplo
-        await solutionService.markAsExample(solutionId, {
-          creditMoves: "0",
-          debitMoves: "0",
-          account_id: 42,
-          solution: solutionData
+        // Envía solo los datos necesarios para marcar como ejemplo
+        await solutionService.markAsExample(statementId, solutionId, {
+          account_id: solution.entries[0]?.annotations[0]?.account_id || 42
+          // creditMoves y debitMoves probablemente no son necesarios
         });
       }
-      
-      // Refrescamos las soluciones después de la actualización
+
       await refreshSolutions();
     } catch (error) {
-      console.error("Error detallado:", {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status
+      console.error("Detalles del error:", {
+        status: error.response?.status,
+        data: error.response?.data,
+        headers: error.response?.headers
       });
-      alert(error.response?.data?.message || error.message || "Ocurrió un error al procesar la solicitud");
+
+      const errorMessage = error.response?.data?.errors?.join('\n') ||
+        error.response?.data?.message ||
+        "Error al actualizar el estado de ejemplo";
+      alert(errorMessage);
     } finally {
       setIsToggling(null);
     }
@@ -67,7 +50,7 @@ const SolutionList = ({ solutions, onEditSolution, onDeleteSolution, solutionToD
         {solutions.map((solution, index) => (
           <li key={index} className={`statement-page__list-item ${solutionToDeleteIndex === index ? 'statement-page__list-item--deleting' : ''}`}>
             <div className="statement-page__statement-container">
-            <h4 className="statement-page__definition-solution">
+              <h4 className="statement-page__definition-solution">
                 {`Solución ${index + 1}`}
                 {solution.is_example && (
                   <span className="help-example-indicator" title="Ejemplo de ayuda">
@@ -81,8 +64,8 @@ const SolutionList = ({ solutions, onEditSolution, onDeleteSolution, solutionToD
                 Editar
               </button>
 
-              <button 
-                onClick={() => handleToggleExample(solution.id, solution.is_example)} 
+              <button
+                onClick={() => handleToggleExample(solution.id, solution.is_example)}
                 className={`statement-page__button-text ${solution.is_example ? 'button-example-active' : ''}`}
                 disabled={isToggling === solution.id} // Désactive le bouton pendant le traitement
               >
@@ -102,20 +85,6 @@ const SolutionList = ({ solutions, onEditSolution, onDeleteSolution, solutionToD
           </li>
         ))}
       </ul>
-
-      <style jsx>{`
-        .help-example-indicator {
-          color: #28a745;
-          margin-right: 6px;
-          font-size: 1.2em;
-          vertical-align: middle;
-        }
-        .button-example-active {
-          color: #28a745;
-          font-weight: bold;
-        }
-      `}</style>
-      
     </div>
   );
 };

@@ -238,6 +238,19 @@
   border-top: 1px solid var(--Color-grey-200);
 }
 
+.help_section__solution--entries-list-wrapper {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.help_section__solution--entries-list {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  min-width: max-content;
+  padding-bottom: 0.5rem;
+}
+
 .help_section__entry_info {
   background-color: var(--Color-White);
   border: 1px solid var(--Color-grey-200);
