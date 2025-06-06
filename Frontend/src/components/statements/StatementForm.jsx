@@ -31,7 +31,7 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
       entries: [
         {
           entry_number: 1,
-          entry_date: "",
+          entry_date: new Date().toISOString().split('T')[0],
           annotations: [
             {
               number: 1,
@@ -128,6 +128,14 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
 
     setErrorMessage("");
     setSuccessMessage("");
+
+    const processedSolutions = (solutions || []).map(solution => ({
+      ...solution,
+      entries: (solution.entries || []).map(entry => ({
+        ...entry,
+        entry_date: entry.entry_date || new Date().toISOString().split('T')[0]
+      }))
+    }));
 
     if (!validateForm()) {
       console.error("Errores de validación:", errorMessage);

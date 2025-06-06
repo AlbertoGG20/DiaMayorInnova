@@ -1,7 +1,21 @@
+import React from "react";
 import AnnotationForm from "../annotation/AnnotationForm.jsx";
 import { getCurrentDate } from "../../utils/dateUtils";
 
 const EntryForm = ({ solutionIndex, entry, entryIndex, solutions, setSolutions }) => {
+
+  const initializeEntryDate = () => {
+    if (!entry.entry_date) {
+      const updatedSolutions = [...solutions];
+      updatedSolutions[solutionIndex].entries[entryIndex].entry_date = getCurrentDate();
+      setSolutions(updatedSolutions);
+    }
+  };
+
+  React.useEffect(() => {
+    initializeEntryDate();
+  }, []);
+
   const handleEntryChange = (event) => {
     if (!event.target || !event.target.name) {
       console.error("Error: event.target o event.target.name no están definidos");
@@ -43,6 +57,7 @@ const EntryForm = ({ solutionIndex, entry, entryIndex, solutions, setSolutions }
           value={entry.entry_date || getCurrentDate()}
           onChange={handleEntryChange}
           className="statement-page__date-input"
+          required
         />
       </div>
 
