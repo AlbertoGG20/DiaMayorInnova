@@ -92,9 +92,9 @@ const SettingsModal = ({ onClose }) => {
             <div className="user-img__img" />
             <label className="img-label__user">
               Foto de Usuario
-              <select name="user-img__images" id="user-img__images">
+              {/* <select name="user-img__images" id="user-img__images">
                 <option value="img1">Imagen 1</option>
-              </select>
+              </select> */}
             </label>
           </div>
 
