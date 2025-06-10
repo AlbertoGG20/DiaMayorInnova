@@ -1,17 +1,14 @@
 import { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import statementService from "../../services/statementService";
+import Breadcrumbs from "../breadcrumbs/Breadcrumbs";
+import ButtonBack from "../button-back/ButtonBack";
+import EditSolutionModal from "../modal/EditSolutionModal";
+import SolutionList from "../solution/SolutionList";
 import StatementForm from "./StatementForm";
 import StatementList from "./StatementList";
-import SolutionList from "../solution/SolutionList";
-import EditSolutionModal from "../modal/EditSolutionModal";
-import statementService from "../../services/statementService";
-import http from "../../http-common";
 import "./StatementPage.css";
-import ButtonBack from "../button-back/ButtonBack";
-import Breadcrumbs from "../breadcrumbs/Breadcrumbs";
 
 const StatementCreateForm = () => {
-  const navigate = useNavigate();
   const statementListRef = useRef();
   const [solutions, setSolutions] = useState([]);
   const [isModalOpen, setModalOpen] = useState(false);
@@ -19,6 +16,13 @@ const StatementCreateForm = () => {
   const [selectedStatement, setSelectedStatement] = useState(null);
   const [solutionToDeleteIndex, setSolutionToDeleteIndex] = useState(null);
   const [message, setMessage] = useState("");
+  const [isError, setIsError] = useState(undefined);
+
+  const showMessage = (text, isError = undefined) => {
+    setIsError(isError);
+    setMessage(text);
+    setTimeout(() => setMessage(""), 5000);
+  };
 
   const refreshSolutions = async () => {
     if (selectedStatement?.id) {
@@ -30,51 +34,39 @@ const StatementCreateForm = () => {
         }));
         setSolutions(fetchedSolutions);
       } catch (error) {
-        console.error("Erreur lors du rafraîchissement des solutions:", error);
-        setMessage("Erreur lors du chargement des solutions.");
-        setTimeout(() => setMessage(""), 5000);
+        console.error("Error refreshing solutions:", error);
+        showMessage("Error al cargar soluciones.", true);
       }
     }
   };
 
-  const getAccountName = async (accountId) => {
-    try {
-      const response = await http.get(`/accounts/${accountId}`);
-      return response.data.name;
-    } catch (error) {
-      console.error("Error al obtener el nombre de la cuenta:", error);
-      return "";
-    }
-  };
+  const normalizeSolution = (solution) => ({
+    ...solution,
+    entries: solution.entries?.map(entry => ({
+      ...entry,
+      annotations: entry.annotations?.map(annotation => ({
+        ...annotation,
+        account_name: annotation.account_name || "",
+        account_id: annotation.account_id
+      })) || [],
+    })) || [],
+  });
 
   const handleSelectStatement = async (statement) => {
     setSelectedStatement(statement);
-    if (statement && statement.solutions) {
-      const initializedSolutions = statement.solutions.map(solution => ({
-        ...solution,
-        entries: solution.entries || [],
-      }));
-      setSolutions(initializedSolutions);
-      console.log("Soluciones establecidas:", initializedSolutions);
-    } else {
-      setSolutions([]);
-    }
+    setSolutions(statement?.solutions?.map(normalizeSolution) || []);
   };
 
-  const handleStatementCreated = (updatedStatement) => {
+  const handleStatementCreated = () => {
     // Reset states
     setSelectedStatement(null);
     setSolutions([]);
-    setMessage("Enunciado guardado correctamente.");
-    setTimeout(() => setMessage(""), 5000);
-    
+    showMessage("Enunciado guardado correctamente.");
+
     // Update list
     if (statementListRef.current) {
       statementListRef.current.refreshList();
     }
-    
-    // Go to statements list
-    navigate("/add-statements");
   };
 
   const handleEditSolution = (index) => {
@@ -88,17 +80,14 @@ const StatementCreateForm = () => {
       try {
         await statementService.deleteSolution(solutionToDelete.id);
         setSolutions((prevSolutions) => prevSolutions.filter((_, i) => i !== index));
-        setMessage("Solución eliminada con éxito.");
-        setTimeout(() => setMessage(""), 5000);
+        showMessage("Solución eliminada con éxito.");
       } catch (error) {
-        console.error("Error al eliminar solución:", error);
-        setMessage("Error al eliminar la solución. Intenta de nuevo.");
-        setTimeout(() => setMessage(""), 5000);
+        console.error("Error deleting solution:", error);
+        showMessage("Error al eliminar la solución. Intenta de nuevo.", true);
       }
     } else {
       setSolutions((prevSolutions) => prevSolutions.filter((_, i) => i !== index));
-      setMessage("Solución eliminada localmente. Debes guardar el enunciado para confirmar.");
-      setTimeout(() => setMessage(""), 5000);
+      showMessage("Solución eliminada localmente. Debes guardar el enunciado para confirmar.");
     }
     setSolutionToDeleteIndex(null);
   };
@@ -110,33 +99,20 @@ const StatementCreateForm = () => {
 
   const handleSaveSolution = async (updatedSolution) => {
     const updatedSolutions = [...solutions];
-    updatedSolutions[selectedSolutionIndex] = {
-      ...updatedSolution,
-      entries: updatedSolution.entries?.map(entry => ({
-        ...entry,
-        annotations: entry.annotations.map(annotation => ({
-          ...annotation,
-          account_name: annotation.account_name || "",
-          account_id: annotation.account_id
-        })),
-      })) || [],
-    };
+    updatedSolutions[selectedSolutionIndex] = normalizeSolution(updatedSolution);
 
     if (updatedSolution.id) {
       try {
         await statementService.updateSolution(updatedSolution.id, updatedSolution);
         setSolutions(updatedSolutions);
-        setMessage("Solución actualizada con éxito.");
-        setTimeout(() => setMessage(""), 5000);
+        showMessage("Solución actualizada con éxito.");
       } catch (error) {
-        console.error("Error al actualizar solución:", error);
-        setMessage("Error al actualizar la solución. Intenta de nuevo.");
-        setTimeout(() => setMessage(""), 5000);
+        console.error("Error updating solution:", error);
+        showMessage("Error al actualizar la solución. Intenta de nuevo.", true);
       }
     } else {
       setSolutions(updatedSolutions);
-      setMessage("Solución actualizada localmente. Debes guardar el enunciado para persistirla.");
-      setTimeout(() => setMessage(""), 5000);
+      showMessage("Solución actualizada localmente. Debes guardar el enunciado para persistirla.");
     }
     handleCloseModal();
   };
@@ -149,7 +125,7 @@ const StatementCreateForm = () => {
       </header>
 
       {message && (
-        <div className={message.includes("Error") ? "error-message" : "success-message"}>
+        <div className={isError ? "error-message" : "success-message"}>
           {message}
         </div>
       )}
@@ -171,7 +147,7 @@ const StatementCreateForm = () => {
           solutionToDeleteIndex={solutionToDeleteIndex}
           refreshSolutions={refreshSolutions}
         />
-        {isModalOpen && selectedSolutionIndex !== null && (
+        {isModalOpen && solutions[selectedSolutionIndex] && (
           <EditSolutionModal
             solution={solutions[selectedSolutionIndex]}
             solutionIndex={selectedSolutionIndex}
@@ -184,9 +160,9 @@ const StatementCreateForm = () => {
       </aside>
 
       <section className="statement-page__selection">
-        <StatementList 
+        <StatementList
           ref={statementListRef}
-          onSelectStatement={handleSelectStatement} 
+          onSelectStatement={handleSelectStatement}
           onStatementCreated={handleStatementCreated}
         />
       </section>
