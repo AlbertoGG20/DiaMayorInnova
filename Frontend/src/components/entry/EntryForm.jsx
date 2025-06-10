@@ -27,14 +27,6 @@ const EntryForm = ({ solutionIndex, entry, entryIndex, solutions, setSolutions }
     setSolutions(updatedSolutions);
   };
 
-  const removeEntry = () => {
-    const updatedSolutions = [...solutions];
-    updatedSolutions[solutionIndex].entries = updatedSolutions[solutionIndex].entries.filter(
-      (_, i) => i !== entryIndex
-    );
-    setSolutions(updatedSolutions);
-  };
-
   const addAnnotation = () => {
     const updatedSolutions = [...solutions];
     updatedSolutions[solutionIndex].entries[entryIndex].annotations.push({
