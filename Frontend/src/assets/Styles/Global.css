@@ -1,4 +1,185 @@
-@use './variables';
+:root {
+  /*     Colors    */
+
+  --Color-Neutral-Black: #323232;
+  --Color-Neutral-White: #FAFAFA;
+  --Color-White: #fff;
+  --Color-Neutral-Dark: #374957;
+
+  --Color-principal-50: #EBEDEE;
+  --Color-principal-100: #C1C7CB;
+  --Color-principal-200: #A3ABB2;
+  --Color-principal-300: #79858E;
+  --Color-principal-400: #5F6D79;
+  --Color-principal-500: #374957;
+  --Color-principal-600: #32424F;
+  --Color-principal-700: #27343E;
+  --Color-principal-800: #1E2830;
+  --Color-principal-900: #1E2830;
+
+  --Color-grey-50: #F3F3F3;
+  --Color-grey-100: #D8D8D8;
+  --Color-grey-200: #C6C6C6;
+  --Color-grey-300: #ABABAB;
+  --Color-grey-400: #9B9B9B;
+  --Color-grey-500: #828282;
+  --Color-grey-600: #767676;
+  --Color-grey-700: #5C5C5C;
+  --Color-grey-800: #484848;
+  --Color-grey-900: #373737;
+
+  --Color-green-50: #F6FDF8;
+  --Color-green-100: #E2FAEB;
+  --Color-green-200: #D4F7E1;
+  --Color-green-300: #C0F4D3;
+  --Color-green-400: #B4F1CA;
+  --Color-green-500: #A1EEBD;
+  --Color-green-600: #93D9AC;
+  --Color-green-700: #72A986;
+  --Color-green-800: #598368;
+  --Color-green-900: #44644F;
+
+  --Color-blue-50: #F0FBFF;
+  --Color-blue-100: #D2F2FF;
+  --Color-blue-200: #BCECFF;
+  --Color-blue-300: #9DE4FF;
+  --Color-blue-400: #8ADEFF;
+  --Color-blue-500: #6DD6FF;
+  --Color-blue-600: #63C3E8;
+  --Color-blue-700: #4D98B5;
+  --Color-blue-800: #3C768C;
+  --Color-blue-900: #2E5A6B;
+
+  --Color-orange-50: #FFF9F1;
+  --Color-orange-100: #FFEBD3;
+  --Color-orange-200: #FFE2BE;
+  --Color-orange-300: #FFD4A1;
+  --Color-orange-400: #FFCC8E;
+  --Color-orange-500: #FFBF72;
+  --Color-orange-600: #E8AE68;
+  --Color-orange-700: #B58851;
+  --Color-orange-800: #8C693F;
+  --Color-orange-900: #6B5030;
+
+  --Color-red-50: #FFF1EF;
+  --Color-red-100: #FFD2CE;
+  --Color-red-200: #FFBDB6;
+  --Color-red-300: #FF9F95;
+  --Color-red-400: #FF8C81;
+  --Color-red-500: #FF6F61;
+  --Color-red-600: #E86558;
+  --Color-red-700: #B54F45;
+  --Color-red-800: #8C3D35;
+  --Color-red-900: #6B2F29;
+
+  --Color-yellow-50: #FFFEF5;
+  --Color-yellow-100: #FFFDE0;
+  --Color-yellow-200: #FFFCD1;
+  --Color-yellow-300: #FFFABB;
+  --Color-yellow-400: #FFF9AE;
+  --Color-yellow-500: #FFF89A;
+  --Color-yellow-600: #E8E28C;
+  --Color-yellow-700: #B5B06D;
+  --Color-yellow-800: #8C8855;
+  --Color-yellow-900: #6B6841;
+
+  --Color-rose-50: #FFF3F7;
+  --Color-rose-100: #FFDBE6;
+  --Color-rose-200: #FFC9DA;
+  --Color-rose-300: #FFB1C9;
+  --Color-rose-400: #FFA1BE;
+  --Color-rose-500: #FF8AAE;
+  --Color-rose-600: #E87E9E;
+  --Color-rose-700: #B5627C;
+  --Color-rose-800: #8C4C60;
+  --Color-rose-900: #6B3A49;
+
+  --Color-lavender-50: #F7F7FF;
+  --Color-lavender-100: #E7E6FF;
+  --Color-lavender-200: #DBDAFF;
+  --Color-lavender-300: #CBC9FF;
+  --Color-lavender-400: #C1BFFF;
+  --Color-lavender-500: #B1AFFF;
+  --Color-lavender-600: #A19FE8;
+  --Color-lavender-700: #7E7CB5;
+  --Color-lavender-800: #61608C;
+  --Color-lavender-900: #4A4A6B;
+
+
+  /*     radius    */
+
+  --r-xxs: 4px;
+  --r-xs: 8px;
+  --r-s: 12px;
+  --r-m: 16px;
+  --r-l: 20px;
+  --r-xl: 24px;
+  --r-xxl: 28px;
+
+
+  /*     gaps margin and padding    */
+  --gap-xxxs: 4px;
+  --gap-xxs: 8px;
+  --gap-xs: 12px;
+  --gap-s: 16px;
+  --gap-m: 20px;
+  --gap-l: 24px;
+  --gap-xl: 28px;
+  --gap-xxl: 32px;
+  --gap-xxxl: 36px;
+
+  /* Font Family and Font Sizes  */
+  --font-family: Quicksand, system-ui, Avenir, Helvetica, Arial, sans-serif;
+
+  /* Desktop */
+
+  --text-desktop-display: 64px;
+  --text-desktop-h1: 56px;
+  --text-desktop-h2: 48px;
+  --text-desktop-h3: 40px;
+  --text-desktop-h4: 32px;
+  --text-desktop-subtitles-1: 28px;
+  --text-desktop-subtitles-2: 24px;
+  --text-desktop-lead: 20px;
+  --text-desktop-body-large: 18px;
+  --text-desktop-body-small: 16px;
+  --text-desktop-small: 14px;
+  --text-desktop-tiny: 12px;
+
+  /* Mobile and Tablet */
+
+  --text-mobile-display: 36px;
+  --text-mobile-h1: 30px;
+  --text-mobile-h2: 28px;
+  --text-mobile-h3: 26px;
+  --text-mobile-h4: 24px;
+  --text-mobile-subtitles-1: 22px;
+  --text-mobile-subtitles-2: 20px;
+  --text-mobile-lead: 18px;
+  --text-mobile-body-large: 16px;
+  --text-mobile-body-small: 14px;
+  --text-mobile-small: 12px;
+  --text-mobile-tiny: 11px;
+
+  /* Box shadows */
+  --box-shadow-M3: 0px 1px 2px 0px rgba(0, 0, 0, 0.30), 0px 2px 6px 2px rgba(0, 0, 0, 0.15);
+  --box-shadow-btn: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+
+  /* Sub Variables */
+  --Color-Principal-claro: var(--Color-principal-300);
+  --Color-Principal: var(--Color-principal-500);
+  --Color-Principal-oscuro: var(--Color-principal-700);
+
+  --background-color: var(--Color-Neutral-White);
+  --background-color-dark: var(--Color-principal-500);
+
+  --Color-letra-claro: var(--Color-grey-100);
+  --Color-letra-oscuro: var(--Color-Neutral-Black);
+
+  --icon-l: var(--text-desktop-body-large);
+  --icon-m: var(--text-desktop-body-small);
+  --icon-s: var(--text-desktop-small);
+}
 
 *,
 *::before,
@@ -97,6 +278,7 @@ a {
   gap: var(--gap-xxs);
   align-items: center;
   box-shadow: var(--box-shadow-btn);
+  text-transform: capitalize;
   width: auto;
   height: auto;
   transition: background-color 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
