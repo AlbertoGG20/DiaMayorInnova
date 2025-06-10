@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import AnnotationForm from "../annotation/AnnotationForm.jsx";
 import { getCurrentDate } from "../../utils/dateUtils";
 

@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import statementService from "../../services/statementService";
+import { getCurrentDate } from "../../utils/dateUtils";
 
-const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSolutions, onSaveSolution, statement, onDeleteSolution }) => {
+const StatementForm = ({ onStatementCreated, solutions, setSolutions, statement }) => {
   const [definition, setDefinition] = useState(statement?.definition || "");
   const [isPublic, setIsPublic] = useState(statement?.is_public || false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -31,7 +32,7 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
       entries: [
         {
           entry_number: 1,
-          entry_date: new Date().toISOString().split('T')[0],
+          entry_date: getCurrentDate(),
           annotations: [
             {
               number: 1,
@@ -50,21 +51,6 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
       ]
     };
     setSolutions((prevSolutions) => [...prevSolutions, newSolution]);
-  };
-
-  const handleSaveSolution = (updatedSolution, index) => {
-    const updatedSolutions = [...solutions];
-    updatedSolutions[index] = updatedSolution;
-    setSolutions(updatedSolutions);
-    if (onSaveSolution) {
-      onSaveSolution(updatedSolution);
-    }
-  };
-
-  const handleDeleteSolution = (index) => {
-    if (onDeleteSolution) {
-      onDeleteSolution(index);
-    }
   };
 
   const validateForm = () => {
@@ -129,14 +115,6 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
     setErrorMessage("");
     setSuccessMessage("");
 
-    const processedSolutions = (solutions || []).map(solution => ({
-      ...solution,
-      entries: (solution.entries || []).map(entry => ({
-        ...entry,
-        entry_date: entry.entry_date || new Date().toISOString().split('T')[0]
-      }))
-    }));
-
     if (!validateForm()) {
       console.error("Errores de validación:", errorMessage);
       return;
@@ -175,7 +153,6 @@ const StatementForm = ({ onStatementCreated, onAddSolution, solutions, setSoluti
         onStatementCreated(response);
       }
 
-      // Resetear el formulario
       setDefinition("");
       setIsPublic(false);
       setFieldErrors({});
