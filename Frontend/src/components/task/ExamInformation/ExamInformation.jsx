@@ -1,14 +1,14 @@
 import { useNavigate, useParams } from "react-router-dom";
-import "./ExamInformation.css"
-import ExamStatement from "./ExamStatement/ExamStatement"
 import { useEffect, useState } from "react";
-import "../../aux-section-two/AuxSectionTwo.css"
 import exerciseServices from "../../../services/exerciseServices";
 import marksServices from "../../../services/marksServices";
 import RealTimeTrialBalance from "../../trial-balance/RealTimeTrialBalance";
 import LedgerBook from "../../trial-balance/LedgerBook";
 import ButtonBack from "../../button-back/ButtonBack";
 import Breadcrumbs from "../../breadcrumbs/Breadcrumbs";
+import ExamStatement from "./ExamStatement/ExamStatement";
+import "../../aux-section-two/AuxSectionTwo.css";
+import "./ExamInformation.css";
 
 const ExamInformation = () => {
   const navigate = useNavigate();
@@ -16,7 +16,6 @@ const ExamInformation = () => {
   const [statements, setStatements] = useState([]);
   const [selectedStatement, setSelectedStatement] = useState(0);
   const [visitedStatements, setVisitedStatements] = useState([]);
-  const [name, setName] = useState("");
   const [studentExercise, setStudentExercise] = useState([]);
   const [isModifiedMark, setIsModifiedMark] = useState(false);
   const [totalMark, setTotalMark] = useState(0);
@@ -121,7 +120,6 @@ const ExamInformation = () => {
   useEffect(() => {
     exerciseServices.getByExerciseId(exerciseId)
       .then(({ data }) => {
-        setName(data[0].user.name)
         setStatements(data[0].marks)
         setStudentExercise(data[0])
       })
@@ -136,61 +134,10 @@ const ExamInformation = () => {
     calculateStats();
   }, [statements]);
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case "statements":
-        return (
-          <div className="exam_statement__list">
-            {(statements.length > 0) ?
-              statements.map((mark, index) => {
-                console.log("mark", mark)
-                return (
-                  <ExamStatement
-                    key={mark.id}
-                    statement_title={mark.statement}
-                    statement_id={mark.id}
-                    index={index}
-                    mark={mark.mark}
-                    comment={mark.comment}
-                    student_entries={mark.student_entries}
-                    open_statement={selectedStatement}
-                    handleMarkChange={handleMarkChange}
-                    modified={isModifiedMark}
-                    setIsModifiedMark={setIsModifiedMark}
-                    handleCommentChange={handleCommentChange}
-                  />
-                )
-              }) : <p className="exam_statements__empty">No hay respuestas</p>
-            }
-          </div>
-        );
-      case "mayor":
-        return (
-          <div className="exam_statement__list">
-            <LedgerBook
-              entries={statements.flatMap(statement =>
-                statement.student_entries?.map(entry => ({
-                  ...entry,
-                  annotations: entry.student_annotations
-                })) || []
-              )}
-            />
-          </div>
-        );
-      case "balance":
-        return (
-          <RealTimeTrialBalance
-            entries={statements.flatMap(statement =>
-              statement.student_entries?.map(entry => ({
-                ...entry,
-                annotations: entry.student_annotations
-              })) || []
-            )}
-          />
-        );
-      default:
-        return null;
-    }
+  const tabTitles = {
+    statements: "Enunciados",
+    mayor: "Mayor",
+    balance: "Balance"
   };
 
   return (
@@ -200,11 +147,7 @@ const ExamInformation = () => {
         <Breadcrumbs />
       </header>
       <main className="exam_statements__main">
-        <h2 className="exam_statement__statement">
-          {activeTab === "statements" ? "Enunciados" :
-            activeTab === "mayor" ? "Diario Mayor" :
-              "Balance"}
-        </h2>
+        <h2 className="exam_statement__statement">{tabTitles[activeTab] || tabTitles.balance}</h2>
         <div className="exam_statements__container">
           {activeTab === "statements" && (
             <div className="exam_statement__list">
@@ -278,14 +221,21 @@ const ExamInformation = () => {
             </div>
             <div className="statement-grid">
               {statements.map((statement, index) => {
-                let buttonClass = "statement-button";
-                if (selectedStatement?.id === statement.id) {
-                  buttonClass += " selected_mark";
-                }
+                const isSelected = selectedStatement?.id === statement.id;
+
+                const colorClass =
+                  statement.mark >= 1
+                    ? 'green'
+                    : statement.mark < 0.5
+                      ? 'red'
+                      : 'orange';
+
+                const buttonClass = `statement-button ${isSelected ? 'selected_mark' : ''} ${colorClass}`;
+
                 return (
                   <button
                     key={statement.id}
-                    className={statement.mark >= 1 ? `${buttonClass} green` : (statement.mark < 0.5) ? `${buttonClass} red` : `${buttonClass} orange`}
+                    className={buttonClass}
                     onClick={() => handleStatementClick(statement)}
                   >
                     {index + 1}
