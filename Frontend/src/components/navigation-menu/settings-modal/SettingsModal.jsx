@@ -3,7 +3,7 @@ import userService from "/Ruby/DiaMayorInnova/Frontend/src/services/userService"
 import "./SettingsModal.css";
 
 const SettingsModal = ({ onClose }) => {
-  const [pswdIsOpen, setPswdIsOpen] = useState(false);
+  const [pswdIsOpen, setPswdIsOpen] = useState(true);
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -11,14 +11,13 @@ const SettingsModal = ({ onClose }) => {
   const [success, setSuccess] = useState("");
   const [currentUser, setCurrentUser] = useState(null);
 
-  // Récupérer l'utilisateur connecté au montage du composant
   useEffect(() => {
     const fetchCurrentUser = async () => {
       const user = await userService.getCurrentUser();
       if (user) {
         setCurrentUser(user);
       } else {
-        setError("Erreur lors de la récupération de l'utilisateur connecté.");
+        setError("Error al obtener el usuario actual.");
       }
     };
     fetchCurrentUser();
@@ -28,54 +27,43 @@ const SettingsModal = ({ onClose }) => {
     onClose();
   };
 
-  const togglePasswordFields = () => {
-    setPswdIsOpen(!pswdIsOpen);
-    setError("");
-    setSuccess("");
-  };
-
   const savePassword = async () => {
-    // Validation de base côté client
     if (!oldPassword || !newPassword || !confirmPassword) {
-      setError("Tous les champs doivent être remplis.");
+      setError("Todos los campos deben estar completos.");
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setError("Les nouveaux mots de passe ne correspondent pas.");
+      setError("Las nuevas contraseñas no coinciden.");
       return;
     }
 
     if (!currentUser) {
-      setError("Utilisateur non identifié.");
+      setError("Usuario no identificado.");
       return;
     }
 
     try {
-      // Préparer les données pour l'API
       const formData = new FormData();
       formData.append("user[password]", newPassword);
       formData.append("user[password_confirmation]", confirmPassword);
 
-      // Envoyer la requête de mise à jour
       const response = await userService.updateUser(currentUser.id, formData);
 
       if (response.status === 200) {
-        setSuccess("Mot de passe mis à jour avec succès. Veuillez vous reconnecter.");
+        setSuccess("Contraseña actualizada correctamente. Por favor, vuelve a iniciar sesión.");
         setError("");
         setOldPassword("");
         setNewPassword("");
         setConfirmPassword("");
-        setPswdIsOpen(false);
 
-        // Forcer une déconnexion après 3 secondes pour laisser le temps de voir le message
         setTimeout(() => {
-          localStorage.removeItem("site"); // Supprime le token
-          window.location.reload(); // Recharge la page pour déconnexion
+          localStorage.removeItem("site"); 
+          window.location.reload(); 
         }, 3000);
       }
     } catch (err) {
-      setError(err.response?.data?.errors?.join(", ") || "Erreur lors de la mise à jour du mot de passe.");
+      setError(err.response?.data?.errors?.join(", ") || "Error al actualizar la contraseña.");
     }
   };
 
@@ -85,25 +73,12 @@ const SettingsModal = ({ onClose }) => {
         <button onClick={closeModal} className="btn light">X</button>
         <section className="moda-settings__wrapper">
           <h2>Configuración</h2>
-
-          <h3>Perfil de Usuario</h3>
-
-          <div className="user-img__container">
-            <div className="user-img__img" />
-            <label className="img-label__user">
-              Foto de Usuario
-              {/* <select name="user-img__images" id="user-img__images">
-                <option value="img1">Imagen 1</option>
-              </select> */}
-            </label>
-          </div>
-
           <div className="user-passwd__container">
-            <h3>Contraseña Usuario</h3>
+            <h3>Contraseña del Usuario</h3>
             {pswdIsOpen && (
               <div className="passwrd__inputs">
                 <label className="passwd__labels">
-                  Contraseña Antigua
+                  Contraseña Anterior
                   <input
                     type="password"
                     value={oldPassword}
@@ -112,7 +87,7 @@ const SettingsModal = ({ onClose }) => {
                   />
                 </label>
                 <label className="passwd__labels">
-                  Contraseña Nueva
+                  Nueva Contraseña
                   <input
                     type="password"
                     value={newPassword}
@@ -121,7 +96,7 @@ const SettingsModal = ({ onClose }) => {
                   />
                 </label>
                 <label className="passwd__labels">
-                  Repetir Contraseña
+                  Repetir Nueva Contraseña
                   <input
                     type="password"
                     value={confirmPassword}
@@ -135,9 +110,9 @@ const SettingsModal = ({ onClose }) => {
             )}
           </div>
 
-          <button onClick={pswdIsOpen ? savePassword : togglePasswordFields} className="btn">
+          <button onClick={savePassword} className="btn">
             <i className="fi fi-rr-exclamation"></i>
-            {pswdIsOpen ? "Guardar Contraseña" : "Modificar Contraseña"}
+            Guardar Contraseña
           </button>
         </section>
       </section>

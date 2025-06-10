@@ -148,8 +148,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_20_084905) do
     t.datetime "updated_at", null: false
     t.string "code"
     t.index ["code"], name: "index_school_centers_on_code", unique: true
-    t.index ["email"], name: "index_school_centers_on_email", unique: true
-    t.index ["school_name"], name: "index_school_centers_on_school_name", unique: true
   end
 
   create_table "solutions", force: :cascade do |t|
@@ -197,7 +195,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_20_084905) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "mark_id", null: false
-    t.text "observations"
     t.index ["mark_id"], name: "index_student_entries_on_mark_id"
   end
 
