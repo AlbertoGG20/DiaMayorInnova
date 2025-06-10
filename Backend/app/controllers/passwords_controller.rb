@@ -22,11 +22,11 @@ class PasswordsController < Devise::PasswordsController
     set_minimum_password_length
     resource.reset_password_token = params[:reset_password_token]
 
-    # Use the Devise method to validate the token
+    # Usar el método de Devise para validar el token
     user = User.with_reset_password_token(params[:reset_password_token])
 
     if user.present?
-      # Redirect to the frontend with the token as a parameter
+      # Redirigir al frontend con el token como parámetro
       redirect_to "#{ENV['FRONTEND_URL']}/reset-password?reset_password_token=#{params[:reset_password_token]}"
     else
       redirect_to "#{ENV['FRONTEND_URL']}/reset-password?error=invalid_token"

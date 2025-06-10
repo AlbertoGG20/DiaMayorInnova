@@ -39,7 +39,7 @@ Rails.application.configure do
   # caching is enabled.
   config.action_mailer.perform_caching = false
 
-  # URL Configuration for Devise
+  # Configuración de URL para Devise
   config.action_mailer.default_url_options = {
     host: ENV['MAILER_HOST'] || 'localhost',
     port: ENV['MAILER_PORT'] || 3000,
@@ -57,7 +57,7 @@ Rails.application.configure do
     enable_starttls_auto: true
   }
 
-  # Default sender settings
+  # Configuración del remitente por defecto
   config.action_mailer.default_options = {
     from: ENV['SMTP_USERNAME'] || 'noreply@diamayorinnova.com'
   }
