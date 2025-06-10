@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import solutionService from '../../services/solutionService';
 import { formatCurrency } from '../../utils/formatCurrency';
 import Spinner from '../spinners/Spinner';
@@ -19,7 +19,7 @@ const HelpSection = ({ statementId }) => {
   const toggleEntries = () => setIsEntriesExpanded(prev => !prev);
   const toggleAccounts = () => setIsAccountsExpanded(prev => !prev);
 
-  const fetchExampleSolution = async () => {
+  const fetchExampleSolution = useCallback(async () => {
     if (!statementId) {
       setIsLoading(false);
       setErrorMessage('No se proporcionó un ID de enunciado');
@@ -68,11 +68,11 @@ const HelpSection = ({ statementId }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [statementId]);
 
   useEffect(() => {
     fetchExampleSolution()
-  }, [statementId]);
+  }, [fetchExampleSolution]);
 
   // Extract unique accounts from solution entries
   const getUniqueAccounts = () => {
