@@ -80,7 +80,7 @@ export const AuxSection = ({
           className={`btn__tabs ${activeTab === 'mayor' ? 'btn__tabs--active' : ''}`}
           onClick={() => setActiveTab('mayor')}
         >
-          Mayor
+          Diario Mayor
         </button>
         <button
           className={`btn__tabs ${activeTab === 'balance' ? 'btn__tabs--active' : ''}`}
