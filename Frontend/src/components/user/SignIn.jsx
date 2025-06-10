@@ -1,17 +1,16 @@
-import { useState } from 'react';
-import { useAuth } from '../../context/AuthContext';
-import { useNavigate, Link } from 'react-router-dom';
-import { API_BASE_URL } from '../../config';
-import { login as texts } from '../../texts/user';
-import './Sign.css';
+import { useState } from "react";
+import { useAuth } from "../../context/AuthContext";
+import { useNavigate, Link } from "react-router-dom";
+import { API_BASE_URL } from "../../config";
+import "./Sign.css";
 
 const SignIn = () => {
   const [input, setInput] = useState({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
-  const [errorMessage, setErrorMessage] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const auth = useAuth();
   const navigate = useNavigate();
 
@@ -19,7 +18,7 @@ const SignIn = () => {
     e.preventDefault();
 
     if (!input.email || !input.password) {
-      setErrorMessage('Por favor, complete todos los campos.');
+      setErrorMessage("Por favor, complete todos los campos.");
       return;
     }
     auth
@@ -34,17 +33,17 @@ const SignIn = () => {
             const avatarUrl = `${API_BASE_URL}/${user.featured_image}`;
             auth.setUserAvatarUrl(avatarUrl);
           }
-          setErrorMessage('');
-          setSuccessMessage('Inicio de sesión exitoso.');
-          navigate('/home');
+          setErrorMessage("");
+          setSuccessMessage("Inicio de sesión exitoso.");
+          navigate("/home");
         } else {
-          setErrorMessage('No se pudo obtener información del usuario.');
+          setErrorMessage("No se pudo obtener información del usuario.");
         }
       })
       .catch((error) => {
-        console.error('Error durante el inicio de sesión:', error);
-        setErrorMessage('Hubo un error durante el inicio de sesión. Verifique sus credenciales.');
-        setSuccessMessage('');
+        console.error("Error durante el inicio de sesión:", error);
+        setErrorMessage("Hubo un error durante el inicio de sesión. Verifique sus credenciales.");
+        setSuccessMessage("");
       });
   };
 
@@ -61,16 +60,16 @@ const SignIn = () => {
       <div className="log__section">
         <img className="log__img" src="/images/log.jpg" alt="Imagen de inicio de sesión" />
         <div className="log__container">
-          <h1 className="log__tittle">{texts.title}</h1>
+          <h1 className="log__tittle">Iniciar Sesión</h1>
           <form className="log__form" onSubmit={handleSubmitEvent}>
             <div className="inputs__wrapper">
               <div className="form_control">
-                <label className="input__wrapper" htmlFor="user-email">{texts.email}:
+                <label className="input__wrapper" htmlFor="user-email">Email:
                   <input
                     type="email"
                     id="user-email"
                     name="email"
-                    placeholder={texts.emailPlaceholder}
+                    placeholder="example@yahoo.com"
                     aria-describedby="user-email"
                     aria-invalid="false"
                     onChange={handleInput}
@@ -78,7 +77,7 @@ const SignIn = () => {
                 </label>
               </div>
               <div className="form_control">
-                <label className="input__wrapper" htmlFor="password">{texts.password}:
+                <label className="input__wrapper" htmlFor="password">Password:
                   <input
                     type="password"
                     id="password"
@@ -92,8 +91,10 @@ const SignIn = () => {
             </div>
             {errorMessage && <div className="error__message">{errorMessage}</div>}
             {successMessage && <div style={{ color: "green", marginBottom: "10px" }}>{successMessage}</div>}
-            <button className="btn light">{texts.submit}</button>
-            <Link className="forgot-password-link" to="/forgot-password">{texts.forgotPassword}</Link>
+            <button className="btn light">Iniciar Sesión</button>
+            <div className="forgot-password-link">
+              <Link to="/forgot-password">¿Olvidaste tu contraseña?</Link>
+            </div>
           </form>
         </div>
       </div>
