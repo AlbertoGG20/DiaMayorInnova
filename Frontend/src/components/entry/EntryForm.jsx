@@ -1,4 +1,4 @@
-import React from 'react';
+import { useEffect } from "react";
 import AnnotationForm from "../annotation/AnnotationForm.jsx";
 import { getCurrentDate } from "../../utils/dateUtils";
 
@@ -12,9 +12,9 @@ const EntryForm = ({ solutionIndex, entry, entryIndex, solutions, setSolutions }
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     initializeEntryDate();
-  }, []);
+  }, [solutionIndex, entry, entryIndex, solutions, setSolutions]);
 
   const handleEntryChange = (event) => {
     if (!event.target || !event.target.name) {
