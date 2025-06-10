@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import SolutionForm from "./SolutionForm.jsx";
+import { useState } from "react";
 import solutionService from "../../services/solutionService";
 import "./SolutionList.css";
 
 const SolutionList = ({ solutions, onEditSolution, onDeleteSolution, solutionToDeleteIndex, refreshSolutions }) => {
-  const [isToggling, setIsToggling] = useState(null); // État pour suivre la solution en cours de bascule
+  // Status to track the solution being changed
+  const [isToggling, setIsToggling] = useState(null);
 
   const handleToggleExample = async (solutionId, isCurrentlyExample) => {
     if (isToggling === solutionId) return;
@@ -13,22 +13,23 @@ const SolutionList = ({ solutions, onEditSolution, onDeleteSolution, solutionToD
     try {
       const solution = solutions.find(s => s.id === solutionId);
       if (!solution) throw new Error("No se encontró la solución");
+      const accountId = solution.entries?.[0]?.annotations?.[0]?.account_id;
+      if (!accountId) throw new Error("No se encontró el asiento contable asociado a la solución");
 
       const statementId = solution.statement_id;
 
       if (isCurrentlyExample) {
         await solutionService.unmarkAsExample(statementId, solutionId);
       } else {
-        // Envía solo los datos necesarios para marcar como ejemplo
+        // Send only the necessary data to mark as example
         await solutionService.markAsExample(statementId, solutionId, {
-          account_id: solution.entries[0]?.annotations[0]?.account_id || 42
-          // creditMoves y debitMoves probablemente no son necesarios
+          account_id: accountId,
         });
       }
 
       await refreshSolutions();
     } catch (error) {
-      console.error("Detalles del error:", {
+      console.error("Error details:", {
         status: error.response?.status,
         data: error.response?.data,
         headers: error.response?.headers
@@ -48,7 +49,7 @@ const SolutionList = ({ solutions, onEditSolution, onDeleteSolution, solutionToD
       <h3 className="statement-page__solutions-header">Soluciones del Enunciado</h3>
       <ul className="statement-page__list">
         {solutions.map((solution, index) => (
-          <li key={index} className={`statement-page__list-item ${solutionToDeleteIndex === index ? 'statement-page__list-item--deleting' : ''}`}>
+          <li key={solution.id} className={`statement-page__list-item ${solutionToDeleteIndex === index ? 'statement-page__list-item--deleting' : ''}`}>
             <div className="statement-page__statement-container">
               <h4 className="statement-page__definition-solution">
                 {`Solución ${index + 1}`}
@@ -67,7 +68,7 @@ const SolutionList = ({ solutions, onEditSolution, onDeleteSolution, solutionToD
               <button
                 onClick={() => handleToggleExample(solution.id, solution.is_example)}
                 className={`statement-page__button-text ${solution.is_example ? 'button-example-active' : ''}`}
-                disabled={isToggling === solution.id} // Désactive le bouton pendant le traitement
+                disabled={isToggling === solution.id} // Disables the button during processing
               >
                 {solution.is_example ? (
                   <>
