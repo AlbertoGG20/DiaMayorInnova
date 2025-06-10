@@ -214,12 +214,9 @@ const StatementCreateForm = () => {
       <section className="statement-page__form">
         <StatementForm
           onStatementCreated={handleStatementCreated}
-          onAddSolution={handleAddSolution}
           solutions={solutions}
           setSolutions={setSolutions}
-          onSaveSolution={handleSaveSolution}
           statement={selectedStatement}
-          onDeleteSolution={handleDeleteSolution}
         />
       </section>
 
