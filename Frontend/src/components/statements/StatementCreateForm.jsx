@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import StatementForm from "./StatementForm";
 import StatementList from "./StatementList";
@@ -9,20 +9,17 @@ import http from "../../http-common";
 import "./StatementPage.css";
 import ButtonBack from "../button-back/ButtonBack";
 import Breadcrumbs from "../breadcrumbs/Breadcrumbs";
-import Modal from "../modal/Modal";
 
 const StatementCreateForm = () => {
   const navigate = useNavigate();
   const statementListRef = useRef();
   const [solutions, setSolutions] = useState([]);
-  const [prevSolutions, setPrevSolutions] = useState([]);
   const [isModalOpen, setModalOpen] = useState(false);
   const [selectedSolutionIndex, setSelectedSolutionIndex] = useState(null);
   const [selectedStatement, setSelectedStatement] = useState(null);
   const [solutionToDeleteIndex, setSolutionToDeleteIndex] = useState(null);
   const [message, setMessage] = useState("");
 
-  // Nouvelle fonction pour rafraîchir les solutions
   const refreshSolutions = async () => {
     if (selectedStatement?.id) {
       try {
@@ -59,70 +56,25 @@ const StatementCreateForm = () => {
       }));
       setSolutions(initializedSolutions);
       console.log("Soluciones establecidas:", initializedSolutions);
-      const solutionsWithAccounts = [...statement.solutions];
-      for (let solution of solutionsWithAccounts) {
-        for (let entry of solution.entries) {
-          for (let annotation of entry.annotations) {
-            if (annotation.account_id) {
-              annotation.account_name = await getAccountName(annotation.account_id);
-            }
-          }
-        }
-      }
-      setPrevSolutions(solutionsWithAccounts);
     } else {
       setSolutions([]);
     }
   };
 
   const handleStatementCreated = (updatedStatement) => {
-    // Resetear todos los estados
+    // Reset states
     setSelectedStatement(null);
     setSolutions([]);
-    setPrevSolutions([]);
     setMessage("Enunciado guardado correctamente.");
     setTimeout(() => setMessage(""), 5000);
     
-    // Forzar la actualización de la lista de enunciados
+    // Update list
     if (statementListRef.current) {
       statementListRef.current.refreshList();
     }
     
-    // Navegar a la página de enunciados
+    // Go to statements list
     navigate("/add-statements");
-  };
-
-  const handleAddSolution = async () => {
-    const newSolution = {
-      description: "",
-      entries: [{
-        entry_number: 1,
-        entry_date: "",
-        annotations: [{
-          number: 1,
-          credit: "",
-          debit: "",
-          account_id: "",
-        }],
-      }],
-    };
-
-    if (selectedStatement?.id) {
-      try {
-        const response = await statementService.addSolution(selectedStatement.id, newSolution);
-        setSolutions((prevSolutions) => [...prevSolutions, response.data]);
-        setMessage("Solución añadida con éxito.");
-        setTimeout(() => setMessage(""), 5000);
-      } catch (error) {
-        console.error("Error al añadir solución:", error);
-        setMessage("Error al añadir la solución. Intenta de nuevo.");
-        setTimeout(() => setMessage(""), 5000);
-      }
-    } else {
-      setSolutions((prevSolutions) => [...prevSolutions, newSolution]);
-      setMessage("Solución añadida localmente. Debes guardar el enunciado para persistirla.");
-      setTimeout(() => setMessage(""), 5000);
-    }
   };
 
   const handleEditSolution = (index) => {
@@ -145,19 +97,10 @@ const StatementCreateForm = () => {
       }
     } else {
       setSolutions((prevSolutions) => prevSolutions.filter((_, i) => i !== index));
-      setPrevSolutions((prevSolutions) =>
-        prevSolutions.map((solution, i) =>
-          i === index ? { ...solution, _destroy: true } : solution
-        )
-      );
       setMessage("Solución eliminada localmente. Debes guardar el enunciado para confirmar.");
       setTimeout(() => setMessage(""), 5000);
     }
     setSolutionToDeleteIndex(null);
-  };
-
-  const handleEditStatement = (statement) => {
-    setSelectedStatement(statement);
   };
 
   const handleCloseModal = () => {
