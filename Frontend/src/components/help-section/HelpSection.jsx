@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
-import Spinner from '../spinners/Spinner';
+import { useState, useEffect, useMemo } from 'react';
 import solutionService from '../../services/solutionService';
-import "./HelpSection.css"
+import { formatCurrency } from '../../utils/formatCurrency';
+import Spinner from '../spinners/Spinner';
+import "./HelpSection.css";
 
 const HelpSection = ({ statementId }) => {
   const [solution, setSolution] = useState(null);
@@ -9,12 +10,15 @@ const HelpSection = ({ statementId }) => {
   const [isError, setIsError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Estados para secciones expandibles
-  const [isEntriesExpanded, setIsEntriesExpanded] = useState(false);
+  // Expandable sections
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  const [isEntriesExpanded, setIsEntriesExpanded] = useState(false);
   const [isAccountsExpanded, setIsAccountsExpanded] = useState(false);
 
-  useEffect(() => {
+  const toggleDescription = () => setIsDescriptionExpanded(prev => !prev);
+  const toggleEntries = () => setIsEntriesExpanded(prev => !prev);
+  const toggleAccounts = () => setIsAccountsExpanded(prev => !prev);
+
   const fetchExampleSolution = async () => {
     if (!statementId) {
       setIsLoading(false);
@@ -30,14 +34,13 @@ const HelpSection = ({ statementId }) => {
     try {
       const response = await solutionService.getExampleSolution(statementId);
 
-      // Verificación modificada - la respuesta ES la solución directamente
+      // Improved check - response IS the solution directly
       if (!response || !response.entries || !Array.isArray(response.entries)) {
         setIsLoading(false);
         setSolution(null);
         return;
       }
 
-      // Normalización de datos
       const normalizedSolution = {
         ...response,
         entries: response.entries.map(entry => ({
@@ -57,22 +60,21 @@ const HelpSection = ({ statementId }) => {
 
       setSolution(normalizedSolution);
     } catch (error) {
-      setIsError(true);
-      setErrorMessage(error.message || 'Error al obtener la solución');
+      const status = error?.response?.status;
+      const message = error?.response?.data?.error || 'Error al obtener la solución';
+
+      setIsError(status !== 404);
+      setErrorMessage(message);
     } finally {
       setIsLoading(false);
     }
   };
 
-  fetchExampleSolution();
-}, [statementId]);
+  useEffect(() => {
+    fetchExampleSolution()
+  }, [statementId]);
 
-  // Funciones para expandir/secciones
-  const toggleAllEntries = () => setIsEntriesExpanded(!isEntriesExpanded);
-  const toggleDescription = () => setIsDescriptionExpanded(!isDescriptionExpanded);
-  const toggleAccounts = () => setIsAccountsExpanded(!isAccountsExpanded);
-
-  // Extraer cuentas únicas
+  // Extract unique accounts from solution entries
   const getUniqueAccounts = () => {
     if (!solution?.entries) return [];
 
@@ -95,7 +97,8 @@ const HelpSection = ({ statementId }) => {
     return Array.from(accounts.values());
   };
 
-  // Renderizado condicional
+  const uniqueAccounts = useMemo(() => getUniqueAccounts(), [solution]);
+
   if (isLoading) {
     return (
       <section className="section-one_loader">
@@ -105,12 +108,13 @@ const HelpSection = ({ statementId }) => {
     );
   }
 
+  const handleRetry = () => fetchExampleSolution();
   if (isError) {
     return (
       <section className='help_section__container'>
         <p className='text-error-feedback'>{errorMessage}</p>
         <button
-          onClick={() => window.location.reload()}
+          onClick={handleRetry}
           className="retry-button"
         >
           Reintentar
@@ -128,14 +132,11 @@ const HelpSection = ({ statementId }) => {
     );
   }
 
-  const uniqueAccounts = getUniqueAccounts();
-
   return (
     <section className='help_section__container'>
       <h2 className='help_section_title'>Ejemplo de solución</h2>
 
       <div className="help_section__solution_info scroll-style">
-        {/* Sección de Descripción */}
         <div className="help_section__solution--description">
           <div className="help_section__header" onClick={toggleDescription}>
             <h4 className='help_section__lead'>Descripción</h4>
@@ -150,9 +151,8 @@ const HelpSection = ({ statementId }) => {
           )}
         </div>
 
-        {/* Sección de Asientos */}
         <div className="help_section__solution--entries">
-          <div className="help_section__header" onClick={toggleAllEntries}>
+          <div className="help_section__header" onClick={toggleEntries}>
             <h4 className='help_section__lead'>Asientos</h4>
             <button className="help_section__expand_button">
               <i className={`fi fi-rr-angle-${isEntriesExpanded ? 'up' : 'down'}`}></i>
@@ -172,7 +172,6 @@ const HelpSection = ({ statementId }) => {
           )}
         </div>
 
-        {/* Sección de Cuentas */}
         <div className="help_section__info-accounts">
           <div className="help_section__header" onClick={toggleAccounts}>
             <h4 className='help_section__lead'>Información de Cuentas</h4>
@@ -196,7 +195,17 @@ const HelpSection = ({ statementId }) => {
   );
 };
 
-// Componente para mostrar detalle de asiento
+const AccountDetail = ({ account }) => (
+  <div className="account_info">
+    <span className="account_number">Cuenta: {account.account_number}</span>
+    <div className="help_section__info-accounts--list-charges">
+      <span className="description">Descripción: {account.description || 'N/A'}</span>
+      <span className="charge">Motivos de cargo: {account.charge || 'N/A'}</span>
+      <span className="credit">Motivos de abono: {account.credit || 'N/A'}</span>
+    </div>
+  </div>
+);
+
 const EntryDetail = ({ entry }) => (
   <div className="help_section__entry_info">
     <div className="help_section__header">
@@ -212,7 +221,6 @@ const EntryDetail = ({ entry }) => (
   </div>
 );
 
-// Componente para encabezado de asiento
 const EntryHeader = () => (
   <section className="help_section__solution--entry-body-title">
     <header className="help_section__header_container">
@@ -227,20 +235,16 @@ const EntryHeader = () => (
   </section>
 );
 
-// Componente para anotaciones de asiento
 const EntryAnnotations = ({ annotations }) => (
   <div className="help_section__entry_item_container scroll-style">
     {annotations?.map((annotation, annIndex) => {
-      const accountNumber = annotation.account?.account_number || annotation.account_id;
-      const accountName = annotation.account?.name || annotation.account_name;
-
       return (
         <div key={annIndex} className="help_section__entry_form_wrapper">
           <p className='help_section__apt_number'>{annIndex + 1}</p>
           <div className="help_section__entry_form">
             <div className="help_section__entry_form_inputs__wrapper">
-              <AccountNumber number={accountNumber} />
-              <AccountName name={accountName} />
+              <AccountNumber number={annotation.account.account_number} />
+              <AccountName name={annotation.account.name} />
               <DebitValue value={annotation.debit} />
               <CreditValue value={annotation.credit} />
             </div>
@@ -251,7 +255,6 @@ const EntryAnnotations = ({ annotations }) => (
   </div>
 );
 
-// Componentes pequeños reutilizables
 const AccountNumber = ({ number }) => (
   <div className="help_section__form_group help_section__account_number_group">
     <span className="help_section__account_number">{number || '-'}</span>
@@ -266,29 +269,21 @@ const AccountName = ({ name }) => (
 
 const DebitValue = ({ value }) => (
   <div className="help_section__form_group help_section__debit_group">
-    <span className="help_section__debit_value">
-      {value && parseFloat(value) !== 0 ? parseFloat(value).toFixed(2) : ''}
-    </span>
+    {value && parseFloat(value) !== 0 ? (
+      <span className="help_section__debit_value">
+        {formatCurrency(value)}
+      </span>
+    ) : null}
   </div>
 );
 
 const CreditValue = ({ value }) => (
   <div className="help_section__form_group help_section__credit_group">
-    <span className="help_section__credit_value">
-      {value && parseFloat(value) !== 0 ? parseFloat(value).toFixed(2) : ''}
-    </span>
-  </div>
-);
-
-// Componente para detalle de cuenta
-const AccountDetail = ({ account }) => (
-  <div className="account_info">
-    <span className="account_number">Cuenta: {account.account_number}</span>
-    <div className="help_section__info-accounts--list-charges">
-      <span className="description">Descripción: {account.description || 'N/A'}</span>
-      <span className="charge">Motivos de cargo: {account.charge || 'N/A'}</span>
-      <span className="credit">Motivos de abono: {account.credit || 'N/A'}</span>
-    </div>
+    {value && parseFloat(value) !== 0 ? (
+      <span className="help_section__credit_value">
+        {formatCurrency(value)}
+      </span>
+    ) : null}
   </div>
 );
 
