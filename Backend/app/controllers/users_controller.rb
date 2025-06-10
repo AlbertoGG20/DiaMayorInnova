@@ -1,8 +1,9 @@
 class UsersController < ApplicationController
   skip_before_action :authenticate_user!, only: [:create]
-  before_action :authenticate_admin, except: [:current, :index, :show, :update] 
+  before_action :authenticate_admin, except: [:current, :index, :show, :update]
   before_action :set_user, only: [:show, :update, :destroy]
   before_action :authorize_update, only: [:update]
+
   def index
     unless current_user&.admin? || current_user&.teacher? || current_user&.school_admin?
       return json_response "Unauthorized", false, {}, :unauthorized
@@ -50,7 +51,7 @@ class UsersController < ApplicationController
     if current_user.school_admin? && @user.school_center_id != current_user.school_center_id
       return json_response "Unauthorized", false, {}, :unauthorized
     end
-    
+
     user_data = @user.as_json
     if @user.featured_image.attached?
       user_data[:featured_image] = { url: rails_blob_url(@user.featured_image, only_path: true) }
@@ -86,7 +87,7 @@ class UsersController < ApplicationController
     if current_user.school_admin? && @user.school_center_id != current_user.school_center_id
       return json_response "Unauthorized", false, {}, :unauthorized
     end
-    
+
     if @user.update(user_params)
       user_data = @user.as_json
       if @user.featured_image.attached?
@@ -94,7 +95,8 @@ class UsersController < ApplicationController
       else
         user_data[:featured_image] = nil
       end
-  
+
+      # Regenerate token after password change to force relogin
       if user_params[:password].present?
         @user.generate_new_authentication_token
       end
@@ -160,4 +162,5 @@ class UsersController < ApplicationController
       json_response "Unauthorized", false, {}, :unauthorized
     end
   end
+
 end

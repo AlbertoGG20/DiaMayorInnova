@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import userService from "/Ruby/DiaMayorInnova/Frontend/src/services/userService";
+import userService from '../../../services/userService.js';
 import "./SettingsModal.css";
 
 const SettingsModal = ({ onClose }) => {
