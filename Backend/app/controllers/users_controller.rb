@@ -1,9 +1,8 @@
 class UsersController < ApplicationController
   skip_before_action :authenticate_user!, only: [:create]
-  before_action :authenticate_admin, except: [:current, :index, :show, :update] # Ajout de :update à l'exception
+  before_action :authenticate_admin, except: [:current, :index, :show, :update] 
   before_action :set_user, only: [:show, :update, :destroy]
-  before_action :authorize_update, only: [:update] # Nouvelle vérification pour update
-  
+  before_action :authorize_update, only: [:update]
   def index
     unless current_user&.admin? || current_user&.teacher? || current_user&.school_admin?
       return json_response "Unauthorized", false, {}, :unauthorized
@@ -95,7 +94,7 @@ class UsersController < ApplicationController
       else
         user_data[:featured_image] = nil
       end
-      # Régénérer le token après un changement de mot de passe pour forcer une reconnexion
+  
       if user_params[:password].present?
         @user.generate_new_authentication_token
       end
