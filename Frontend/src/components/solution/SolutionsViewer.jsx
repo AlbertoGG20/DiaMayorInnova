@@ -1,4 +1,5 @@
 import React from "react";
+import { formatDate } from '../../utils/dateTimeFormat';
 
 const SolutionsViewer = ({ solutions }) => {
   if (!solutions || solutions.length === 0) {
@@ -35,7 +36,7 @@ const SolutionsViewer = ({ solutions }) => {
                         <strong>Asiento:</strong> {entry.entry_number}
                       </span>
                       <span>
-                        <strong>Fecha:</strong> {entry.entry_date}
+                        <strong>Fecha:</strong> {formatDate(entry.entry_date)}
                       </span>
                   </div>
                   <ul className="modal-solutionViewer__annotation-items">

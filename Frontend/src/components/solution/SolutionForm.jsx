@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import EntryForm from "../entry/EntryForm.jsx";
+import { formatDate } from '../../utils/dateTimeFormat';
 
 const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
 
@@ -98,7 +99,7 @@ const SolutionForm = ({ solution, solutionIndex, solutions, setSolutions }) => {
                   }
                   ></i>
                 </span>
-                <span className="statement-page__entry-date">Fecha: {entry.entry_date || "Sin fecha"}</span>
+                <span className="statement-page__entry-date">Fecha: {formatDate(entry.entry_date) || "Sin fecha"}</span>
               </div>
               <button
                 type="button"

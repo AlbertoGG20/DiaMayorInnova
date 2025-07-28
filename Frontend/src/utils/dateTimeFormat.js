@@ -1,4 +1,4 @@
-const formatDateForInput = (date) => {
+export const formatDateForInput = (date) => {
   const dateObj = new Date(date);
   // Ajustamos la fecha para compensar el offset de la zona horaria
   const offset = dateObj.getTimezoneOffset();
@@ -6,4 +6,8 @@ const formatDateForInput = (date) => {
   return dateObj.toISOString().slice(0, 16); // Devuelve el formato "yyyy-MM-ddThh:mm"
 };
 
-export default formatDateForInput;
+export const formatDate = (date) => {
+  if (!date) return '--/--/----';
+
+  return new Date(date).toLocaleDateString();
+}

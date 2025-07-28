@@ -3,6 +3,7 @@ import "./StudentMark.css";
 import userExerciseDataService from '../../services/userExerciseDataService';
 import Modal from '../modal/Modal'
 import { Tooltip } from 'react-tooltip';
+import { formatDate } from '../../utils/dateTimeFormat';
 
 const StudentMark = () => {
 
@@ -81,7 +82,7 @@ const StudentMark = () => {
                             <div className="exercise_entries__container" key={index + entry.entry_number}>
                               <div className="exercise_entry__header">
                                 <p>Asiento {entry.entry_number}</p>
-                                <p>Fecha {entry.entry_date}</p>
+                                <p>Fecha {formatDate(entry.entry_date)}</p>
                               </div>
                               <div className="exercise_annotations">
                                 <table>

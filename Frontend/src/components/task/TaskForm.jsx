@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import dateTimeFormat from "../../utils/dateTimeFormat";
+import { formatDateForInput } from "../../utils/dateTimeFormat";
 import "./TaskPage.css";
 import AssignTaskUser from "../assignTaskUser/AssignTaskUser";
 
@@ -46,7 +46,7 @@ const TaskForm = ({
               id="opening_date"
               className="task-page__input"
               type="datetime-local"
-              value={openingDate ? dateTimeFormat(openingDate) : ""}
+              value={openingDate ? formatDateForInput(openingDate) : ""}
               onChange={(e) => setOpeningDate(e.target.value)}
             />
 
@@ -57,7 +57,7 @@ const TaskForm = ({
               id="closing_date"
               className="task-page__input"
               type="datetime-local"
-              value={closingDate ? dateTimeFormat(closingDate) : ""}
+              value={closingDate ? formatDateForInput(closingDate) : ""}
               onChange={(e) => setClosingDate(e.target.value)}
             />
           </div>
